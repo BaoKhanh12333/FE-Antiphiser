@@ -3,7 +3,9 @@ import {
   CheckCircle2, XCircle, AlertTriangle, RefreshCw,
   Mail, Star, Paperclip, Inbox, Archive, Trash2, Bot,
   Shield, ChevronRight, ArrowRight, Sparkles, ExternalLink,
+  Loader2,
 } from "lucide-react";
+import { scenarioService } from "../services/scenarioService";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -138,6 +140,119 @@ const phishingEmails = [
   },
 ];
 
+const parseHtmlToBodyParts = (html: string, isPhishing: boolean) => {
+  if (!html) return [];
+  if (!html.includes("<a") && !html.includes("<span")) {
+    return [{ type: "text" as const, content: html }];
+  }
+
+  const parts: any[] = [];
+  const regex = /(<a\s+[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>|<span\s+class="urgency"[^>]*>(.*?)<\/span>)/gi;
+  
+  let lastIndex = 0;
+  let match;
+  
+  while ((match = regex.exec(html)) !== null) {
+    const textBefore = html.substring(lastIndex, match.index);
+    if (textBefore) {
+      parts.push({ type: "text", content: textBefore.replace(/<[^>]*>/g, "") });
+    }
+    
+    if (match[1].startsWith("<a") || match[1].startsWith("<A")) {
+      const href = match[2];
+      const linkText = match[3].replace(/<[^>]*>/g, "");
+      parts.push({
+        type: "link",
+        content: linkText,
+        fakeUrl: href
+      });
+    } else {
+      const spanText = match[4].replace(/<[^>]*>/g, "");
+      parts.push({
+        type: "highlight",
+        content: spanText,
+        style: "urgency"
+      });
+    }
+    
+    lastIndex = regex.lastIndex;
+  }
+  
+  const textAfter = html.substring(lastIndex);
+  if (textAfter) {
+    parts.push({ type: "text", content: textAfter.replace(/<[^>]*>/g, "") });
+  }
+  
+  return parts;
+};
+
+const mapDbScenario = (s: any) => {
+  let bodyParts = [];
+  if (s.emailBodyHtml) {
+    bodyParts = parseHtmlToBodyParts(s.emailBodyHtml, s.isPhishing);
+  } else {
+    bodyParts = [{ type: "text" as const, content: s.description || "Nội dung email..." }];
+  }
+
+  let clues: any[] = [];
+  try {
+    if (s.phishingIndicators) {
+      const indicators = typeof s.phishingIndicators === "string" ? JSON.parse(s.phishingIndicators) : s.phishingIndicators;
+      if (Array.isArray(indicators)) {
+        clues = indicators.map((ind: any) => ({
+          flag: ind.flag || "🚩",
+          label: ind.label || "Indicator",
+          text: ind.text || ind.description || ""
+        }));
+      }
+    }
+  } catch (e) {}
+
+  if (clues.length === 0) {
+    if (s.isPhishing) {
+      clues = [
+        { flag: "🚩", label: "Fake Domain", text: s.senderEmail || "Tên miền giả mạo" },
+        { flag: "🚩", label: "Phishing Attempt", text: s.explanationHint || "Dấu hiệu lừa đảo" }
+      ];
+    } else {
+      clues = [
+        { flag: "✅", label: "Legit Sender", text: s.senderEmail || "Địa chỉ tin cậy" },
+        { flag: "✅", label: "Safe Email", text: s.explanationHint || "Nội dung hợp lệ" }
+      ];
+    }
+  }
+
+  return {
+    id: s.scenarioId,
+    from: s.senderEmail,
+    fromName: s.senderName || "Hệ thống",
+    fromAvatar: (s.senderName || "HT").split(" ").map((w: string) => w[0]).slice(-2).join("").toUpperCase(),
+    avatarColor: s.isPhishing ? "#EF4444" : "#10B981",
+    subject: s.subject || "Thông báo từ hệ thống",
+    time: "Hôm nay",
+    bodyParts: bodyParts,
+    isPhishing: s.isPhishing,
+    hasAttachment: !!s.attachmentUrl,
+    starred: false,
+    aiVerdict: {
+      correct: {
+        headline: s.isPhishing ? "Chính xác! Bạn đã phát hiện email phishing." : "Chính xác! Đây là email hợp lệ.",
+        summary: s.description || "Hãy xem phân tích chi tiết bên dưới.",
+        clues: clues,
+        points: s.isPhishing ? "+15" : "+10",
+        pointColor: "#10B981",
+      },
+      wrong: {
+        headline: s.isPhishing ? "Chưa đúng! Đây là email phishing." : "Chưa đúng! Đây là email hợp lệ.",
+        summary: s.explanationHint || "Xem dấu hiệu nhận biết của email này.",
+        clues: clues,
+        points: "-5",
+        pointColor: "#EF4444",
+      }
+    }
+  };
+};
+
 // ─── Email Body Renderer ───────────────────────────────────────────────────────
 
 function EmailBodyRenderer({
@@ -239,14 +354,17 @@ function AIFeedbackPanel({
   correct,
   onNext,
   isLast,
+  backendFeedback,
 }: {
-  verdict: typeof phishingEmails[0]["aiVerdict"];
+  verdict: any;
   correct: boolean;
   onNext: () => void;
   isLast: boolean;
+  backendFeedback?: any;
 }) {
   const data = correct ? verdict.correct : verdict.wrong;
-  const isPhishingEmail = verdict.correct.clues.some(c => c.flag === "🚩");
+  const isPhishingEmail = verdict.correct.clues.some((c: any) => c.flag === "🚩" || c.flag === "💡");
+  const pointColor = backendFeedback ? (backendFeedback.scoreEarned >= 0 ? "#10B981" : "#EF4444") : data.pointColor;
 
   return (
     <div
@@ -257,7 +375,6 @@ function AIFeedbackPanel({
         boxShadow: "0 4px 24px rgba(99,102,241,0.08)",
       }}
     >
-      {/* Panel header */}
       <div
         className="px-5 py-4 flex items-center gap-3"
         style={{
@@ -277,21 +394,24 @@ function AIFeedbackPanel({
           {correct ? <CheckCircle2 size={20} className="text-white" /> : <XCircle size={20} className="text-white" />}
         </div>
         <div className="flex-1 min-w-0">
-          <p style={{ fontWeight: 700, fontSize: "0.88rem", color: correct ? "#065F46" : "#991B1B", lineHeight: 1.3 }}>
-            {data.headline}
-          </p>
+          <div style={{ fontWeight: 700, fontSize: "0.88rem", color: correct ? "#065F46" : "#991B1B", lineHeight: 1.3 }}>
+            {backendFeedback
+              ? (correct ? "Chính xác! Bạn đã vượt qua thử thách." : "Chưa chính xác! Bạn đã dính bẫy.")
+              : data.headline}
+          </div>
         </div>
         <div
           className="px-2.5 py-1 rounded-full text-sm font-extrabold shrink-0"
-          style={{ background: `${data.pointColor}15`, color: data.pointColor }}
+          style={{
+            background: correct ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
+            color: correct ? "#10B981" : "#EF4444"
+          }}
         >
-          {data.points} pts
+          {backendFeedback ? `${backendFeedback.scoreEarned >= 0 ? "+" : ""}${backendFeedback.scoreEarned}` : data.points} pts
         </div>
       </div>
 
-      {/* AI analysis */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-        {/* AI bot header */}
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#EEF2FF" }}>
             <Bot size={16} className="text-indigo-500" />
@@ -312,41 +432,82 @@ function AIFeedbackPanel({
           }}
         >
           <p className="text-indigo-800" style={{ fontSize: "0.82rem", lineHeight: 1.7 }}>
-            {data.summary}
+            {backendFeedback?.feedbackText || data.summary}
           </p>
         </div>
 
         {/* Clue list */}
         <div>
           <p className="text-slate-500 mb-2.5" style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.08em" }}>
-            {isPhishingEmail ? "DẤU HIỆU PHISHING PHÁT HIỆN" : "DẤU HIỆU EMAIL HỢP LỆ"}
+            {isPhishingEmail ? "DẤU HIỆU NHẬN BIẾT" : "DẤU HIỆU EMAIL HỢP LỆ"}
           </p>
           <div className="space-y-2">
-            {data.clues.map((clue, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
-                style={{
-                  background: "#fff",
-                  border: `1px solid ${clue.flag === "🚩" ? "rgba(239,68,68,0.08)" : "rgba(16,185,129,0.08)"}`,
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
-                }}
-              >
-                <span className="text-base shrink-0">{clue.flag}</span>
-                <div className="min-w-0">
-                  <span
-                    className="inline-block px-1.5 py-0.5 rounded text-xs font-bold mb-1"
+            {backendFeedback ? (
+              <>
+                {backendFeedback.indicatorsExplained && (
+                  <div
+                    className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
                     style={{
-                      background: clue.flag === "🚩" ? "#FEF2F2" : "#ECFDF5",
-                      color: clue.flag === "🚩" ? "#DC2626" : "#059669",
+                      background: "#fff",
+                      border: `1px solid rgba(99,102,241,0.08)`,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
                     }}
                   >
-                    {clue.label}
-                  </span>
-                  <p className="text-slate-500" style={{ fontSize: "0.78rem", lineHeight: 1.6 }}>{clue.text}</p>
+                    <span className="text-base shrink-0">💡</span>
+                    <div className="min-w-0">
+                      <span className="inline-block px-1.5 py-0.5 rounded text-xs font-bold mb-1" style={{ background: "#EEF2FF", color: "#6366F1" }}>
+                        Giải thích dấu hiệu
+                      </span>
+                      <p className="text-slate-500" style={{ fontSize: "0.78rem", lineHeight: 1.6 }}>{backendFeedback.indicatorsExplained}</p>
+                    </div>
+                  </div>
+                )}
+                {backendFeedback.improvementTips && (
+                  <div
+                    className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+                    style={{
+                      background: "#fff",
+                      border: `1px solid rgba(16,185,129,0.08)`,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                    }}
+                  >
+                    <span className="text-base shrink-0">🛡️</span>
+                    <div className="min-w-0">
+                      <span className="inline-block px-1.5 py-0.5 rounded text-xs font-bold mb-1" style={{ background: "#ECFDF5", color: "#059669" }}>
+                        Lời khuyên bảo mật
+                      </span>
+                      <p className="text-slate-500" style={{ fontSize: "0.78rem", lineHeight: 1.6 }}>{backendFeedback.improvementTips}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              data.clues.map((clue: any, i: number) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+                  style={{
+                    background: "#fff",
+                    border: `1px solid ${clue.flag === "🚩" ? "rgba(239,68,68,0.08)" : "rgba(16,185,129,0.08)"}`,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                  }}
+                >
+                  <span className="text-base shrink-0">{clue.flag}</span>
+                  <div className="min-w-0">
+                    <span
+                      className="inline-block px-1.5 py-0.5 rounded text-xs font-bold mb-1"
+                      style={{
+                        background: clue.flag === "🚩" ? "#FEF2F2" : "#ECFDF5",
+                        color: clue.flag === "🚩" ? "#DC2626" : "#059669",
+                      }}
+                    >
+                      {clue.label}
+                    </span>
+                    <p className="text-slate-500" style={{ fontSize: "0.78rem", lineHeight: 1.6 }}>{clue.text}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -354,15 +515,15 @@ function AIFeedbackPanel({
         <div
           className="rounded-xl px-4 py-3 flex items-center gap-3"
           style={{
-            background: `${data.pointColor}08`,
-            border: `1px solid ${data.pointColor}20`,
+            background: `${pointColor}08`,
+            border: `1px solid ${pointColor}20`,
           }}
         >
-          <Sparkles size={16} style={{ color: data.pointColor, flexShrink: 0 }} />
+          <Sparkles size={16} style={{ color: pointColor, flexShrink: 0 }} />
           <p style={{ fontSize: "0.78rem", color: "#374151" }}>
             Risk Score cập nhật:{" "}
-            <strong style={{ color: data.pointColor }}>
-              {data.points} điểm
+            <strong style={{ color: pointColor }}>
+              {backendFeedback ? `${backendFeedback.scoreEarned >= 0 ? "+" : ""}${backendFeedback.scoreEarned}` : data.points} điểm
             </strong>{" "}
             {correct ? "được cộng vào hồ sơ của bạn" : "bị trừ — làm lại để lấy lại điểm"}
           </p>
@@ -444,35 +605,93 @@ function ResultsScreen({ score, total, onRestart }: { score: number; total: numb
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export function MoPhong() {
+  const [scenarios, setScenarios] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [current, setCurrent] = useState(0);
   const [decision, setDecision] = useState<"phishing" | "safe" | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  const email = phishingEmails[current];
-  const answered = decision !== null;
-  const isCorrect = answered
-    ? (decision === "phishing") === email.isPhishing
-    : null;
+  // States cho Backend Interaction
+  const [loadingDecision, setLoadingDecision] = useState(false);
+  const [backendFeedback, setBackendFeedback] = useState<any>(null);
 
-  function handleDecision(pick: "phishing" | "safe") {
-    if (answered) return;
-    setDecision(pick);
-    const correct = (pick === "phishing") === email.isPhishing;
-    if (correct) setScore((s) => s + 1);
+  useEffect(() => {
+    scenarioService.getAllScenarios()
+      .then((data) => {
+        if (data && data.length > 0) {
+          const mapped = data.map((s: any) => mapDbScenario(s));
+          setScenarios(mapped);
+        } else {
+          setScenarios(phishingEmails);
+        }
+      })
+      .catch((err) => {
+        console.error("Lỗi khi tải kịch bản từ API:", err);
+        setScenarios(phishingEmails);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+        <p className="text-slate-400 text-sm font-medium">Đang tải kịch bản mô phỏng...</p>
+      </div>
+    );
   }
 
-  function handleNext() {
-    if (current + 1 >= phishingEmails.length) {
+  const email = scenarios[current];
+  const answered = decision !== null;
+  const isCorrect = answered
+    ? (decision === "phishing") === email?.isPhishing
+    : null;
+
+  const handleDecision = async (pick: "phishing" | "safe") => {
+    if (answered || loadingDecision || !email) return;
+    setLoadingDecision(true);
+
+    const userAnswer = pick === "phishing" ? "Phishing" : "Safe";
+
+    try {
+      // Gửi nộp kết quả thực tế lên backend API
+      const result = await scenarioService.submitAttempt({
+        scenarioId: email.id,
+        campaignId: null,
+        userAnswer: userAnswer,
+        timeTakenSeconds: 12,
+      });
+
+      setBackendFeedback(result);
+      setDecision(pick);
+
+      if (result.isCorrect) {
+        setScore((s) => s + 1);
+      }
+    } catch (error) {
+      console.error("Lỗi nộp bài lên API:", error);
+      // Fallback local logic nếu API gặp sự cố để đảm bảo app chạy mượt
+      setDecision(pick);
+      const localCorrect = (pick === "phishing") === email.isPhishing;
+      if (localCorrect) setScore((s) => s + 1);
+    } finally {
+      setLoadingDecision(false);
+    }
+  };
+
+  const handleNext = () => {
+    if (current + 1 >= scenarios.length) {
       setFinished(true);
     } else {
       setCurrent((c) => c + 1);
       setDecision(null);
+      setBackendFeedback(null);
     }
-  }
+  };
 
   if (finished) {
-    return <ResultsScreen score={score} total={phishingEmails.length} onRestart={() => { setCurrent(0); setDecision(null); setScore(0); setFinished(false); }} />;
+    return <ResultsScreen score={score} total={scenarios.length} onRestart={() => { setCurrent(0); setDecision(null); setBackendFeedback(null); setScore(0); setFinished(false); }} />;
   }
 
   return (
@@ -485,19 +704,19 @@ export function MoPhong() {
             Mô phỏng Phishing
           </h1>
           <p className="text-slate-400" style={{ fontSize: "0.8rem" }}>
-            Basic Banking Phishing Awareness · Email {current + 1}/{phishingEmails.length}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Progress dots */}
-          <div className="flex items-center gap-1.5">
-            {phishingEmails.map((_, i) => (
-              <div
-                key={i}
-                className="rounded-full transition-all"
-                style={{
-                  width: i === current ? 20 : 8,
-                  height: 8,
+          Basic Banking Phishing Awareness · Email {current + 1}/{scenarios.length}
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
+        {/* Progress dots */}
+        <div className="flex items-center gap-1.5">
+          {scenarios.map((_, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all"
+              style={{
+                width: i === current ? 20 : 8,
+                height: 8,
                   background: i < current ? "#10B981" : i === current ? "#6366F1" : "#E2E8F0",
                 }}
               />
@@ -676,7 +895,8 @@ export function MoPhong() {
               verdict={email.aiVerdict}
               correct={isCorrect}
               onNext={handleNext}
-              isLast={current + 1 >= phishingEmails.length}
+              isLast={current + 1 >= scenarios.length}
+              backendFeedback={backendFeedback}
             />
           </div>
         )}

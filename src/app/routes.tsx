@@ -1,6 +1,7 @@
 import { createBrowserRouter, Outlet } from "react-router";
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
 import { UserLayout } from "./UserLayout";
 import { ManagerLayout } from "./ManagerLayout";
 import { AdminLayout } from "./AdminLayout";
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: LandingPage },
       { path: "dang-nhap", Component: LoginPage },
+      { path: "dang-ky", Component: RegisterPage },
 
       {
         path: "nguoi-dung",

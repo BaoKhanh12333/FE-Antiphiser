@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Mail, Bot, CheckCircle2, XCircle, MinusCircle, AlertTriangle,
   Flame, ArrowUpRight, Star, Paperclip, AlertCircle, Sparkles,
@@ -186,6 +186,18 @@ function EmailPreview() {
 export function TongQuan() {
   const [paywallHit] = useState(false); // set true to demo paywall state
 
+  // Lấy tên người dùng từ localStorage
+  const [userName, setUserName] = useState("bạn");
+  useEffect(() => {
+    try {
+      const userJson = localStorage.getItem("user");
+      if (userJson) {
+        const profile = JSON.parse(userJson);
+        setUserName(profile.fullName || "bạn");
+      }
+    } catch {}
+  }, []);
+
   return (
     <div className="space-y-6 max-w-screen-xl mx-auto">
 
@@ -193,7 +205,7 @@ export function TongQuan() {
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 style={{ fontFamily: "'Be Vietnam Pro', sans-serif", fontWeight: 800, fontSize: "1.45rem", color: "#0F172A" }}>
-            Chào mừng quay trở lại, Thị Lan! 👋
+            Chào mừng quay trở lại, {userName}! 👋
           </h1>
           <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.82rem" }}>
             Thứ Năm, 05 tháng 3 năm 2026 · Gói:{" "}

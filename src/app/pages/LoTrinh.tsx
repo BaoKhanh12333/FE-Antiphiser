@@ -1,83 +1,14 @@
 import { useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { campaignService } from "../services/campaignService";
 import {
   PlayCircle, Lock, CheckCircle2, Clock, Award,
   Mail, Target, Zap, ChevronRight, BarChart3,
   X, Sparkles, ArrowRight, Shield,
+  Loader2, BookOpen,
 } from "lucide-react";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const campaigns = [
-  {
-    id: 1,
-    tag: "NGÂN HÀNG",
-    tagColor: "#6366F1",
-    tagBg: "#EEF2FF",
-    icon: "🏦",
-    title: "Basic Banking Phishing Awareness",
-    desc: "Nhận biết email giả mạo tổ chức tài chính — Vietcombank, VietinBank, MBBank với kỹ thuật Urgency & Fake Domain.",
-    totalEmails: 10,
-    doneEmails: 4,
-    difficulty: "Trung bình",
-    diffColor: "#F59E0B",
-    status: "active",
-    assignedBy: "Manager Trần Minh Khoa",
-    deadline: "20/03/2026",
-  },
-  {
-    id: 2,
-    tag: "NỘI BỘ",
-    tagColor: "#10B981",
-    tagBg: "#ECFDF5",
-    icon: "🏢",
-    title: "CEO Fraud & BEC Simulation",
-    desc: "Nhận biết email mạo danh CEO/CFO yêu cầu chuyển khoản khẩn cấp — Business Email Compromise phổ biến nhất trong SME.",
-    totalEmails: 8,
-    doneEmails: 8,
-    difficulty: "Cao",
-    diffColor: "#EF4444",
-    status: "done",
-    assignedBy: "Hệ thống AntiPhisher AI",
-    deadline: "10/03/2026",
-  },
-  {
-    id: 3,
-    tag: "THƯƠNG MẠI",
-    tagColor: "#F59E0B",
-    tagBg: "#FFFBEB",
-    icon: "🛒",
-    title: "E-commerce Phishing: Shopee & Lazada",
-    desc: "Phân biệt email xác nhận đơn hàng thật/giả từ các sàn TMĐT — đặc biệt là kỹ thuật Lookalike Domain và Clone Site.",
-    totalEmails: 12,
-    doneEmails: 0,
-    difficulty: "Dễ",
-    diffColor: "#10B981",
-    status: "pending",
-    assignedBy: "Manager Trần Minh Khoa",
-    deadline: "31/03/2026",
-  },
-  {
-    id: 4,
-    tag: "CHÍNH PHỦ",
-    tagColor: "#8B5CF6",
-    tagBg: "#F5F3FF",
-    icon: "🏛️",
-    title: "Gov & Tax Authority Impersonation",
-    desc: "Nhận diện email giả mạo Tổng cục Thuế, Bộ Công an yêu cầu nộp phạt hoặc cập nhật thông tin cá nhân khẩn cấp.",
-    totalEmails: 6,
-    doneEmails: 0,
-    difficulty: "Cao",
-    diffColor: "#EF4444",
-    status: "locked",
-    assignedBy: "Yêu cầu hoàn thành chiến dịch 3 trước",
-    deadline: "—",
-  },
-];
-
-const totalEmailsAll = campaigns.filter(c => c.status !== "locked").reduce((a, c) => a + c.totalEmails, 0);
-const doneEmailsAll = campaigns.reduce((a, c) => a + c.doneEmails, 0);
-const overallPct = Math.round((doneEmailsAll / totalEmailsAll) * 100);
+// Campaigns array has been migrated to database-driven fetching using campaignService.
 
 // ─── Paywall Modal ─────────────────────────────────────────────────────────────
 
@@ -219,7 +150,7 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
 
 // ─── Campaign Card ─────────────────────────────────────────────────────────────
 
-function CampaignCard({ campaign, onPaywall }: { campaign: typeof campaigns[0]; onPaywall: () => void }) {
+function CampaignCard({ campaign, onPaywall }: { campaign: any; onPaywall: () => void }) {
   const navigate = useNavigate();
   const { status, totalEmails, doneEmails } = campaign;
   const isDone = status === "done";
@@ -417,106 +348,342 @@ function CampaignCard({ campaign, onPaywall }: { campaign: typeof campaigns[0]; 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export function LoTrinh() {
-  const activeCampaign = campaigns.find(c => c.status === "active");
+  const [campaignList, setCampaignList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showPaywall, setShowPaywall] = useState(false);
+
+  // Thêm State cho Bài học lý thuyết
+  const [activeTab, setActiveTab] = useState<"campaigns" | "lessons">("campaigns");
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [loadingLessons, setLoadingLessons] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState<any | null>(null);
+  const [completedLessonIds, setCompletedLessonIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    campaignService.getAllCampaigns()
+      .then((data) => {
+        const mapped = data.map((c: any, index: number) => {
+          const firstScenario = c.scenarios?.[0];
+          const diffName = firstScenario?.difficultyName || "Trung bình";
+          const diffColor = diffName === "Cao" ? "#EF4444" : diffName === "Dễ" ? "#10B981" : "#F59E0B";
+
+          return {
+            id: c.campaignId,
+            tag: c.companyId ? "DOANH NGHIỆP" : "HỆ THỐNG",
+            tagColor: c.companyId ? "#10B981" : "#6366F1",
+            tagBg: c.companyId ? "#ECFDF5" : "#EEF2FF",
+            icon: index % 2 === 0 ? "🏦" : "🏢",
+            title: c.campaignName,
+            desc: c.description || "Chiến dịch kiểm tra nhận thức an toàn thông tin.",
+            totalEmails: c.scenarios?.length || 0,
+            doneEmails: 0,
+            difficulty: diffName,
+            diffColor: diffColor,
+            status: c.isActive ? "active" : "pending",
+            assignedBy: c.companyId ? "Doanh nghiệp giao" : "Hệ thống AntiPhisher AI",
+            deadline: c.endDate ? new Date(c.endDate).toLocaleDateString("vi-VN") : "Không giới hạn",
+          };
+        });
+        setCampaignList(mapped);
+      })
+      .catch((err) => console.error("Lỗi khi tải chiến dịch:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Tải danh sách bài học lý thuyết
+  useEffect(() => {
+    if (activeTab === "lessons" && lessons.length === 0) {
+      setLoadingLessons(true);
+      let currentUserId = null;
+      try {
+        const userJson = localStorage.getItem("user");
+        if (userJson) {
+          currentUserId = JSON.parse(userJson).userId;
+        }
+      } catch {}
+
+      Promise.all([
+        lessonService.getAllLessons(),
+        currentUserId ? lessonService.getUserProgress(currentUserId).catch(() => []) : Promise.resolve([])
+      ])
+        .then(([allLessons, userProgress]) => {
+          setLessons(allLessons || []);
+          const completedIds = (userProgress || [])
+            .filter((p: any) => p.isCompleted)
+            .map((p: any) => p.lessonId);
+          setCompletedLessonIds(completedIds);
+        })
+        .catch((err) => console.error("Lỗi tải bài học:", err))
+        .finally(() => setLoadingLessons(false));
+    }
+  }, [activeTab]);
+
+  const handleMarkLessonComplete = async (lessonId: number) => {
+    let currentUserId = null;
+    try {
+      const userJson = localStorage.getItem("user");
+      if (userJson) {
+        currentUserId = JSON.parse(userJson).userId;
+      }
+    } catch {}
+
+    if (!currentUserId) return;
+
+    try {
+      await lessonService.trackProgress({
+        userId: currentUserId,
+        lessonId: lessonId,
+        isCompleted: true
+      });
+      setCompletedLessonIds((prev) => [...prev, lessonId]);
+      setSelectedLesson(null);
+    } catch (err) {
+      console.error("Lỗi cập nhật tiến độ bài học:", err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] gap-3">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+        <p className="text-slate-400 text-sm font-medium">Đang tải danh sách chiến dịch...</p>
+      </div>
+    );
+  }
+
+  const activeCampaign = campaignList.find(c => c.status === "active");
+  const openCampaignsCount = campaignList.filter(c => c.status !== "locked").length;
+
+  const totalEmailsAll = campaignList.filter(c => c.status !== "locked").reduce((a, c) => a + c.totalEmails, 0);
+  const doneEmailsAll = campaignList.reduce((a, c) => a + c.doneEmails, 0);
+  const overallPct = totalEmailsAll > 0 ? Math.round((doneEmailsAll / totalEmailsAll) * 100) : 0;
 
   return (
     <div className="max-w-4xl mx-auto space-y-7" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
 
       {/* Header */}
-      <div>
-        <h1 style={{ fontWeight: 800, fontSize: "1.45rem", color: "#0F172A" }}>
-          Chiến dịch được giao
-        </h1>
-        <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.82rem" }}>
-          Assigned Campaigns · {campaigns.filter(c => c.status !== "locked").length} chiến dịch đang mở
-        </p>
-      </div>
-
-      {/* Overall progress banner */}
-      <div
-        className="rounded-2xl p-5"
-        style={{
-          background: "linear-gradient(160deg, #1E1B4B 0%, #312E81 60%, #3730A3 100%)",
-          boxShadow: "0 8px 32px rgba(30,27,75,0.22)",
-        }}
-      >
-        <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <Zap size={15} className="text-indigo-300" />
-            <p className="text-indigo-200" style={{ fontSize: "0.85rem", fontWeight: 600 }}>Tiến độ tổng thể</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="text-center">
-              <p className="text-white font-bold" style={{ fontSize: "1.1rem" }}>{doneEmailsAll}</p>
-              <p className="text-indigo-400" style={{ fontSize: "0.65rem" }}>Email hoàn thành</p>
-            </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div className="text-center">
-              <p className="text-white font-bold" style={{ fontSize: "1.1rem" }}>{totalEmailsAll}</p>
-              <p className="text-indigo-400" style={{ fontSize: "0.65rem" }}>Tổng email</p>
-            </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div className="flex items-center gap-1">
-              <Award size={15} className="text-amber-400" />
-              <span className="text-amber-300 font-bold" style={{ fontSize: "1.1rem" }}>{overallPct}%</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="h-3 rounded-full relative overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
-          <div
-            className="h-full rounded-full"
-            style={{
-              width: `${overallPct}%`,
-              background: "linear-gradient(90deg, #6366F1, #8B5CF6, #10B981)",
-              boxShadow: "0 0 14px rgba(99,102,241,0.5)",
-            }}
-          />
-          {/* Glow tip */}
-          <div
-            className="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full"
-            style={{
-              left: `calc(${overallPct}% - 10px)`,
-              background: "#10B981",
-              boxShadow: "0 0 10px rgba(16,185,129,0.9), 0 0 20px rgba(16,185,129,0.4)",
-            }}
-          />
-        </div>
-
-        <div className="flex justify-between mt-2">
-          <span className="text-indigo-300" style={{ fontSize: "0.72rem" }}>
-            {campaigns.filter(c => c.status === "done").length} chiến dịch hoàn thành
-          </span>
-          <span className="text-indigo-300" style={{ fontSize: "0.72rem" }}>
-            {campaigns.filter(c => c.status === "active" || c.status === "pending").length} đang chờ thực hành
-          </span>
-        </div>
-      </div>
-
-      {/* Active campaign highlight */}
-      {activeCampaign && (
-        <div
-          className="rounded-xl px-4 py-3 flex items-center gap-3"
-          style={{
-            background: "linear-gradient(135deg, #EEF2FF, #F5F3FF)",
-            border: "1px solid rgba(99,102,241,0.2)",
-          }}
-        >
-          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shrink-0" />
-          <p className="text-indigo-700" style={{ fontSize: "0.82rem" }}>
-            <strong>Đang thực hành:</strong> {activeCampaign.title} — Tiến độ {activeCampaign.doneEmails}/{activeCampaign.totalEmails} email
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div>
+          <h1 style={{ fontWeight: 800, fontSize: "1.45rem", color: "#0F172A" }}>
+            Lộ trình học tập & Thực hành
+          </h1>
+          <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.82rem" }}>
+            Học lý thuyết song song với rèn luyện kỹ năng mô phỏng
           </p>
+        </div>
+        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <button
+            onClick={() => setActiveTab("campaigns")}
+            className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style={{
+              background: activeTab === "campaigns" ? "#ffffff" : "transparent",
+              color: activeTab === "campaigns" ? "#4F46E5" : "#64748B",
+              boxShadow: activeTab === "campaigns" ? "0 2px 6px rgba(0,0,0,0.05)" : "none"
+            }}
+          >
+            Chiến dịch giả lập
+          </button>
+          <button
+            onClick={() => setActiveTab("lessons")}
+            className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style={{
+              background: activeTab === "lessons" ? "#ffffff" : "transparent",
+              color: activeTab === "lessons" ? "#4F46E5" : "#64748B",
+              boxShadow: activeTab === "lessons" ? "0 2px 6px rgba(0,0,0,0.05)" : "none"
+            }}
+          >
+            Bài học lý thuyết
+          </button>
+        </div>
+      </div>
+
+      {activeTab === "campaigns" ? (
+        <>
+          {/* Overall progress banner */}
+          <div
+            className="rounded-2xl p-5"
+            style={{
+              background: "linear-gradient(160deg, #1E1B4B 0%, #312E81 60%, #3730A3 100%)",
+              boxShadow: "0 8px 32px rgba(30,27,75,0.22)",
+            }}
+          >
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <Zap size={15} className="text-indigo-300" />
+                <p className="text-indigo-200" style={{ fontSize: "0.85rem", fontWeight: 600 }}>Tiến độ tổng thể</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="text-center">
+                  <p className="text-white font-bold" style={{ fontSize: "1.1rem" }}>{doneEmailsAll}</p>
+                  <p className="text-indigo-400" style={{ fontSize: "0.65rem" }}>Email hoàn thành</p>
+                </div>
+                <div className="w-px h-8 bg-white/10" />
+                <div className="text-center">
+                  <p className="text-white font-bold" style={{ fontSize: "1.1rem" }}>{totalEmailsAll}</p>
+                  <p className="text-indigo-400" style={{ fontSize: "0.65rem" }}>Tổng email</p>
+                </div>
+                <div className="w-px h-8 bg-white/10" />
+                <div className="flex items-center gap-1">
+                  <Award size={15} className="text-amber-400" />
+                  <span className="text-amber-300 font-bold" style={{ fontSize: "1.1rem" }}>{overallPct}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-3 rounded-full relative overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${overallPct}%`,
+                  background: "linear-gradient(90deg, #6366F1, #8B5CF6, #10B981)",
+                  boxShadow: "0 0 14px rgba(99,102,241,0.5)",
+                }}
+              />
+              {/* Glow tip */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full"
+                style={{
+                  left: `calc(${overallPct}% - 10px)`,
+                  background: "#10B981",
+                  boxShadow: "0 0 10px rgba(16,185,129,0.9), 0 0 20px rgba(16,185,129,0.4)",
+                }}
+              />
+            </div>
+
+            <div className="flex justify-between mt-2">
+              <span className="text-indigo-300" style={{ fontSize: "0.72rem" }}>
+                {campaignList.filter(c => c.status === "done").length} chiến dịch hoàn thành
+              </span>
+              <span className="text-indigo-300" style={{ fontSize: "0.72rem" }}>
+                {campaignList.filter(c => c.status === "active" || c.status === "pending").length} đang chờ thực hành
+              </span>
+            </div>
+          </div>
+
+          {/* Active campaign highlight */}
+          {activeCampaign && activeCampaign.totalEmails > 0 && (
+            <div
+              className="rounded-xl px-4 py-3 flex items-center gap-3"
+              style={{
+                background: "linear-gradient(135deg, #EEF2FF, #F5F3FF)",
+                border: "1px solid rgba(99,102,241,0.2)",
+              }}
+            >
+              <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shrink-0" />
+              <p className="text-indigo-700" style={{ fontSize: "0.82rem" }}>
+                <strong>Đang thực hành:</strong> {activeCampaign.title} — Tiến độ {activeCampaign.doneEmails}/{activeCampaign.totalEmails} email
+              </p>
+            </div>
+          )}
+
+          {/* Campaign list */}
+          <div className="space-y-4">
+            {campaignList.length > 0 ? (
+              campaignList.map((campaign) => (
+                <CampaignCard key={campaign.id} campaign={campaign} onPaywall={() => setShowPaywall(true)} />
+              ))
+            ) : (
+              <div className="text-center p-8 bg-white rounded-2xl border border-slate-100">
+                <Shield size={40} className="mx-auto text-indigo-400 mb-3" />
+                <p className="text-slate-500 font-medium">Hiện tại bạn chưa được giao chiến dịch nào.</p>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="space-y-4">
+          {loadingLessons ? (
+            <div className="flex flex-col items-center justify-center min-h-[200px] gap-3">
+              <Loader2 className="animate-spin text-indigo-600" size={24} />
+              <p className="text-slate-400 text-xs">Đang tải danh sách bài học...</p>
+            </div>
+          ) : lessons.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {lessons.map((lesson: any) => {
+                const isCompleted = completedLessonIds.includes(lesson.lessonId);
+                return (
+                  <div
+                    key={lesson.lessonId}
+                    onClick={() => setSelectedLesson(lesson)}
+                    className="p-5 bg-white rounded-2xl border border-slate-100 hover:border-indigo-100 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded uppercase">
+                          Phase {lesson.phaseNumber} · Mod {lesson.moduleNumber}
+                        </span>
+                        {isCompleted ? (
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                            <CheckCircle2 size={10} /> Đã học
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
+                            <Clock size={10} /> Chưa học
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-slate-800 text-sm mb-1 group-hover:text-indigo-600 leading-snug">
+                        {lesson.title}
+                      </h3>
+                      <p className="text-xs text-slate-400 line-clamp-2 mt-1">
+                        {lesson.content || "Nhấn để xem chi tiết bài học..."}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50 text-[11px] text-slate-400">
+                      <span>Độ dài ước lượng</span>
+                      <span className="font-semibold text-slate-600">{lesson.estimatedMinutes || 10} phút</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center p-8 bg-white rounded-2xl border border-slate-100">
+              <BookOpen size={40} className="mx-auto text-indigo-400 mb-3" />
+              <p className="text-slate-500 font-medium">Không tìm thấy bài học nào.</p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Campaign list */}
-      <div className="space-y-4">
-        {campaigns.map((campaign) => (
-          <CampaignCard key={campaign.id} campaign={campaign} onPaywall={() => setShowPaywall(true)} />
-        ))}
-      </div>
+      {/* Lesson Detail Modal */}
+      {selectedLesson && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-start">
+              <div>
+                <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">
+                  PHASE {selectedLesson.phaseNumber} · MODULE {selectedLesson.moduleNumber}
+                </span>
+                <h3 className="font-extrabold text-lg text-slate-800 mt-2">{selectedLesson.title}</h3>
+              </div>
+              <button onClick={() => setSelectedLesson(null)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto space-y-4 text-slate-600 text-sm leading-relaxed" style={{ whiteSpace: "pre-wrap" }}>
+              {selectedLesson.content || "Không có nội dung chi tiết cho bài học này."}
+            </div>
+            <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+              <button
+                onClick={() => setSelectedLesson(null)}
+                className="px-4 py-2 text-slate-600 font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-xs"
+              >
+                Đóng
+              </button>
+              {!completedLessonIds.includes(selectedLesson.lessonId) && (
+                <button
+                  onClick={() => handleMarkLessonComplete(selectedLesson.lessonId)}
+                  className="px-5 py-2 text-white font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/10"
+                >
+                  <CheckCircle2 size={14} /> Hoàn thành bài học
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

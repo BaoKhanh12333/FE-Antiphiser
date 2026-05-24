@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { authService } from "../services/authService";
+import { userService } from "../services/userService";
 import {
   Shield,
   Eye,
@@ -378,23 +380,42 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginState, setLoginState] = useState<"idle" | "loading" | "success">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPassValid = password.length >= 6;
   const loginSuccess = loginState === "success";
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!isEmailValid || !isPassValid) return;
     setLoginState("loading");
-    // Simulate JWT verification delay
-    setTimeout(() => {
+    setErrorMsg("");
+
+    try {
+      // 1. Đăng nhập qua API Backend
+      await authService.login(email, password);
+
+      // 2. Lấy thông tin cá nhân và lưu thông tin
+      const profile = await userService.getUserProfile();
+
+      // 3. Đánh dấu đăng nhập thành công
       setLoginState("success");
+
+      // 4. Định tuyến dựa trên vai trò thực tế của người dùng
       setTimeout(() => {
-        const target =
-          roles.find((r) => r.value === selectedRole)?.path ?? "/nguoi-dung";
+        const userRoleName = profile.role?.roleName?.toLowerCase() || "";
+        let target = "/nguoi-dung";
+        if (userRoleName === "manager") {
+          target = "/quan-ly";
+        } else if (userRoleName === "admin") {
+          target = "/quan-tri";
+        }
         navigate(target);
-      }, 600);
-    }, 1400);
+      }, 800);
+    } catch (error) {
+      setLoginState("idle");
+      setErrorMsg(error.message || "Đăng nhập thất bại. Email hoặc mật khẩu không chính xác!");
+    }
   };
 
   return (
@@ -647,6 +668,23 @@ export function LoginPage() {
             </a>
           </div>
 
+          {/* Error Message Display */}
+          {errorMsg && (
+            <div
+              className="mb-5 rounded-2xl p-4 flex items-center gap-2.5"
+              style={{
+                background: "#FEF2F2",
+                border: "1.5px solid rgba(239,68,68,0.2)",
+                color: "#991B1B",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+              }}
+            >
+              <Shield size={16} className="text-red-500 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
           {/* Login button — 3 states: idle / loading / success */}
           <button
             onClick={handleLogin}
@@ -749,13 +787,13 @@ export function LoginPage() {
             style={{ fontSize: "0.85rem" }}
           >
             Chưa có tài khoản?{" "}
-            <a
-              href="#"
-              className="text-indigo-600 hover:text-indigo-800 transition-colors"
+            <span
+              onClick={() => navigate("/dang-ky")}
+              className="text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
               style={{ fontWeight: 700 }}
             >
-              Liên hệ IT để được cấp phép
-            </a>
+              Đăng ký ngay
+            </span>
           </p>
         </div>
       </div>

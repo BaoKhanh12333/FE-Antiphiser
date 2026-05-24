@@ -1,5 +1,7 @@
 import { Outlet, NavLink, useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { authService } from "../services/authService";
+import { userService } from "../services/userService";
 import {
   LayoutDashboard, BookOpen, ShieldAlert, BarChart3,
   X, Shield, LogOut, Settings, Menu, Bell, Search,
@@ -32,10 +34,10 @@ const navByRole: Record<Role, { to: string; label: string; icon: React.ElementTy
   ],
 };
 
-const roleLabels: Record<Role, { name: string; dept: string; abbr: string; color: string }> = {
-  user:    { name: "Nguyễn Thị Lan",   dept: "Nhân viên – Phòng Kế toán",      abbr: "NT", color: "#10B981" },
-  manager: { name: "Trần Minh Khoa",   dept: "Trưởng phòng – HR & Đào tạo",    abbr: "TK", color: "#6366F1" },
-  admin:   { name: "Lê Hoàng Phúc",    dept: "Quản trị viên – Phòng IT",       abbr: "LP", color: "#F59E0B" },
+const defaultRoleLabels: Record<Role, { dept: string; color: string }> = {
+  user:    { dept: "Nhân viên",      color: "#10B981" },
+  manager: { dept: "Quản lý",       color: "#6366F1" },
+  admin:   { dept: "Quản trị viên", color: "#F59E0B" },
 };
 
 const roleSwitchTargets: Record<Role, { label: string; path: string }[]> = {
@@ -49,8 +51,34 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const navItems = navByRole[role];
-  const user = roleLabels[role];
   const switchTargets = roleSwitchTargets[role];
+
+  // Load real user profile from localStorage (populated after login)
+  const [userProfile, setUserProfile] = useState<{ fullName: string; email: string; role?: { roleName: string } } | null>(null);
+
+  useEffect(() => {
+    const cached = userService.getCurrentUser();
+    if (cached) {
+      setUserProfile(cached);
+    } else if (authService.isAuthenticated()) {
+      userService.getUserProfile()
+        .then((profile) => setUserProfile(profile))
+        .catch(() => {});
+    }
+  }, []);
+
+  const displayName = userProfile?.fullName || "Người dùng";
+  const displayEmail = userProfile?.email || "";
+  const abbr = displayName.split(" ").map((w: string) => w[0]).slice(-2).join("").toUpperCase() || "U";
+  const roleColor = defaultRoleLabels[role].color;
+  const roleDept = userProfile?.role?.roleName || defaultRoleLabels[role].dept;
+
+  // Dữ liệu user cho sidebar và topbar
+  const user = { name: displayName, dept: roleDept, abbr, color: roleColor };
+
+  const handleLogout = () => {
+    authService.logout();
+  };
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ fontFamily: "'Be Vietnam Pro', sans-serif", background: "#F0F2FF" }}>
@@ -109,7 +137,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               <button
                 className="w-full text-left px-3 py-2 text-red-300 hover:bg-red-500/10 transition-all border-t border-white/10"
                 style={{ fontSize: "0.82rem" }}
-                onClick={() => navigate("/")}
+                onClick={handleLogout}
               >
                 <LogOut size={13} className="inline mr-1.5" />Đăng xuất
               </button>
@@ -152,7 +180,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
           >
             <Settings size={18} /><span style={{ fontSize: "0.9rem" }}>Cài đặt</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-200 hover:text-red-300 hover:bg-red-500/10 transition-all" onClick={() => navigate("/")}>
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-200 hover:text-red-300 hover:bg-red-500/10 transition-all" onClick={handleLogout}>
             <LogOut size={18} /><span style={{ fontSize: "0.9rem" }}>Đăng xuất</span>
           </button>
         </div>
