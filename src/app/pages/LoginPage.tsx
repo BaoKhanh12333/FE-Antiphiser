@@ -11,6 +11,9 @@ import {
   CheckCircle2,
   Quote,
   Loader2,
+  Mail,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 
 type Role = "user" | "manager" | "admin";
@@ -131,75 +134,6 @@ function FloatingInput({
   );
 }
 
-/* ── Segmented Control ────────────────────────────── */
-function SegmentedControl({
-  selected,
-  onChange,
-}: {
-  selected: Role;
-  onChange: (r: Role) => void;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const idx = roles.findIndex((r) => r.value === selected);
-    const buttons = containerRef.current.querySelectorAll<HTMLButtonElement>(
-      "[data-segment]"
-    );
-    if (buttons[idx]) {
-      const btn = buttons[idx];
-      setIndicatorStyle({
-        left: btn.offsetLeft,
-        width: btn.offsetWidth,
-      });
-    }
-  }, [selected]);
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative flex p-1"
-      style={{
-        borderRadius: 16,
-        background: "#F1F5F9",
-        border: "1px solid rgba(99,102,241,0.08)",
-      }}
-    >
-      {/* Sliding indicator */}
-      <div
-        className="absolute top-1 bottom-1 transition-all duration-300 ease-out"
-        style={{
-          left: indicatorStyle.left,
-          width: indicatorStyle.width,
-          borderRadius: 12,
-          background: "#fff",
-          boxShadow:
-            "0 2px 8px rgba(99,102,241,0.12), 0 1px 2px rgba(0,0,0,0.06)",
-        }}
-      />
-
-      {roles.map(({ value, label, emoji }) => (
-        <button
-          key={value}
-          data-segment
-          onClick={() => onChange(value)}
-          className="flex-1 relative z-10 flex items-center justify-center gap-2 py-3 transition-colors duration-200"
-          style={{
-            borderRadius: 12,
-            fontWeight: selected === value ? 700 : 500,
-            fontSize: "0.85rem",
-            color: selected === value ? "#4F46E5" : "#64748B",
-          }}
-        >
-          <span style={{ fontSize: "1rem" }}>{emoji}</span>
-          <span>{label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
 
 /* ── Quote Rotator ────────────────────────────────── */
 function QuoteRotator() {
@@ -381,9 +315,10 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [loginState, setLoginState] = useState<"idle" | "loading" | "success">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [showForgotModal, setShowForgotModal] = useState(false);
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isPassValid = password.length >= 6;
+  const isPassValid = password.length >= 4;
   const loginSuccess = loginState === "success";
 
   const handleLogin = async () => {
@@ -396,14 +331,21 @@ export function LoginPage() {
       await authService.login(email, password);
 
       // 2. Lấy thông tin cá nhân và lưu thông tin
-      const profile = await userService.getUserProfile();
+      await userService.getUserProfile();
+
+      // Cập nhật selectedRole từ Token để Spinner hiển thị đúng màu/tên vai trò thực tế
+      const currentRole = authService.getCurrentRole();
+      if (currentRole) {
+        setSelectedRole(currentRole.toLowerCase() as Role);
+      }
 
       // 3. Đánh dấu đăng nhập thành công
       setLoginState("success");
 
       // 4. Định tuyến dựa trên vai trò thực tế của người dùng
       setTimeout(() => {
-        const userRoleName = profile.role?.roleName?.toLowerCase() || "";
+        const role = authService.getCurrentRole();
+        const userRoleName = role ? role.toLowerCase() : "";
         let target = "/nguoi-dung";
         if (userRoleName === "manager") {
           target = "/quan-ly";
@@ -412,9 +354,9 @@ export function LoginPage() {
         }
         navigate(target);
       }, 800);
-    } catch (error) {
+    } catch (error: any) {
       setLoginState("idle");
-      setErrorMsg(error.message || "Đăng nhập thất bại. Email hoặc mật khẩu không chính xác!");
+      setErrorMsg(error?.message || error?.errorMessage || "Đăng nhập thất bại. Email hoặc mật khẩu không chính xác!");
     }
   };
 
@@ -609,19 +551,7 @@ export function LoginPage() {
             </p>
           </div>
 
-          {/* Role Segmented Control */}
-          <div className="mb-8">
-            <label
-              className="block text-slate-500 mb-3"
-              style={{ fontWeight: 600, fontSize: "0.82rem" }}
-            >
-              Đăng nhập với tư cách
-            </label>
-            <SegmentedControl
-              selected={selectedRole}
-              onChange={setSelectedRole}
-            />
-          </div>
+
 
           {/* Email input */}
           <div className="mb-5">
@@ -659,13 +589,14 @@ export function LoginPage() {
 
           {/* Forgot password */}
           <div className="flex justify-end mb-8">
-            <a
-              href="#"
-              className="text-indigo-500 hover:text-indigo-700 transition-colors"
-              style={{ fontSize: "0.82rem", fontWeight: 600 }}
+            <button
+              type="button"
+              onClick={() => setShowForgotModal(true)}
+              className="text-indigo-500 hover:text-indigo-700 transition-colors cursor-pointer"
+              style={{ fontSize: "0.82rem", fontWeight: 600, background: "none", border: "none", padding: 0 }}
             >
               Quên mật khẩu?
-            </a>
+            </button>
           </div>
 
           {/* Error Message Display */}
@@ -682,6 +613,13 @@ export function LoginPage() {
             >
               <Shield size={16} className="text-red-500 shrink-0" />
               <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {(!isEmailValid || !isPassValid) && (email || password) && (
+            <div className="text-red-500 text-[0.8rem] px-2 mb-4">
+              {!isEmailValid && email && <p>- Phải là email hợp lệ</p>}
+              {!isPassValid && password && <p>- Mật khẩu phải có từ 7 ký tự trở lên</p>}
             </div>
           )}
 
@@ -744,7 +682,7 @@ export function LoginPage() {
                 },
                 {
                   ok: isPassValid,
-                  text: "Mật khẩu ít nhất 6 ký tự",
+                  text: "Mật khẩu ít nhất 4 ký tự",
                 },
               ].map(({ ok, text }) => (
                 <div key={text} className="flex items-center gap-2">
@@ -797,6 +735,135 @@ export function LoginPage() {
           </p>
         </div>
       </div>
+
+      {/* ── FORGOT PASSWORD MODAL ── */}
+      {showForgotModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{
+            background: "rgba(15,23,42,0.6)",
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => setShowForgotModal(false)}
+        >
+          <div
+            className="relative bg-white w-full mx-4 overflow-hidden"
+            style={{
+              maxWidth: 440,
+              borderRadius: 24,
+              boxShadow: "0 25px 60px rgba(99,102,241,0.18), 0 1px 4px rgba(0,0,0,0.04)",
+              border: "1px solid rgba(99,102,241,0.1)",
+              animation: "modalIn 0.3s ease-out",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-4 right-4 text-slate-300 hover:text-slate-600 transition-colors"
+              style={{ background: "none", border: "none", cursor: "pointer" }}
+            >
+              <X size={20} />
+            </button>
+
+            {/* Header gradient strip */}
+            <div
+              style={{
+                height: 4,
+                background: "linear-gradient(90deg, #6366F1, #818CF8, #A5B4FC)",
+              }}
+            />
+
+            {/* Content */}
+            <div className="p-8 text-center">
+              {/* Icon */}
+              <div
+                className="w-16 h-16 flex items-center justify-center mx-auto mb-5"
+                style={{
+                  borderRadius: 20,
+                  background: "linear-gradient(135deg, #FEF3C7, #FDE68A)",
+                  boxShadow: "0 4px 16px rgba(245,158,11,0.15)",
+                }}
+              >
+                <AlertTriangle size={28} className="text-amber-600" />
+              </div>
+
+              <h3
+                style={{
+                  fontSize: "1.25rem",
+                  fontWeight: 800,
+                  color: "#0F172A",
+                  letterSpacing: "-0.02em",
+                  marginBottom: 8,
+                }}
+              >
+                Quên mật khẩu?
+              </h3>
+
+              <p
+                style={{
+                  fontSize: "0.88rem",
+                  color: "#64748B",
+                  lineHeight: 1.7,
+                  marginBottom: 24,
+                }}
+              >
+                Hiện tại hệ thống chưa hỗ trợ tự đặt lại mật khẩu.
+                Vui lòng liên hệ <strong style={{ color: "#4338CA" }}>Quản trị viên</strong> để được hỗ trợ đặt lại mật khẩu cho tài khoản của bạn.
+              </p>
+
+              {/* Contact info box */}
+              <div
+                className="rounded-2xl p-4 flex items-center gap-3 text-left mb-6"
+                style={{
+                  background: "#F8FAFF",
+                  border: "1.5px solid rgba(99,102,241,0.1)",
+                }}
+              >
+                <div
+                  className="w-10 h-10 flex items-center justify-center shrink-0"
+                  style={{
+                    borderRadius: 12,
+                    background: "linear-gradient(135deg, #6366F1, #818CF8)",
+                  }}
+                >
+                  <Mail size={18} className="text-white" />
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.75rem", color: "#94A3B8", fontWeight: 600 }}>
+                    Email hỗ trợ
+                  </p>
+                  <p style={{ fontSize: "0.88rem", color: "#1E293B", fontWeight: 700 }}>
+                    admin@antiphisher.vn
+                  </p>
+                </div>
+              </div>
+
+              {/* Close button */}
+              <button
+                onClick={() => setShowForgotModal(false)}
+                className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all hover:scale-[1.01] active:scale-[0.99]"
+                style={{
+                  background: "linear-gradient(135deg, #6366F1, #818CF8)",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 8px 24px rgba(99,102,241,0.2)",
+                }}
+              >
+                Đã hiểu, quay lại đăng nhập
+              </button>
+            </div>
+          </div>
+
+          <style>{`
+            @keyframes modalIn {
+              0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+              100% { opacity: 1; transform: scale(1) translateY(0); }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }

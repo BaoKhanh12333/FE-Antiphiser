@@ -1,5 +1,29 @@
 import axiosInstance from "../api/axiosInstance";
 
+/**
+ * Giải mã JWT Token để lấy thông tin payload (UserId, Role, FullName, Email...)
+ * Hàm thuần không phụ thuộc thư viện bên ngoài, hỗ trợ Unicode (tiếng Việt có dấu).
+ * @param {string} token - Chuỗi JWT Token
+ * @returns {object|null} Payload đã giải mã hoặc null nếu token không hợp lệ
+ */
+export const decodeToken = (token) => {
+  try {
+    if (!token) return null;
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      window.atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Lỗi giải mã token:", error);
+    return null;
+  }
+};
+
 export const authService = {
   /**
    * Đăng nhập người dùng
@@ -35,12 +59,9 @@ export const authService = {
       const response = await axiosInstance.post("/Auth/register", {
         email: registerData.email,
         password: registerData.password,
-        confirmPassword: registerData.confirmPassword,
         fullName: registerData.fullName,
-        role: {
-          roleId: parseInt(registerData.roleId) || 1, // Mặc định là 1 (User/Nhân viên)
-          roleName: registerData.roleName || "User"
-        }
+        phoneNumber: registerData.phoneNumber,
+        isAgreedToTerms: registerData.isAgreedToTerms
       });
       return response;
     } catch (error) {
@@ -78,5 +99,34 @@ export const authService = {
    */
   isAuthenticated: () => {
     return !!localStorage.getItem("token");
-  }
+  },
+
+  /**
+   * Lấy vai trò (Role) của người dùng hiện tại từ Token đã lưu
+   * @returns {string|null} "Admin", "Manager", "User" hoặc null
+   */
+  getCurrentRole: () => {
+    const token = localStorage.getItem("token");
+    const payload = decodeToken(token);
+    return payload?.Role || payload?.role || null;
+  },
+
+  /**
+   * Lấy UserId của người dùng hiện tại từ Token đã lưu
+   * @returns {string|null} UserId dạng chuỗi hoặc null
+   */
+  getCurrentUserId: () => {
+    const token = localStorage.getItem("token");
+    const payload = decodeToken(token);
+    return payload?.UserId || null;
+  },
+
+  /**
+   * Lấy toàn bộ payload đã giải mã từ Token hiện tại
+   * @returns {object|null} { UserId, Role, Email, FullName, exp, ... }
+   */
+  getTokenPayload: () => {
+    const token = localStorage.getItem("token");
+    return decodeToken(token);
+  },
 };
