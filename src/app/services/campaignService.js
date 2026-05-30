@@ -30,5 +30,39 @@ export const campaignService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  /**
+   * Tạo chiến dịch đào tạo mới (Admin/Manager)
+   * @param {object} data - { campaignName, description, scenarioIds, startDate, endDate, ... }
+   * @returns {Promise<object>} Chiến dịch vừa tạo
+   */
+  createCampaign: async (data) => {
+    try {
+      const response = await axiosInstance.post("/Campaigns", data);
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tạo chiến dịch mới");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Xóa chiến dịch đào tạo theo ID (Admin/Manager)
+   * @param {number} id - ID chiến dịch cần xóa
+   * @returns {Promise<object>} Kết quả xóa
+   */
+  deleteCampaign: async (id) => {
+    try {
+      const response = await axiosInstance.delete(`/Campaigns/${id}`);
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể xóa chiến dịch");
+    } catch (error) {
+      throw error;
+    }
   }
 };

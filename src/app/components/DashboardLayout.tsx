@@ -51,7 +51,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const navItems = navByRole[role];
-  const switchTargets = roleSwitchTargets[role];
+  // const switchTargets = roleSwitchTargets[role]; // Unused after removing quick role switch
 
   // Load real user profile from localStorage (populated after login)
   const [userProfile, setUserProfile] = useState<{ fullName: string; email: string; role?: { roleName: string } } | null>(null);
@@ -123,19 +123,8 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
           </div>
           {dropdownOpen && (
             <div className="mt-2 rounded-xl overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
-              <p className="px-3 py-1.5 text-indigo-400" style={{ fontSize: "0.65rem", fontWeight: 600 }}>ĐỔI VAI NHANH</p>
-              {switchTargets.map((t) => (
-                <button
-                  key={t.path}
-                  className="w-full text-left px-3 py-2 text-indigo-200 hover:text-white hover:bg-white/10 transition-all"
-                  style={{ fontSize: "0.82rem" }}
-                  onClick={() => { navigate(t.path); setDropdownOpen(false); setSidebarOpen(false); }}
-                >
-                  → {t.label}
-                </button>
-              ))}
               <button
-                className="w-full text-left px-3 py-2 text-red-300 hover:bg-red-500/10 transition-all border-t border-white/10"
+                className="w-full text-left px-3 py-2 text-red-300 hover:bg-red-500/10 transition-all border-white/10"
                 style={{ fontSize: "0.82rem" }}
                 onClick={handleLogout}
               >

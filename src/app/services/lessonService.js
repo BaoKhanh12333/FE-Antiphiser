@@ -62,6 +62,56 @@ export const lessonService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  /**
+   * Tạo bài học lý thuyết mới (Admin)
+   * @param {object} data - { lessonTitle, content, phaseId, moduleId, orderIndex, ... }
+   * @returns {Promise<object>} Bài học vừa tạo
+   */
+  createLesson: async (data) => {
+    try {
+      const response = await axiosInstance.post("/Lesson", data);
+      // LessonController trả về 201 CreatedAtAction, không wrap ApiResponse
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Kiểm tra điều kiện User có đủ tiêu chuẩn tham gia chiến dịch thực hành không
+   * (Đã hoàn thành đầy đủ các bài học lý thuyết tiên quyết)
+   * @param {number} userId - ID người dùng
+   * @param {number} campaignId - ID chiến dịch
+   * @returns {Promise<boolean>} true nếu đủ điều kiện, false nếu chưa
+   */
+  checkEligibility: async (userId, campaignId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/Lesson/check-eligibility?userId=${userId}&campaignId=${campaignId}`
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Cấu hình danh sách bài học lý thuyết tiên quyết cho chiến dịch (Admin)
+   * @param {number} campaignId - ID chiến dịch
+   * @param {number[]} lessonIds - Danh sách ID bài học bắt buộc
+   * @returns {Promise<object>} Kết quả cấu hình
+   */
+  setPrerequisites: async (campaignId, lessonIds) => {
+    try {
+      const response = await axiosInstance.post("/Lesson/set-prerequisites", {
+        campaignId,
+        lessonIds,
+      });
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
 };
-
