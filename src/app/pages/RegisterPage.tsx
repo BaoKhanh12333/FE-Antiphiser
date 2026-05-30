@@ -14,13 +14,7 @@ import {
   Lock,
 } from "lucide-react";
 
-type Role = "user" | "manager" | "admin";
 
-const rolesList = [
-  { value: "user", label: "Nhân viên", emoji: "👤", roleId: 1, roleName: "User" },
-  { value: "manager", label: "Quản lý", emoji: "👔", roleId: 2, roleName: "Manager" },
-  { value: "admin", label: "Quản trị", emoji: "⚙️", roleId: 3, roleName: "Admin" },
-];
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -30,7 +24,8 @@ export function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState<Role>("user");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [isAgreedToTerms, setIsAgreedToTerms] = useState(false);
   
   // UX states
   const [step, setStep] = useState<1 | 2>(1); // 1: Register Form, 2: OTP Verification
@@ -43,9 +38,10 @@ export function RegisterPage() {
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isNameValid = fullName.trim().length >= 2;
-  const isPassValid = password.length >= 6;
+  const isPhoneValid = phoneNumber.trim().length >= 10;
+  const isPassValid = password.length >= 7;
   const isConfirmValid = password === confirmPassword;
-  const isFormValid = isEmailValid && isNameValid && isPassValid && isConfirmValid;
+  const isFormValid = isEmailValid && isNameValid && isPhoneValid && isPassValid && isConfirmValid && isAgreedToTerms;
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,14 +51,12 @@ export function RegisterPage() {
     setErrorMsg("");
     
     try {
-      const selected = rolesList.find(r => r.value === selectedRole)!;
       const data = {
         email,
         fullName,
         password,
-        confirmPassword,
-        roleId: selected.roleId,
-        roleName: selected.roleName
+        phoneNumber,
+        isAgreedToTerms
       };
 
       const response = await authService.register(data);
@@ -75,7 +69,7 @@ export function RegisterPage() {
         setErrorMsg(response.errorMessage || "Đăng ký thất bại");
       }
     } catch (error: any) {
-      setErrorMsg(error.message || "Không thể đăng ký. Email có thể đã tồn tại!");
+      setErrorMsg(error?.message || error?.errorMessage || "Không thể đăng ký. Email có thể đã tồn tại!");
     } finally {
       setLoading(false);
     }
@@ -250,6 +244,27 @@ export function RegisterPage() {
                 />
               </div>
 
+              {/* Phone Number */}
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <span style={{ fontWeight: "bold", fontSize: "0.8rem", marginLeft: "-2px" }}>VN</span>
+                </span>
+                <input
+                  type="text"
+                  placeholder="Số điện thoại"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3.5 outline-none transition-all"
+                  style={{
+                    borderRadius: 14,
+                    border: "1.5px solid rgba(99,102,241,0.12)",
+                    background: "#F8FAFF",
+                    fontSize: "0.9rem"
+                  }}
+                  required
+                />
+              </div>
+
               {/* Password */}
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -257,7 +272,7 @@ export function RegisterPage() {
                 </span>
                 <input
                   type={showPass ? "text" : "password"}
-                  placeholder="Mật khẩu (ít nhất 6 ký tự)"
+                  placeholder="Mật khẩu (ít nhất 7 ký tự)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-12 pr-12 py-3.5 outline-none transition-all"
@@ -299,32 +314,31 @@ export function RegisterPage() {
                 />
               </div>
 
-              {/* Role Selection */}
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-2">Đăng ký với vai trò</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {rolesList.map((r) => (
-                    <button
-                      key={r.value}
-                      type="button"
-                      onClick={() => setSelectedRole(r.value as Role)}
-                      className="py-2.5 px-2 rounded-xl flex flex-col items-center justify-center transition-all border"
-                      style={{
-                        background: selectedRole === r.value ? "#EEF2FF" : "#FFF",
-                        borderColor: selectedRole === r.value ? "#6366F1" : "rgba(99,102,241,0.1)",
-                        color: selectedRole === r.value ? "#4F46E5" : "#64748B",
-                        fontWeight: selectedRole === r.value ? 700 : 500,
-                        fontSize: "0.75rem"
-                      }}
-                    >
-                      <span className="text-base mb-1">{r.emoji}</span>
-                      <span>{r.label}</span>
-                    </button>
-                  ))}
-                </div>
+              {/* Checkbox */}
+              <div className="flex items-center gap-2 mt-2 px-1">
+                <input 
+                  type="checkbox" 
+                  id="terms" 
+                  checked={isAgreedToTerms}
+                  onChange={(e) => setIsAgreedToTerms(e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                />
+                <label htmlFor="terms" className="text-xs text-slate-500">
+                  Tôi đồng ý với các <span className="text-indigo-600 font-semibold cursor-pointer">điều khoản sử dụng</span>
+                </label>
               </div>
 
               {/* Submit Register */}
+              {!isFormValid && (fullName || email || password || confirmPassword || phoneNumber) && (
+                <div className="text-red-500 text-[0.8rem] px-2">
+                  {!isNameValid && fullName && <p>- Tên phải có ít nhất 2 ký tự</p>}
+                  {!isEmailValid && email && <p>- Phải là email hợp lệ</p>}
+                  {!isPhoneValid && phoneNumber && <p>- Số điện thoại không hợp lệ</p>}
+                  {!isPassValid && password && <p>- Mật khẩu phải có từ 7 ký tự trở lên</p>}
+                  {!isConfirmValid && confirmPassword && password && <p>- Mật khẩu xác nhận chưa khớp</p>}
+                  {!isAgreedToTerms && <p>- Vui lòng đồng ý với điều khoản sử dụng</p>}
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={!isFormValid || loading}

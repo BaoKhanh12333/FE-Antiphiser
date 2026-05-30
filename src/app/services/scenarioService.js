@@ -46,5 +46,57 @@ export const scenarioService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  /**
+   * Tạo kịch bản mô phỏng mới (Admin)
+   * @param {object} data - { scenarioName, senderEmail, senderName, subject, body, isPhishing, ... }
+   * @returns {Promise<object>} Kịch bản vừa tạo
+   */
+  createScenario: async (data) => {
+    try {
+      const response = await axiosInstance.post("/Scenarios", data);
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tạo kịch bản mới");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Cập nhật kịch bản mô phỏng (Admin)
+   * @param {number} id - ID kịch bản cần cập nhật
+   * @param {object} data - Dữ liệu cập nhật
+   * @returns {Promise<object>} Kịch bản sau khi cập nhật
+   */
+  updateScenario: async (id, data) => {
+    try {
+      const response = await axiosInstance.put(`/Scenarios/${id}`, data);
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể cập nhật kịch bản");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Xóa kịch bản mô phỏng (Admin)
+   * @param {number} id - ID kịch bản cần xóa
+   * @returns {Promise<object>} Kết quả xóa
+   */
+  deleteScenario: async (id) => {
+    try {
+      const response = await axiosInstance.delete(`/Scenarios/${id}`);
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể xóa kịch bản");
+    } catch (error) {
+      throw error;
+    }
   }
 };

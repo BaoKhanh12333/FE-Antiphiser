@@ -17,6 +17,9 @@ import { AdminThuVien } from "./pages/admin/AdminThuVien";
 import { AdminAIController } from "./pages/admin/AdminAIController";
 import { AdminQuanLyNguoiDung } from "./pages/admin/AdminQuanLyNguoiDung";
 import { Settings } from "./pages/Settings";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PaymentSuccess } from "./pages/PaymentSuccess";
+import { PaymentFail } from "./pages/PaymentFail";
 
 function RootLayout() {
   return <Outlet />;
@@ -56,38 +59,60 @@ export const router = createBrowserRouter([
       { path: "dang-nhap", Component: LoginPage },
       { path: "dang-ky", Component: RegisterPage },
 
+      // Payment Callback Pages (from VNPAY)
+      { path: "paymentsuccess", Component: PaymentSuccess },
+      { path: "paymentfail", Component: PaymentFail },
+
+      // Nhóm người dùng (User/Nhân viên, Manager, Admin)
       {
-        path: "nguoi-dung",
-        Component: UserLayout,
+        element: <ProtectedRoute allowedRoles={["User", "Manager", "Admin"]} />,
         children: [
-          { index: true, Component: TongQuan },
-          { path: "lo-trinh", Component: LoTrinh },
-          { path: "mo-phong", Component: MoPhong },
-          { path: "bao-cao", Component: BaoCao },
-          { path: "cai-dat", Component: Settings },
+          {
+            path: "nguoi-dung",
+            Component: UserLayout,
+            children: [
+              { index: true, Component: TongQuan },
+              { path: "lo-trinh", Component: LoTrinh },
+              { path: "mo-phong", Component: MoPhong },
+              { path: "bao-cao", Component: BaoCao },
+              { path: "cai-dat", Component: Settings },
+            ],
+          },
         ],
       },
 
+      // Nhóm Quản lý (Manager)
       {
-        path: "quan-ly",
-        Component: ManagerLayout,
+        element: <ProtectedRoute allowedRoles={["Manager"]} />,
         children: [
-          { index: true, Component: ManagerDashboard },
-          { path: "doi-ngu", Component: ManagerDoiNgu },
-          { path: "bao-cao", Component: ManagerBaoCao },
-          { path: "cai-dat", Component: Settings },
+          {
+            path: "quan-ly",
+            Component: ManagerLayout,
+            children: [
+              { index: true, Component: ManagerDashboard },
+              { path: "doi-ngu", Component: ManagerDoiNgu },
+              { path: "bao-cao", Component: ManagerBaoCao },
+              { path: "cai-dat", Component: Settings },
+            ],
+          },
         ],
       },
 
+      // Nhóm Quản trị hệ thống (Admin)
       {
-        path: "quan-tri",
-        Component: AdminLayout,
+        element: <ProtectedRoute allowedRoles={["Admin"]} />,
         children: [
-          { index: true, Component: AdminTongQuan },
-          { path: "kich-ban", Component: AdminThuVien },
-          { path: "ai-controller", Component: AdminAIController },
-          { path: "quan-ly", Component: AdminQuanLyNguoiDung },
-          { path: "cai-dat", Component: Settings },
+          {
+            path: "quan-tri",
+            Component: AdminLayout,
+            children: [
+              { index: true, Component: AdminTongQuan },
+              { path: "kich-ban", Component: AdminThuVien },
+              { path: "ai-controller", Component: AdminAIController },
+              { path: "quan-ly", Component: AdminQuanLyNguoiDung },
+              { path: "cai-dat", Component: Settings },
+            ],
+          },
         ],
       },
 
@@ -95,3 +120,4 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
+

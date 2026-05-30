@@ -45,7 +45,8 @@ axiosInstance.interceptors.response.use(
       }
 
       // Trả về lỗi đã được đóng gói từ Backend (nếu có ApiResponse)
-      const errorMessage = data?.errorMessage || data?.message || "Đã xảy ra lỗi hệ thống!";
+      const backendError = data?.errorMessage || (typeof data?.result === "string" ? data.result : null);
+      const errorMessage = backendError || data?.message || "Đã xảy ra lỗi hệ thống!";
       return Promise.reject({
         status,
         message: errorMessage,

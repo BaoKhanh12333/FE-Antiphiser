@@ -31,11 +31,49 @@ export const userService = {
     }
   },
 
+  getAllAccounts: async (searchTerm = "", pageIndex = 1, pageSize = 10) => {
+    try {
+      const response = await axiosInstance.get(`/UserAccount/GetAllAccountAsync?searchTerm=${searchTerm}&pageIndex=${pageIndex}&pageSize=${pageSize}`);
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể lấy danh sách tải khoản");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  updateUserStatusOrRole: async (data) => {
+    try {
+      // data: { userId, roleId, status, systemScore, riskLevel }
+      const response = await axiosInstance.put("/UserAccount/UpdateUserStatusOrRole", data);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   /**
    * Lấy thông tin user hiện hành đã lưu trong localStorage
    */
   getCurrentUser: () => {
     const userJson = localStorage.getItem("user");
     return userJson ? JSON.parse(userJson) : null;
+  },
+
+  /**
+   * Lấy danh sách tất cả tài khoản trong đội ngũ (Manager)
+   * @returns {Promise<Array>} Danh sách tài khoản người dùng
+   */
+  getAllTeamAccounts: async () => {
+    try {
+      const response = await axiosInstance.get("/UserAccount/GetAllAccountAsync");
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tải danh sách tài khoản đội ngũ");
+    } catch (error) {
+      throw error;
+    }
   }
 };
