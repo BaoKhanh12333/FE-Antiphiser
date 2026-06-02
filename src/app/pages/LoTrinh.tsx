@@ -431,7 +431,6 @@ export function LoTrinh() {
 
     try {
       await lessonService.trackProgress({
-        userId: currentUserId,
         lessonId: lessonId,
         isCompleted: true
       });

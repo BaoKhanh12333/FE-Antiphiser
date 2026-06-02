@@ -51,6 +51,27 @@ export const authService = {
   },
 
   /**
+   * Đăng nhập người dùng qua Google
+   * @param {string} credential Google JWT token
+   */
+  loginWithGoogle: async (credential) => {
+    try {
+      const response = await axiosInstance.post("/Auth/google-login", {
+        credential: credential,
+      });
+
+      if (response && response.isSuccess && response.result) {
+        const token = response.result;
+        localStorage.setItem("token", token);
+        return response;
+      }
+      throw new Error(response?.errorMessage || "Đăng nhập Google thất bại");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
    * Đăng ký tài khoản mới
    * @param {object} registerData - { email, password, confirmPassword, fullName, roleId, roleName }
    */

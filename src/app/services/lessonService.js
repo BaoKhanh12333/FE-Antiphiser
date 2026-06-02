@@ -34,7 +34,8 @@ export const lessonService = {
 
   /**
    * Cập nhật tiến độ bài học của người dùng (Đánh dấu hoàn thành / chưa hoàn thành)
-   * @param {object} progressData - { userId, lessonId, isCompleted }
+   * userId lấy từ JWT token phía backend — không truyền vào đây.
+   * @param {object} progressData - { lessonId, isCompleted }
    */
   trackProgress: async (progressData) => {
     try {
@@ -82,14 +83,14 @@ export const lessonService = {
   /**
    * Kiểm tra điều kiện User có đủ tiêu chuẩn tham gia chiến dịch thực hành không
    * (Đã hoàn thành đầy đủ các bài học lý thuyết tiên quyết)
-   * @param {number} userId - ID người dùng
+   * userId lấy từ JWT token phía backend — không truyền vào đây.
    * @param {number} campaignId - ID chiến dịch
    * @returns {Promise<boolean>} true nếu đủ điều kiện, false nếu chưa
    */
-  checkEligibility: async (userId, campaignId) => {
+  checkEligibility: async (campaignId) => {
     try {
       const response = await axiosInstance.get(
-        `/Lesson/check-eligibility?userId=${userId}&campaignId=${campaignId}`
+        `/Lesson/check-eligibility?campaignId=${campaignId}`
       );
       return response;
     } catch (error) {

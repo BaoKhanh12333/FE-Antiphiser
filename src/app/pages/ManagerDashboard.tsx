@@ -1,60 +1,109 @@
+import { useState, useEffect } from "react";
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
-  ResponsiveContainer, Legend, LineChart, Line,
+  BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
+  ResponsiveContainer, Legend, Cell,
 } from "recharts";
 import {
   TrendingUp, Users, AlertTriangle, Award, ChevronRight, Star,
-  ArrowUpRight, ArrowDownRight, Send,
+  Loader2, Send,
 } from "lucide-react";
+import { analyticsService } from "../services/analyticsService";
 
-/* ── DATA ─────────────────────────────────────────── */
-const teamProgress = [
-  { month: "T10", ketoan: 42, it: 68, kinh_doanh: 35 },
-  { month: "T11", ketoan: 50, it: 72, kinh_doanh: 41 },
-  { month: "T12", ketoan: 58, it: 78, kinh_doanh: 49 },
-  { month: "T1",  ketoan: 65, it: 82, kinh_doanh: 55 },
-  { month: "T2",  ketoan: 71, it: 87, kinh_doanh: 62 },
-  { month: "T3",  ketoan: 79, it: 91, kinh_doanh: 70 },
-];
-
-const employees = [
-  { name: "Nguyễn Thị Lan",  dept: "Kế toán",    score: 83, risk: "low",    avatar: "NT", done: 12, total: 20 },
-  { name: "Trần Văn Bình",   dept: "Kế toán",    score: 47, risk: "high",   avatar: "TB", done: 5,  total: 20 },
-  { name: "Lê Thị Hoa",      dept: "Kế toán",    score: 65, risk: "medium", avatar: "LH", done: 9,  total: 20 },
-  { name: "Phạm Minh Tuấn",  dept: "Kinh doanh", score: 72, risk: "low",    avatar: "PT", done: 14, total: 20 },
-  { name: "Vũ Thị Thu",      dept: "Kinh doanh", score: 38, risk: "high",   avatar: "VT", done: 3,  total: 20 },
-  { name: "Hoàng Đức Nam",   dept: "IT",          score: 91, risk: "low",    avatar: "HN", done: 20, total: 20 },
-  { name: "Đinh Thị Yến",    dept: "IT",          score: 88, risk: "low",    avatar: "DY", done: 18, total: 20 },
-];
-
-const riskConfig = {
-  high:   { label: "Cao",        color: "#EF4444", glow: "rgba(239,68,68,0.35)" },
-  medium: { label: "Trung bình", color: "#F59E0B", glow: "rgba(245,158,11,0.3)" },
-  low:    { label: "Thấp",       color: "#10B981", glow: "rgba(16,185,129,0.35)" },
+/* ── riskConfig: thêm critical ──────────────────────── */
+const riskConfig: Record<string, { label: string; color: string; glow: string }> = {
+  critical: { label: "Nguy kịch", color: "#7C3AED", glow: "rgba(124,58,237,0.4)" },
+  high:     { label: "Cao",        color: "#EF4444", glow: "rgba(239,68,68,0.35)" },
+  medium:   { label: "Trung bình", color: "#F59E0B", glow: "rgba(245,158,11,0.3)" },
+  low:      { label: "Thấp",       color: "#10B981", glow: "rgba(16,185,129,0.35)" },
 };
 
 const scoreColor = (s: number) => s >= 75 ? "#10B981" : s >= 50 ? "#F59E0B" : "#EF4444";
 
-const sparkScore = [{ v: 60 }, { v: 63 }, { v: 66 }, { v: 68 }, { v: 71 }, { v: 69 }, { v: 69 }];
-const sparkClick = [{ v: 20 }, { v: 18 }, { v: 15 }, { v: 14 }, { v: 12 }, { v: 10 }, { v: 8 }];
-
-/* ── Sparkline ────────────────────────────────────── */
-function Sparkline({ data, color, id }: { data: { v: number }[]; color: string; id: string }) {
-  return (
-    <div style={{ width: "100%", height: 36 }}>
-      <ResponsiveContainer width="100%" height={36}>
-        <LineChart data={data} id={id}>
-          <Line type="monotone" dataKey="v" stroke={color} strokeWidth={2} dot={false} />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
+/* Derive avatar initials từ fullName ─────────────────── */
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-/* ── MAIN ─────────────────────────────────────────── */
+/* ── MAIN ─────────────────────────────────────────────── */
 export function ManagerDashboard() {
-  const avgScore = Math.round(employees.reduce((a, e) => a + e.score, 0) / employees.length);
-  const completedPct = Math.round(employees.filter((e) => e.done === e.total).length / employees.length * 100);
+  const [overview, setOverview] = useState<any>(null);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [ov, emps, cpRes] = await Promise.all([
+          analyticsService.getCompanyOverview(),
+          analyticsService.getHighRiskEmployees(),
+          analyticsService.getCampaignCompletion(),
+        ]);
+        setOverview(ov);
+        setEmployees(emps ?? []);
+        setCampaigns(cpRes?.campaigns ?? []);
+      } catch (err) {
+        console.error("Analytics load error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  /* Stat cards ─────────────────────────────────────── */
+  const cards = [
+    {
+      label: "Điểm TB phòng ban",
+      value: overview ? `${overview.avgRiskScore}` : "—",
+      suffix: "/100",
+      icon: Star,
+      color: "#6366F1",
+      sub: `${overview?.totalAttempts ?? 0} lần thực hành`,
+    },
+    {
+      label: "Đã hoàn thành học",
+      value: overview ? `${overview.lessonCompletionRate}%` : "—",
+      suffix: "",
+      icon: Users,
+      color: "#10B981",
+      sub: `${overview?.activeEmployees ?? 0} nhân viên hoạt động`,
+    },
+    {
+      label: "Email lừa đảo click",
+      value: overview ? `${overview.totalClickedLink}` : "—",
+      suffix: " lần",
+      icon: AlertTriangle,
+      color: "#F59E0B",
+      sub: `${overview?.totalCredentialLeaked ?? 0} lần lộ thông tin`,
+    },
+    {
+      label: "Nhân viên hoạt động",
+      value: overview ? `${overview.activeEmployees}` : "—",
+      suffix: "",
+      icon: Award,
+      color: "#8B5CF6",
+      sub: `Tổng ${overview?.totalEmployees ?? 0} nhân viên`,
+    },
+  ];
+
+  /* Bar chart data từ campaigns ────────────────────── */
+  const chartData = campaigns.map((c: any) => ({
+    name: c.campaignName.length > 16 ? c.campaignName.slice(0, 14) + "…" : c.campaignName,
+    "Hoàn thành bài học": Math.round(c.lessonCompletionPct),
+    "Tỷ lệ phát hiện": Math.round(c.detectionRate),
+  }));
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 size={28} className="animate-spin text-indigo-500" />
+        <span className="ml-3 text-slate-400 text-sm">Đang tải dữ liệu...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 max-w-screen-xl mx-auto">
@@ -65,7 +114,7 @@ export function ManagerDashboard() {
             Dashboard Quản lý 👔
           </h1>
           <p className="text-slate-500 mt-0.5" style={{ fontSize: "0.88rem" }}>
-            Tổng quan hiệu suất bảo mật Phòng Kế toán & Kinh doanh
+            Tổng quan hiệu suất bảo mật — {overview?.totalEmployees ?? 0} nhân viên
           </p>
         </div>
         <button
@@ -82,14 +131,9 @@ export function ManagerDashboard() {
         </button>
       </div>
 
-      {/* Stat cards with sparklines */}
+      {/* Stat cards — deltas ẩn (không có time-series) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {[
-          { label: "Điểm TB phòng ban", value: avgScore, suffix: "/100", icon: Star, color: "#6366F1", delta: "+8", deltaUp: true, deltaText: "so với tháng trước", spark: sparkScore, sparkColor: "#6366F1", sparkId: "mgr-spark-score" },
-          { label: "Đã hoàn thành học", value: `${completedPct}%`, suffix: "", icon: Users, color: "#10B981", delta: "+14%", deltaUp: true, deltaText: "4/7 nhân viên", spark: null, sparkColor: "", sparkId: "" },
-          { label: "Email lừa đảo click", value: "8", suffix: " lần", icon: AlertTriangle, color: "#F59E0B", delta: "↓12", deltaUp: false, deltaText: "giảm so với tháng trước", spark: sparkClick, sparkColor: "#EF4444", sparkId: "mgr-spark-click" },
-          { label: "Xếp hạng công ty", value: "#3", suffix: "", icon: Award, color: "#8B5CF6", delta: "+1", deltaUp: true, deltaText: "trong 12 phòng ban", spark: null, sparkColor: "", sparkId: "" },
-        ].map(({ label, value, suffix, icon: Icon, color, delta, deltaUp, deltaText, spark, sparkColor, sparkId }) => (
+        {cards.map(({ label, value, suffix, icon: Icon, color, sub }) => (
           <div
             key={label}
             className="rounded-3xl p-5 transition-all duration-300 hover:-translate-y-0.5"
@@ -109,17 +153,12 @@ export function ManagerDashboard() {
             <p className="mb-1" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: "1.7rem", color: "#0F172A" }}>
               {value}<span style={{ fontSize: "0.9rem", fontWeight: 500, color: "#94A3B8" }}>{suffix}</span>
             </p>
-            <div className="flex items-center gap-1.5 mb-2">
-              {deltaUp ? <ArrowUpRight size={14} className="text-emerald-500" /> : <ArrowDownRight size={14} className="text-emerald-500" />}
-              <span className="text-emerald-600" style={{ fontSize: "0.78rem", fontWeight: 700 }}>{delta}</span>
-              <span className="text-slate-400" style={{ fontSize: "0.72rem" }}>{deltaText}</span>
-            </div>
-            {spark && <Sparkline data={spark} color={sparkColor} id={sparkId} />}
+            <p className="text-slate-400" style={{ fontSize: "0.72rem" }}>{sub}</p>
           </div>
         ))}
       </div>
 
-      {/* Area chart */}
+      {/* Bar chart: tiến độ theo Campaign */}
       <div
         className="rounded-3xl p-6"
         style={{
@@ -132,45 +171,40 @@ export function ManagerDashboard() {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "1.05rem", color: "#0F172A" }}>
-              Tiến độ 3 nhóm nhân viên
+              Tiến độ theo Chiến dịch
             </h3>
-            <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.78rem" }}>Chỉ số tín nhiệm bảo mật theo tháng</p>
+            <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.78rem" }}>% hoàn thành bài học & tỷ lệ phát hiện phishing</p>
           </div>
-          <div className="flex items-center gap-1 text-emerald-600" style={{ fontSize: "0.82rem", fontWeight: 700 }}>
-            <TrendingUp size={14} /> Tất cả đang tăng
+          <div className="flex items-center gap-1 text-indigo-600" style={{ fontSize: "0.82rem", fontWeight: 700 }}>
+            <TrendingUp size={14} /> {campaigns.length} chiến dịch
           </div>
         </div>
-        <div style={{ width: "100%", minHeight: 260 }}>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={teamProgress} id="mgr-area-chart">
-              <defs>
-                <linearGradient id="mgrGradKetoan" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6366F1" stopOpacity={0.25} />
-                  <stop offset="100%" stopColor="#6366F1" stopOpacity={0.02} />
-                </linearGradient>
-                <linearGradient id="mgrGradIT" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity={0.02} />
-                </linearGradient>
-                <linearGradient id="mgrGradKD" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#F59E0B" stopOpacity={0.02} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F0F2FF" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-              <YAxis domain={[30, 100]} tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: 16, border: "none", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", fontSize: 12, background: "rgba(255,255,255,0.95)" }} />
-              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} formatter={(v: string) => v === "ketoan" ? "Kế toán" : v === "it" ? "IT" : "Kinh doanh"} />
-              <Area type="monotone" dataKey="ketoan" stroke="#6366F1" strokeWidth={2.5} fill="url(#mgrGradKetoan)" dot={{ r: 4 }} activeDot={{ r: 6 }} />
-              <Area type="monotone" dataKey="it" stroke="#10B981" strokeWidth={2.5} fill="url(#mgrGradIT)" dot={{ r: 4 }} activeDot={{ r: 6 }} />
-              <Area type="monotone" dataKey="kinh_doanh" stroke="#F59E0B" strokeWidth={2.5} fill="url(#mgrGradKD)" dot={{ r: 4 }} activeDot={{ r: 6 }} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+
+        {chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-48 text-slate-400 text-sm">
+            Chưa có chiến dịch nào được giao cho công ty này.
+          </div>
+        ) : (
+          <div style={{ width: "100%", minHeight: 260 }}>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={chartData} barGap={4} barCategoryGap="28%">
+                <CartesianGrid strokeDasharray="3 3" stroke="#F0F2FF" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} unit="%" />
+                <Tooltip
+                  formatter={(val: number) => [`${val}%`]}
+                  contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", fontSize: 12 }}
+                />
+                <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+                <Bar dataKey="Hoàn thành bài học" fill="#6366F1" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Tỷ lệ phát hiện" fill="#10B981" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
-      {/* Employee list — spaced rows with neon glow */}
+      {/* Employee list */}
       <div
         className="rounded-3xl p-6"
         style={{
@@ -191,86 +225,81 @@ export function ManagerDashboard() {
         </div>
 
         {/* Header row */}
-        <div
-          className="grid items-center px-4 pb-3"
-          style={{ gridTemplateColumns: "2fr 1fr 1fr 1.2fr 1fr 0.6fr" }}
-        >
-          {["Nhân viên", "Phòng ban", "Điểm", "Tiến độ", "Rủi ro", ""].map((h) => (
-            <span key={h || "action-col"} className="text-slate-400" style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.04em" }}>{h}</span>
+        <div className="grid items-center px-4 pb-3" style={{ gridTemplateColumns: "2fr 1fr 1fr 1.2fr 1fr 0.6fr" }}>
+          {["Nhân viên", "Bộ phận", "Điểm", "Tiến độ", "Rủi ro", ""].map((h) => (
+            <span key={h || "action"} className="text-slate-400" style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.04em" }}>{h}</span>
           ))}
         </div>
 
-        {/* Rows */}
-        <div className="space-y-2">
-          {employees.map((emp) => {
-            const risk = riskConfig[emp.risk as keyof typeof riskConfig];
-            const pct = (emp.done / emp.total) * 100;
-            return (
-              <div
-                key={emp.name}
-                className="grid items-center px-4 py-3.5 rounded-xl cursor-pointer transition-all hover:shadow-sm group"
-                style={{
-                  gridTemplateColumns: "2fr 1fr 1fr 1.2fr 1fr 0.6fr",
-                  background: "#fff",
-                  borderRadius: 12,
-                }}
-              >
-                {/* Name */}
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${scoreColor(emp.score)}, ${scoreColor(emp.score)}cc)`, fontWeight: 700, fontSize: "0.78rem" }}
-                  >
-                    {emp.avatar}
+        {employees.length === 0 ? (
+          <p className="text-center text-slate-400 py-8 text-sm">Chưa có nhân viên nào trong công ty.</p>
+        ) : (
+          <div className="space-y-2">
+            {employees.map((emp: any) => {
+              const riskKey = (emp.riskLevel ?? "medium").toLowerCase() as keyof typeof riskConfig;
+              const risk = riskConfig[riskKey] ?? riskConfig.medium;
+              const score = Math.round(emp.riskScore ?? 50);
+              const done = emp.completedLessons ?? 0;
+              const total = emp.totalAssignedLessons ?? 0;
+              const pct = total > 0 ? (done / total) * 100 : 0;
+
+              return (
+                <div
+                  key={emp.userId}
+                  className="grid items-center px-4 py-3.5 rounded-xl cursor-pointer transition-all hover:shadow-sm group"
+                  style={{ gridTemplateColumns: "2fr 1fr 1fr 1.2fr 1fr 0.6fr", background: "#fff", borderRadius: 12 }}
+                >
+                  {/* Name + avatar */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0"
+                      style={{ background: `linear-gradient(135deg, ${scoreColor(score)}, ${scoreColor(score)}cc)`, fontWeight: 700, fontSize: "0.78rem" }}
+                    >
+                      {initials(emp.fullName ?? "?")}
+                    </div>
+                    <span className="text-slate-800" style={{ fontWeight: 600, fontSize: "0.88rem" }}>{emp.fullName}</span>
                   </div>
-                  <span className="text-slate-800" style={{ fontWeight: 600, fontSize: "0.88rem" }}>{emp.name}</span>
-                </div>
 
-                {/* Dept */}
-                <span className="text-slate-500" style={{ fontSize: "0.85rem" }}>{emp.dept}</span>
+                  {/* Dept — không có trong model */}
+                  <span className="text-slate-400" style={{ fontSize: "0.85rem" }}>—</span>
 
-                {/* Score */}
-                <div>
-                  <span style={{ fontWeight: 700, fontSize: "1rem", color: scoreColor(emp.score) }}>{emp.score}</span>
-                  <span className="text-slate-400" style={{ fontSize: "0.75rem" }}>/100</span>
-                </div>
-
-                {/* Progress */}
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 rounded-full flex-1 max-w-[100px]" style={{ background: "#F1F5F9" }}>
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: scoreColor(emp.score) }} />
+                  {/* Score */}
+                  <div>
+                    <span style={{ fontWeight: 700, fontSize: "1rem", color: scoreColor(score) }}>{score}</span>
+                    <span className="text-slate-400" style={{ fontSize: "0.75rem" }}>/100</span>
                   </div>
-                  <span className="text-slate-400" style={{ fontSize: "0.72rem" }}>{emp.done}/{emp.total}</span>
-                </div>
 
-                {/* Risk — Neon Glow */}
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <span
-                      className="block w-2.5 h-2.5 rounded-full"
-                      style={{ background: risk.color }}
-                    />
-                    <span
-                      className="absolute inset-0 rounded-full"
-                      style={{ background: risk.color, filter: "blur(4px)", opacity: 0.6 }}
-                    />
-                    {emp.risk === "high" && (
-                      <span className="absolute inset-0 rounded-full animate-ping" style={{ background: risk.color, opacity: 0.3 }} />
-                    )}
+                  {/* Progress */}
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 rounded-full flex-1 max-w-[100px]" style={{ background: "#F1F5F9" }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: scoreColor(score) }} />
+                    </div>
+                    <span className="text-slate-400" style={{ fontSize: "0.72rem" }}>{done}/{total}</span>
                   </div>
-                  <span style={{ fontSize: "0.8rem", fontWeight: 600, color: risk.color, textShadow: `0 0 8px ${risk.glow}` }}>
-                    {risk.label}
-                  </span>
-                </div>
 
-                {/* Action */}
-                <div className="flex justify-end">
-                  <ChevronRight size={15} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                  {/* Risk — Neon Glow */}
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <span className="block w-2.5 h-2.5 rounded-full" style={{ background: risk.color }} />
+                      <span className="absolute inset-0 rounded-full" style={{ background: risk.color, filter: "blur(4px)", opacity: 0.6 }} />
+                      {(riskKey === "high" || riskKey === "critical") && (
+                        <span className="absolute inset-0 rounded-full animate-ping" style={{ background: risk.color, opacity: 0.3 }} />
+                      )}
+                    </div>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 600, color: risk.color, textShadow: `0 0 8px ${risk.glow}` }}>
+                      {risk.label}
+                    </span>
+                  </div>
+
+                  {/* Action */}
+                  <div className="flex justify-end">
+                    <ChevronRight size={15} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
