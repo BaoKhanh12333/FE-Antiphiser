@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { GoogleLogin } from "@react-oauth/google";
 import { authService } from "../services/authService";
 import { userService } from "../services/userService";
 import {
@@ -320,6 +321,35 @@ export function LoginPage() {
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPassValid = password.length >= 4;
   const loginSuccess = loginState === "success";
+
+  const handleGoogleLogin = async (credentialResponse: any) => {
+    setLoginState("loading");
+    setErrorMsg("");
+
+    try {
+      if (!credentialResponse.credential) {
+        throw new Error("Không nhận được credential từ Google");
+      }
+      await authService.loginWithGoogle(credentialResponse.credential);
+
+      const role = authService.getCurrentRole()?.toLowerCase() || "";
+      if (role) {
+        setSelectedRole(role as Role);
+      }
+
+      setLoginState("success");
+
+      setTimeout(() => {
+        const currentRole = authService.getCurrentRole()?.toLowerCase() || "";
+        const path = currentRole === "manager" ? "/quan-ly" : currentRole === "admin" ? "/quan-tri" : "/nguoi-dung";
+        navigate(path);
+      }, 800);
+    } catch (error: any) {
+      console.error("Lỗi đăng nhập Google:", error);
+      setLoginState("idle");
+      setErrorMsg(error.message || "Đăng nhập Google thất bại, vui lòng thử lại!");
+    }
+  };
 
   const handleLogin = async () => {
     if (!isEmailValid || !isPassValid) return;
@@ -665,7 +695,22 @@ export function LoginPage() {
               </>
             )}
           </button>
-
+          {/* Separator / Google Login */}
+          <div className="flex items-center my-6">
+            <div className="flex-grow h-px bg-indigo-500/20"></div>
+            <span className="px-4 text-sm font-medium text-slate-400">Hoặc tiếp tục với</span>
+            <div className="flex-grow h-px bg-indigo-500/20"></div>
+          </div>
+          
+          <div className="flex justify-center mb-6 w-full overflow-hidden">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => setErrorMsg("Đăng nhập Google thất bại!")}
+              theme="outline"
+              size="large"
+              width="100%"
+            />
+          </div>
           {/* Validation hints */}
           {(email.length > 0 || password.length > 0) && (
             <div
@@ -682,7 +727,7 @@ export function LoginPage() {
                 },
                 {
                   ok: isPassValid,
-                  text: "Mật khẩu ít nhất 4 ký tự",
+                  text: "Mật khẩu ít nhất 6 ký tự",
                 },
               ].map(({ ok, text }) => (
                 <div key={text} className="flex items-center gap-2">

@@ -1,75 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  Sparkles, Download, TrendingUp, TrendingDown,
-  AlertTriangle, Shield, Clock, ChevronRight,
-  FileText, Brain,
+  Sparkles, Download, AlertTriangle, Shield, Clock,
+  ChevronRight, FileText, Brain, Loader2, Construction,
 } from "lucide-react";
+import { analyticsService } from "../../services/analyticsService";
 
-/* ── DATA ─────────────────────────────────────────── */
-const heatmapData = [
-  // rows = days (T2-CN), cols = hours (8-18)
-  { day: "T2",  hours: [2, 5, 3, 8, 6, 4, 7, 9, 5, 3, 1] },
-  { day: "T3",  hours: [1, 4, 6, 7, 5, 3, 6, 8, 4, 2, 1] },
-  { day: "T4",  hours: [3, 6, 5, 9, 7, 5, 8,10, 6, 4, 2] },
-  { day: "T5",  hours: [2, 3, 4, 6, 5, 3, 5, 7, 3, 2, 1] },
-  { day: "T6",  hours: [4, 7, 8,10, 8, 6, 9,10, 7, 5, 3] },
-  { day: "T7",  hours: [1, 2, 3, 4, 3, 2, 3, 4, 2, 1, 0] },
-  { day: "CN",  hours: [0, 1, 1, 2, 1, 1, 2, 2, 1, 0, 0] },
-];
-
+/* ── Heatmap helpers ────────────────────────────────── */
+// UI shows working hours 8h–18h → slice hours[8..18] from 24-element array
 const hoursLabels = ["8h", "9h", "10h", "11h", "12h", "13h", "14h", "15h", "16h", "17h", "18h"];
 
-const aiInsights = [
-  {
-    id: 1,
-    type: "warning",
-    title: "Nhóm Kế toán dễ bị lừa bởi tệp đính kèm .zip",
-    desc: "AI nhận thấy 4/5 lần click nhầm của nhóm Kế toán liên quan đến file .zip giả mạo hóa đơn. Hãy ưu tiên khóa học 'Nhận diện Mã độc qua File đính kèm' cho nhóm này.",
-    action: "Gán khóa học Mã độc",
-    gradient: "linear-gradient(135deg, #F59E0B, #FBBF24)",
-    iconBg: "#FFFBEB",
-    iconColor: "#F59E0B",
-  },
-  {
-    id: 2,
-    type: "critical",
-    title: "Trần Văn Bình cần can thiệp khẩn cấp",
-    desc: "Nhân viên này đã click nhầm 4 lần liên tiếp trong 2 tuần, điểm số giảm từ 55 xuống 47. Đề xuất: Buổi đào tạo 1-1 kết hợp bài kiểm tra thực hành.",
-    action: "Lên lịch đào tạo 1-1",
-    gradient: "linear-gradient(135deg, #EF4444, #F87171)",
-    iconBg: "#FEF2F2",
-    iconColor: "#EF4444",
-  },
-  {
-    id: 3,
-    type: "positive",
-    title: "Nhóm IT đạt tỷ lệ phát hiện 95%",
-    desc: "Đội IT đã cải thiện đáng kể nhờ khóa học 'Advanced Phishing Detection'. Hãy áp dụng mô hình tương tự cho các phòng ban khác.",
-    action: "Nhân rộng mô hình",
-    gradient: "linear-gradient(135deg, #10B981, #34D399)",
-    iconBg: "#ECFDF5",
-    iconColor: "#10B981",
-  },
-  {
-    id: 4,
-    type: "info",
-    title: "Chiều thứ Sáu là khung giờ rủi ro cao nhất",
-    desc: "Dữ liệu cho thấy 35% các lần click nhầm xảy ra vào khung 14h-16h thứ Sáu. AI đề xuất: Gửi email mô phỏng vào đúng khung giờ này để huấn luyện.",
-    action: "Lên lịch chiến dịch T6",
-    gradient: "linear-gradient(135deg, #6366F1, #818CF8)",
-    iconBg: "#EEF2FF",
-    iconColor: "#6366F1",
-  },
-];
-
-const monthlyStats = [
-  { label: "Tỷ lệ phát hiện phishing", value: "78%", delta: "+12%", up: true, color: "#10B981" },
-  { label: "Số lần click nhầm", value: "8", delta: "↓12 lần", up: false, color: "#10B981" },
-  { label: "Bài học hoàn thành", value: "67%", delta: "+18%", up: true, color: "#6366F1" },
-  { label: "Thời gian TB phát hiện", value: "45s", delta: "↓15s", up: false, color: "#F59E0B" },
-];
-
-/* ── Heatmap cell color ───────────────────────────── */
 function heatColor(v: number): string {
   if (v === 0) return "#F8FAFF";
   if (v <= 2) return "#E0E7FF";
@@ -78,18 +17,68 @@ function heatColor(v: number): string {
   if (v <= 8) return "#818CF8";
   return "#6366F1";
 }
-
 function heatTextColor(v: number): string {
   return v >= 7 ? "#fff" : "#64748B";
 }
 
-/* ── MAIN ─────────────────────────────────────────── */
+/* ── MAIN ─────────────────────────────────────────────── */
 export function ManagerBaoCao() {
+  const [overview, setOverview] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+
+  useEffect(() => {
+    analyticsService
+      .getCompanyOverview()
+      .then((data: any) => setOverview(data))
+      .catch((err: any) => console.error("BaoCao load error:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
   function handleExport() {
     setExporting(true);
     setTimeout(() => setExporting(false), 2000);
+  }
+
+  /* 4 stat cards — deltas ẩn (không có time-series) */
+  const stats = overview
+    ? [
+        { label: "Tỷ lệ phát hiện phishing", value: `${overview.overallDetectionRate}%`, color: "#10B981" },
+        { label: "Số lần click nhầm",          value: `${overview.totalClickedLink} lần`,   color: "#EF4444" },
+        { label: "Bài học hoàn thành",          value: `${overview.lessonCompletionRate}%`,  color: "#6366F1" },
+        {
+          label: "Thời gian TB phát hiện",
+          value: overview.avgDetectionSeconds > 0 ? `${overview.avgDetectionSeconds}s` : "—",
+          color: "#F59E0B",
+        },
+      ]
+    : [];
+
+  /* Heatmap data: slice giờ làm việc 8h-18h từ mảng 24 phần tử */
+  const heatmapRows = (overview?.heatmap ?? []).map((row: any) => ({
+    day: row.day,
+    hours: (row.hours as number[]).slice(8, 19), // index 8..18 inclusive → 11 giờ
+  }));
+
+  /* Tìm khung giờ cao nhất để sinh insight text động */
+  const peakInfo = (() => {
+    if (!heatmapRows.length) return null;
+    let maxVal = 0, maxDay = "", maxHour = 8;
+    heatmapRows.forEach((row: any) => {
+      row.hours.forEach((v: number, i: number) => {
+        if (v > maxVal) { maxVal = v; maxDay = row.day; maxHour = i + 8; }
+      });
+    });
+    return maxVal > 0 ? { day: maxDay, hour: maxHour, val: maxVal } : null;
+  })();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 size={28} className="animate-spin text-indigo-500" />
+        <span className="ml-3 text-slate-400 text-sm">Đang tải dữ liệu...</span>
+      </div>
+    );
   }
 
   return (
@@ -116,17 +105,13 @@ export function ManagerBaoCao() {
             boxShadow: "0 4px 16px rgba(15,23,42,0.2)",
           }}
         >
-          {exporting ? (
-            <><FileText size={15} /> Đang tải...</>
-          ) : (
-            <><Download size={15} /> Tải báo cáo PDF cho ban giám đốc</>
-          )}
+          {exporting ? <><FileText size={15} /> Đang tải...</> : <><Download size={15} /> Tải báo cáo PDF</>}
         </button>
       </div>
 
-      {/* Monthly stats */}
+      {/* Stat cards — delta ẩn */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {monthlyStats.map(({ label, value, delta, up, color }) => (
+        {stats.map(({ label, value, color }) => (
           <div
             key={label}
             className="rounded-3xl p-5 transition-all hover:-translate-y-0.5"
@@ -138,16 +123,12 @@ export function ManagerBaoCao() {
           >
             <p className="text-slate-500 mb-1" style={{ fontSize: "0.78rem" }}>{label}</p>
             <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: "1.6rem", color: "#0F172A" }}>{value}</p>
-            <div className="flex items-center gap-1.5 mt-1">
-              {up ? <TrendingUp size={13} style={{ color }} /> : <TrendingDown size={13} style={{ color }} />}
-              <span style={{ fontSize: "0.78rem", fontWeight: 700, color }}>{delta}</span>
-              <span className="text-slate-400" style={{ fontSize: "0.72rem" }}>tháng này</span>
-            </div>
+            <p className="text-slate-300 mt-1" style={{ fontSize: "0.7rem" }}>Dữ liệu thực tế</p>
           </div>
         ))}
       </div>
 
-      {/* AI Insights */}
+      {/* AI Insights — placeholder (chưa có nguồn dữ liệu) */}
       <div>
         <div className="flex items-center gap-2 mb-5">
           <Brain size={18} className="text-indigo-500" />
@@ -156,46 +137,26 @@ export function ManagerBaoCao() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {aiInsights.map((insight) => (
-            <div
-              key={insight.id}
-              className="rounded-3xl p-5 relative overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-pointer group"
-              style={{
-                background: "#fff",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.02), 0 8px 32px rgba(0,0,0,0.04)",
-              }}
-            >
-              {/* Gradient top border */}
-              <div className="absolute top-0 left-0 right-0 h-1" style={{ background: insight.gradient }} />
-
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" style={{ background: insight.iconBg }}>
-                  {insight.type === "warning" && <AlertTriangle size={20} style={{ color: insight.iconColor }} />}
-                  {insight.type === "critical" && <AlertTriangle size={20} style={{ color: insight.iconColor }} />}
-                  {insight.type === "positive" && <Shield size={20} style={{ color: insight.iconColor }} />}
-                  {insight.type === "info" && <Clock size={20} style={{ color: insight.iconColor }} />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Sparkles size={14} style={{ color: insight.iconColor }} />
-                    <h3 className="text-slate-800" style={{ fontWeight: 700, fontSize: "0.92rem" }}>{insight.title}</h3>
-                  </div>
-                  <p className="text-slate-500 mb-3" style={{ fontSize: "0.82rem", lineHeight: 1.7 }}>{insight.desc}</p>
-                  <button
-                    className="flex items-center gap-1 transition-colors group-hover:gap-2"
-                    style={{ fontSize: "0.82rem", fontWeight: 700, color: insight.iconColor }}
-                  >
-                    {insight.action} <ChevronRight size={14} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div
+          className="rounded-3xl p-8 flex flex-col items-center gap-3 text-center"
+          style={{
+            background: "rgba(255,255,255,0.7)", backdropFilter: "blur(16px)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.02), 0 8px 32px rgba(0,0,0,0.04)",
+            border: "1px solid rgba(99,102,241,0.1)",
+          }}
+        >
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "#EEF2FF" }}>
+            <Construction size={28} className="text-indigo-400" />
+          </div>
+          <p style={{ fontWeight: 700, fontSize: "0.95rem", color: "#374151" }}>Đang phát triển</p>
+          <p className="text-slate-400 max-w-sm" style={{ fontSize: "0.83rem", lineHeight: 1.7 }}>
+            Tính năng phân tích & đề xuất từ AI đang được xây dựng.
+            Hệ thống sẽ tự động sinh insight từ dữ liệu thực hành của nhân viên.
+          </p>
         </div>
       </div>
 
-      {/* Heatmap */}
+      {/* Heatmap: data thật từ company-overview */}
       <div
         className="rounded-3xl p-6"
         style={{
@@ -210,7 +171,7 @@ export function ManagerBaoCao() {
               Bản đồ nhiệt: Khung giờ mất cảnh giác
             </h3>
             <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.78rem" }}>
-              Số lần click nhầm theo ngày và giờ trong tuần · Màu đậm = rủi ro cao
+              Số lần click nhầm theo ngày và giờ trong tuần (UTC+7) · Màu đậm = rủi ro cao
             </p>
           </div>
           <div className="flex items-center gap-1.5">
@@ -222,52 +183,56 @@ export function ManagerBaoCao() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <div className="min-w-[600px]">
-            {/* Hours header */}
-            <div className="grid items-center gap-1.5 mb-2" style={{ gridTemplateColumns: "60px repeat(11, 1fr)" }}>
-              <span />
-              {hoursLabels.map((h) => (
-                <span key={h} className="text-center text-slate-400" style={{ fontSize: "0.72rem", fontWeight: 600 }}>{h}</span>
-              ))}
-            </div>
-
-            {/* Rows */}
-            {heatmapData.map((row) => (
-              <div key={row.day} className="grid items-center gap-1.5 mb-1.5" style={{ gridTemplateColumns: "60px repeat(11, 1fr)" }}>
-                <span className="text-slate-600" style={{ fontSize: "0.82rem", fontWeight: 600 }}>{row.day}</span>
-                {row.hours.map((v, i) => (
-                  <div
-                    key={`heat-${row.day}-${i}`}
-                    className="rounded-lg flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
-                    style={{
-                      height: 36,
-                      background: heatColor(v),
-                      color: heatTextColor(v),
-                      fontSize: "0.72rem",
-                      fontWeight: v >= 7 ? 700 : 500,
-                    }}
-                    title={`${row.day} ${hoursLabels[i]}: ${v} lần click nhầm`}
-                  >
-                    {v > 0 ? v : ""}
-                  </div>
+        {heatmapRows.length === 0 ? (
+          <p className="text-center text-slate-400 py-8 text-sm">Chưa có dữ liệu thực hành nào.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <div className="min-w-[600px]">
+              {/* Hours header */}
+              <div className="grid items-center gap-1.5 mb-2" style={{ gridTemplateColumns: "60px repeat(11, 1fr)" }}>
+                <span />
+                {hoursLabels.map((h) => (
+                  <span key={h} className="text-center text-slate-400" style={{ fontSize: "0.72rem", fontWeight: 600 }}>{h}</span>
                 ))}
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Heatmap insights */}
+              {/* Rows */}
+              {heatmapRows.map((row: any) => (
+                <div key={row.day} className="grid items-center gap-1.5 mb-1.5" style={{ gridTemplateColumns: "60px repeat(11, 1fr)" }}>
+                  <span className="text-slate-600" style={{ fontSize: "0.82rem", fontWeight: 600 }}>{row.day}</span>
+                  {row.hours.map((v: number, i: number) => (
+                    <div
+                      key={`heat-${row.day}-${i}`}
+                      className="rounded-lg flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                      style={{
+                        height: 36,
+                        background: heatColor(v),
+                        color: heatTextColor(v),
+                        fontSize: "0.72rem",
+                        fontWeight: v >= 7 ? 700 : 500,
+                      }}
+                      title={`${row.day} ${hoursLabels[i]}: ${v} lần click nhầm`}
+                    >
+                      {v > 0 ? v : ""}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Insight text động từ data thật */}
         <div className="mt-5 rounded-2xl p-4 flex items-start gap-3" style={{ background: "rgba(99,102,241,0.04)", border: "1px solid rgba(99,102,241,0.08)" }}>
           <Sparkles size={16} className="text-indigo-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-slate-700" style={{ fontWeight: 600, fontSize: "0.85rem" }}>
-              Phân tích từ AI: Khung giờ rủi ro cao nhất
+              Phân tích dữ liệu: Khung giờ rủi ro
             </p>
             <p className="text-slate-500 mt-1" style={{ fontSize: "0.82rem", lineHeight: 1.7 }}>
-              Thứ Tư và Thứ Sáu, khung giờ <strong>15h-16h</strong> có tỷ lệ click nhầm cao nhất (10 lần/tuần). 
-              Đây là lúc nhân viên thường mệt mỏi và mất tập trung. AI đề xuất: Triển khai email mô phỏng phishing vào đúng khung giờ này 
-              để tạo thói quen cảnh giác.
+              {peakInfo
+                ? <>Khung giờ rủi ro cao nhất là <strong>{peakInfo.day} {peakInfo.hour}h</strong> với <strong>{peakInfo.val} lần</strong> click nhầm. Hãy cân nhắc gửi email mô phỏng vào đúng khung giờ này để tăng cảnh giác.</>
+                : "Chưa có dữ liệu click nhầm. Hệ thống sẽ hiển thị phân tích khi nhân viên thực hành."}
             </p>
           </div>
         </div>
