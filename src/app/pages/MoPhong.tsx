@@ -1,144 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router";
 import {
   CheckCircle2, XCircle, AlertTriangle, RefreshCw,
   Mail, Star, Paperclip, Inbox, Archive, Trash2, Bot,
-  Shield, ChevronRight, ArrowRight, Sparkles, ExternalLink,
-  Loader2,
+  Shield, ChevronRight, ArrowRight, ArrowLeft, Sparkles, ExternalLink,
+  Loader2, BookOpen, FileText,
 } from "lucide-react";
 import { scenarioService } from "../services/scenarioService";
+import { campaignService } from "../services/campaignService";
+import { lessonService } from "../services/lessonService";
+import { Lock } from "lucide-react";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const phishingEmails = [
-  {
-    id: 1,
-    from: "no-reply@vcb-secure.info",
-    fromName: "Vietcombank",
-    fromAvatar: "VB",
-    avatarColor: "#EF4444",
-    subject: "🚨 Tài khoản bị đình chỉ – Xác nhận ngay!",
-    time: "08:42",
-    bodyParts: [
-      { type: "text", content: "Kính gửi Quý khách,\n\nTài khoản của bạn đã bị hạn chế do vi phạm điều khoản sử dụng. Hệ thống ghi nhận 3 lần đăng nhập bất thường từ thiết bị lạ.\n\nVui lòng cung cấp thông tin xác thực trong " },
-      { type: "highlight", content: "24 giờ", style: "urgency" },
-      { type: "text", content: " để mở khóa tài khoản. Quá thời hạn, tài khoản sẽ bị vô hiệu hóa vĩnh viễn.\n\n" },
-      { type: "link", content: "→ Xác minh tài khoản ngay", fakeUrl: "http://vcb-secure-info.xyz/login?ref=urgent" },
-    ],
-    isPhishing: true,
-    hasAttachment: false,
-    starred: false,
-    aiVerdict: {
-      correct: {
-        headline: "Chính xác! Bạn đã phát hiện email phishing.",
-        summary: "Email này giả mạo Vietcombank thông qua địa chỉ người gửi lừa đảo và áp dụng kỹ thuật thúc ép thời gian để thao túng tâm lý nạn nhân.",
-        clues: [
-          { flag: "🚩", label: "Fake Domain", text: "vcb-secure.info ≠ vietcombank.com.vn — tên miền giả mạo điển hình" },
-          { flag: "🚩", label: "Urgency Tactic", text: '"24 giờ", "vô hiệu hóa vĩnh viễn" — tạo áp lực thời gian để làm mờ tư duy' },
-          { flag: "🚩", label: "Fake Link", text: "URL ẩn dẫn đến vcb-secure-info.xyz không phải vietcombank.com.vn" },
-          { flag: "🚩", label: "Data Harvesting", text: "Yêu cầu cung cấp thông tin xác thực qua email — ngân hàng không bao giờ làm vậy" },
-        ],
-        points: "+15",
-        pointColor: "#10B981",
-      },
-      wrong: {
-        headline: "Chưa đúng! Đây là email phishing.",
-        summary: "Email này đã đánh lừa bạn. Hãy để AI phân tích lý do để bạn không mắc bẫy lần sau.",
-        clues: [
-          { flag: "🚩", label: "Fake Domain", text: "vcb-secure.info ≠ vietcombank.com.vn — tên miền giả mạo điển hình" },
-          { flag: "🚩", label: "Urgency Tactic", text: '"24 giờ", "vô hiệu hóa vĩnh viễn" — tạo áp lực thời gian để làm mờ tư duy' },
-          { flag: "🚩", label: "Fake Link", text: "URL ẩn dẫn đến vcb-secure-info.xyz không phải vietcombank.com.vn" },
-        ],
-        points: "-5",
-        pointColor: "#EF4444",
-      },
-    },
-  },
-  {
-    id: 2,
-    from: "hr@congty.vn",
-    fromName: "Phòng Nhân sự",
-    fromAvatar: "NS",
-    avatarColor: "#10B981",
-    subject: "Lịch họp toàn công ty tháng 3/2026",
-    time: "09:15",
-    bodyParts: [
-      { type: "text", content: "Kính gửi toàn thể nhân viên,\n\nPhòng Nhân sự thông báo lịch họp Quý I/2026 sẽ được tổ chức vào ngày " },
-      { type: "highlight", content: "15/3/2026", style: "safe" },
-      { type: "text", content: ", tại hội trường tầng 5, lúc 14:00.\n\nChương trình:\n• Tổng kết Q1/2026\n• Kế hoạch Q2/2026\n• Chương trình đào tạo mới\n\nXin phép xác nhận tham dự qua " },
-      { type: "link", content: "hệ thống nội bộ", fakeUrl: "https://intranet.congty.vn/confirm" },
-      { type: "text", content: " trước ngày 12/3.\n\nTrân trọng,\nPhòng Nhân sự" },
-    ],
-    isPhishing: false,
-    hasAttachment: false,
-    starred: true,
-    aiVerdict: {
-      correct: {
-        headline: "Chính xác! Đây là email hợp lệ.",
-        summary: "Email này đến từ domain nội bộ congty.vn, nội dung chuyên nghiệp, không yêu cầu thông tin nhạy cảm và link dẫn về intranet chính thức.",
-        clues: [
-          { flag: "✅", label: "Legit Domain", text: "@congty.vn — domain chính thức của công ty, không phải tên miền lạ" },
-          { flag: "✅", label: "No Sensitive Request", text: "Không yêu cầu mật khẩu, thông tin tài chính hay CCCD" },
-          { flag: "✅", label: "Internal Link", text: "Link dẫn đến intranet.congty.vn — hệ thống nội bộ tin cậy" },
-        ],
-        points: "+10",
-        pointColor: "#10B981",
-      },
-      wrong: {
-        headline: "Chưa đúng! Đây là email hợp lệ.",
-        summary: "Bạn đã báo nhầm email an toàn. Email từ @congty.vn là domain chính thức, nội dung rõ ràng và không có dấu hiệu lừa đảo.",
-        clues: [
-          { flag: "✅", label: "Legit Domain", text: "@congty.vn — domain chính thức của công ty" },
-          { flag: "✅", label: "Professional Content", text: "Nội dung rõ ràng, đúng ngữ cảnh, không tạo áp lực hay yêu cầu click link lạ" },
-        ],
-        points: "-3",
-        pointColor: "#EF4444",
-      },
-    },
-  },
-  {
-    id: 3,
-    from: "prize@vietlott-lucky.xyz",
-    fromName: "Vietlott Chính thức",
-    fromAvatar: "VL",
-    avatarColor: "#F59E0B",
-    subject: "🎉 Chúc mừng! Bạn đã trúng 500 triệu đồng!",
-    time: "Hôm qua",
-    bodyParts: [
-      { type: "text", content: "Xin chúc mừng!\n\nSố điện thoại của bạn đã được hệ thống chọn ngẫu nhiên để nhận giải thưởng đặc biệt trị giá " },
-      { type: "highlight", content: "500.000.000 VNĐ", style: "urgency" },
-      { type: "text", content: "!\n\nĐể nhận tiền thưởng, vui lòng:\n1. Nhấp vào link bên dưới\n2. Cung cấp thông tin CCCD và số tài khoản ngân hàng\n3. Thanh toán phí xử lý 500.000đ\n\n" },
-      { type: "link", content: "→ Nhận thưởng ngay tại đây", fakeUrl: "http://vietlott-win.xyz/claim?prize=500M" },
-      { type: "text", content: "\n\n⚠️ Giải thưởng chỉ có hiệu lực trong 48 giờ!" },
-    ],
-    isPhishing: true,
-    hasAttachment: true,
-    starred: false,
-    aiVerdict: {
-      correct: {
-        headline: "Chính xác! Đây là email lừa đảo trắng trợn.",
-        summary: "Kỹ thuật lòng tham (Greed Bait) kết hợp Urgency — phần thưởng quá hấp dẫn, yêu cầu CCCD và phí xử lý là dấu hiệu lừa đảo điển hình.",
-        clues: [
-          { flag: "🚩", label: "Fake Domain", text: "vietlott-lucky.xyz — Vietlott chính thức chỉ dùng vietlott.vn" },
-          { flag: "🚩", label: "Greed Bait", text: "500 triệu — phần thưởng quá tốt để là thật, không có cơ sở thực tế" },
-          { flag: "🚩", label: "Data + Fee Harvesting", text: "Yêu cầu CCCD, tài khoản ngân hàng VÀ phí xử lý — combo lừa đảo 3 lớp" },
-          { flag: "🚩", label: "Urgency", text: '"48 giờ" — tạo áp lực thời gian để nạn nhân không kịp suy nghĩ' },
-        ],
-        points: "+15",
-        pointColor: "#10B981",
-      },
-      wrong: {
-        headline: "Chưa đúng! Email này là phishing nghiêm trọng.",
-        summary: "Đây là kỹ thuật Greed Bait + Urgency — phần thưởng 500 triệu là mồi nhử để lấy CCCD, tài khoản ngân hàng và tiền phí.",
-        clues: [
-          { flag: "🚩", label: "Fake Domain", text: "vietlott-lucky.xyz — Vietlott chính thức chỉ dùng vietlott.vn" },
-          { flag: "🚩", label: "Greed Bait + Fee", text: "Yêu cầu phí xử lý 500.000đ để nhận thưởng — đây là chiêu lừa đảo cổ điển" },
-        ],
-        points: "-5",
-        pointColor: "#EF4444",
-      },
-    },
-  },
-];
 
 const parseHtmlToBodyParts = (html: string, isPhishing: boolean) => {
   if (!html) return [];
@@ -186,6 +58,29 @@ const parseHtmlToBodyParts = (html: string, isPhishing: boolean) => {
   return parts;
 };
 
+const AVATAR_COLORS = [
+  "#6366F1", // Indigo
+  "#3B82F6", // Blue
+  "#EC4899", // Pink
+  "#8B5CF6", // Purple
+  "#06B6D4", // Cyan
+  "#10B981", // Emerald
+  "#F59E0B", // Amber
+  "#EF4444", // Red
+  "#14B8A6", // Teal
+  "#F97316"  // Orange
+];
+
+const getAvatarColor = (name: string) => {
+  if (!name) return "#6366F1";
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[index];
+};
+
 const mapDbScenario = (s: any) => {
   let bodyParts = [];
   if (s.emailBodyHtml) {
@@ -227,7 +122,7 @@ const mapDbScenario = (s: any) => {
     from: s.senderEmail,
     fromName: s.senderName || "Hệ thống",
     fromAvatar: (s.senderName || "HT").split(" ").map((w: string) => w[0]).slice(-2).join("").toUpperCase(),
-    avatarColor: s.isPhishing ? "#EF4444" : "#10B981",
+    avatarColor: getAvatarColor(s.senderName || s.senderEmail || "Hệ thống"),
     subject: s.subject || "Thông báo từ hệ thống",
     time: "Hôm nay",
     bodyParts: bodyParts,
@@ -260,11 +155,13 @@ function EmailBodyRenderer({
   isPhishing,
   answered,
   isCorrect,
+  onLinkClick,
 }: {
-  parts: typeof phishingEmails[0]["bodyParts"];
+  parts: any[];
   isPhishing: boolean;
   answered: boolean | null;
   isCorrect: boolean | null;
+  onLinkClick?: () => void;
 }) {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const wrongOnPhishing = answered !== null && isCorrect === false && isPhishing;
@@ -312,6 +209,7 @@ function EmailBodyRenderer({
                 }}
                 onMouseEnter={() => setHoveredLink(part.fakeUrl ?? null)}
                 onMouseLeave={() => setHoveredLink(null)}
+                onClick={() => { onLinkClick?.(); }}
               >
                 {part.content}
               </span>
@@ -553,12 +451,25 @@ function AIFeedbackPanel({
 
 // ─── Results Screen ────────────────────────────────────────────────────────────
 
-function ResultsScreen({ score, total, onRestart }: { score: number; total: number; onRestart: () => void }) {
+function ResultsScreen({
+  score, total, onRestart, onGoBack,
+}: {
+  score: number; total: number; onRestart: () => void; onGoBack: () => void;
+}) {
   const pct = Math.round((score / total) * 100);
   const isPassing = pct >= 67;
 
+  // Vùng KẾT QUẢ rủi ro — màu token, không emoji
+  const riskLevel = pct >= 80
+    ? { label: "Thấp",      color: "#10B981" }
+    : pct >= 60
+    ? { label: "Trung bình", color: "#F59E0B" }
+    : { label: "Cao",        color: "#F97316" };
+
   return (
     <div className="max-w-xl mx-auto flex flex-col items-center justify-center py-16 text-center space-y-6">
+
+      {/* Vùng HỌC — icon + tiêu đề động viên */}
       <div
         className="w-24 h-24 rounded-3xl flex items-center justify-center"
         style={{
@@ -578,26 +489,254 @@ function ResultsScreen({ score, total, onRestart }: { score: number; total: numb
         </p>
       </div>
 
+      {/* 3 ô: 2 ô học (emerald/indigo) + 1 ô rủi ro (token trung lập) */}
       <div className="grid grid-cols-3 gap-4 w-full">
-        {[
-          { label: "Chính xác", value: `${score}/${total}`, color: "#10B981" },
-          { label: "Độ chính xác", value: `${pct}%`, color: "#6366F1" },
-          { label: "Risk Score", value: isPassing ? "+35" : "+10", color: "#F59E0B" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-2xl p-4 text-center" style={{ background: "#F8FAFF", border: "1px solid rgba(99,102,241,0.08)" }}>
-            <p style={{ fontSize: "1.4rem", fontWeight: 800, color: s.color }}>{s.value}</p>
-            <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.72rem" }}>{s.label}</p>
-          </div>
-        ))}
+        <div className="rounded-2xl p-4 text-center" style={{ background: "#F0FDF4", border: "1px solid rgba(16,185,129,0.15)" }}>
+          <p style={{ fontSize: "1.4rem", fontWeight: 800, color: "#10B981" }}>{score}/{total}</p>
+          <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.72rem" }}>Đúng</p>
+        </div>
+        <div className="rounded-2xl p-4 text-center" style={{ background: "#F8FAFF", border: "1px solid rgba(99,102,241,0.08)" }}>
+          <p style={{ fontSize: "1.4rem", fontWeight: 800, color: "#6366F1" }}>{pct}%</p>
+          <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.72rem" }}>Độ chính xác</p>
+        </div>
+        {/* Vùng KẾT QUẢ rủi ro — trình bày trung lập, không emoji */}
+        <div className="rounded-2xl p-4 text-center" style={{ background: "#F8FAFC", border: `1px solid ${riskLevel.color}25` }}>
+          <p style={{ fontSize: "1.4rem", fontWeight: 800, color: riskLevel.color }}>{riskLevel.label}</p>
+          <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.72rem" }}>Mức rủi ro</p>
+        </div>
       </div>
 
-      <button
-        onClick={onRestart}
-        className="flex items-center gap-2 px-6 py-3 rounded-2xl text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
-        style={{ background: "linear-gradient(135deg, #6366F1, #818CF8)", fontWeight: 700, boxShadow: "0 8px 24px rgba(99,102,241,0.35)" }}
-      >
-        <RefreshCw size={16} /> Thử lại chiến dịch
+      {/* Buttons */}
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <button
+          onClick={onGoBack}
+          className="flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+          style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#475569" }}
+        >
+          <ArrowLeft size={15} /> Về danh sách
+        </button>
+        <button
+          onClick={onRestart}
+          className="flex items-center gap-2 px-6 py-3 rounded-2xl text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
+          style={{ background: "linear-gradient(135deg, #6366F1, #818CF8)", fontWeight: 700, boxShadow: "0 8px 24px rgba(99,102,241,0.35)" }}
+        >
+          <RefreshCw size={16} /> Thử lại chiến dịch
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Campaign Picker ──────────────────────────────────────────────────────────
+function CampaignPicker({
+  campaigns, loading, error, onPick, onGoLessons
+}: {
+  campaigns: any[]; loading: boolean; error: string | null;
+  onPick: (id: number) => void; onGoLessons: () => void;
+}) {
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center min-h-[300px] gap-3">
+      <Loader2 className="animate-spin text-indigo-600" size={28} />
+      <p className="text-slate-400 text-sm">Đang tải danh sách chiến dịch...</p>
+    </div>
+  );
+
+  if (error) return (
+    <div className="max-w-lg mx-auto text-center py-16 space-y-3">
+      <AlertTriangle size={36} className="mx-auto text-amber-400" />
+      <p className="text-slate-600 font-semibold">{error}</p>
+      <button onClick={onGoLessons} className="text-indigo-600 text-sm font-semibold hover:underline">
+        ← Về trang bài học
       </button>
+    </div>
+  );
+
+  if (campaigns.length === 0) return (
+    <div className="max-w-lg mx-auto text-center py-16 space-y-4">
+      <Shield size={40} className="mx-auto text-slate-300" />
+      <div>
+        <p className="text-slate-700 font-bold text-base">Bạn chưa được giao chiến dịch nào</p>
+        <p className="text-slate-400 text-sm mt-1">Hoàn thành bài học lý thuyết để được giao chiến dịch mô phỏng.</p>
+      </div>
+      <button onClick={onGoLessons}
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold transition-all hover:scale-[1.02]"
+        style={{ background: "linear-gradient(135deg, #6366F1, #4F46E5)" }}>
+        <BookOpen size={15} /> Về trang bài học
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="max-w-5xl mx-auto space-y-6" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+      
+      {/* Header section with context */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div>
+          <h1 className="font-extrabold text-slate-900" style={{ fontSize: "1.45rem", letterSpacing: "-0.02em" }}>
+            Chiến dịch Mô phỏng Phishing
+          </h1>
+          <p className="text-slate-400 text-xs mt-1 font-medium">
+            Chọn một chiến dịch được giao để rèn luyện phản xạ phát hiện email giả mạo.
+          </p>
+        </div>
+        <div className="px-4 py-2 rounded-2xl bg-indigo-50 border border-indigo-100/30 flex items-center gap-2 shrink-0 self-start md:self-auto">
+          <Sparkles size={14} className="text-indigo-500" />
+          <span className="text-indigo-700 text-xs font-bold">
+            Bạn được giao {campaigns.length} chiến dịch
+          </span>
+        </div>
+      </div>
+
+      {/* Grid of Campaign Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {campaigns.map((c: any) => {
+          const total = c._totalEmails ?? 0;
+          const completed = c._completedEmails ?? 0;
+          const progressPercent = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+          
+          // Trạng thái chiến dịch
+          let statusText = "Chưa bắt đầu";
+          let statusBg = "#F1F5F9";
+          let statusColor = "#475569";
+          if (completed > 0 && completed < total) {
+            statusText = "Đang làm";
+            statusBg = "#EFF6FF";
+            statusColor = "#2563EB";
+          } else if (completed === total && total > 0) {
+            statusText = "Đã xong";
+            statusBg = "#ECFDF5";
+            statusColor = "#10B981";
+          }
+
+          // Độ khó chiến dịch
+          let diffBg = "#F1F5F9";
+          let diffColor = "#475569";
+          if (c._difficulty === "Dễ") {
+            diffBg = "#ECFDF5";
+            diffColor = "#10B981";
+          } else if (c._difficulty === "Trung bình") {
+            diffBg = "#FFFBEB";
+            diffColor = "#D97706";
+          } else if (c._difficulty === "Khó") {
+            diffBg = "#FEF2F2";
+            diffColor = "#EF4444";
+          }
+
+          const isLocked = c._eligible === false;
+
+          return (
+            <div
+              key={c.campaignId}
+              onClick={() => { if (!isLocked) onPick(c.campaignId); }}
+              className={`group flex flex-col justify-between p-6 bg-white rounded-2xl text-left border border-slate-100 shadow-sm transition-all duration-200 relative overflow-hidden ${
+                isLocked
+                  ? "cursor-not-allowed opacity-75"
+                  : "cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+              }`}
+            >
+              {/* Locked overlay */}
+              {isLocked && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
+                  <div className="w-12 h-12 rounded-full bg-amber-50 border-2 border-amber-200 flex items-center justify-center mb-3">
+                    <Lock size={20} className="text-amber-500" />
+                  </div>
+                  <p className="font-bold text-amber-700 text-sm">Chưa đủ điều kiện</p>
+                  <p className="text-amber-600/70 text-xs mt-1 text-center px-6 leading-relaxed">
+                    Hoàn thành bài học lý thuyết bắt buộc để mở khoá chiến dịch này.
+                  </p>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onGoLessons(); }}
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 transition-all"
+                  >
+                    <BookOpen size={13} /> Về trang bài học <ArrowRight size={11} />
+                  </button>
+                </div>
+              )}
+
+              <div>
+                {/* Card Top: Icon and Badges */}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                    style={{
+                      background: completed === total && total > 0
+                        ? "linear-gradient(135deg, #ECFDF5, #D1FAE5)"
+                        : "linear-gradient(135deg, #EEF2FF, #E0E7FF)"
+                    }}
+                  >
+                    <Shield
+                      size={22}
+                      className={completed === total && total > 0 ? "text-emerald-500" : "text-indigo-500"}
+                    />
+                  </div>
+                  
+                  {/* Badges container */}
+                  <div className="flex flex-wrap items-center gap-1.5 justify-end">
+                    <span
+                      className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
+                      style={{ background: diffBg, color: diffColor }}
+                    >
+                      {c._difficulty || "Chưa xác định"}
+                    </span>
+                    <span
+                      className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
+                      style={{ background: statusBg, color: statusColor }}
+                    >
+                      {statusText}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Campaign Title & Description */}
+                <h3 className={`font-extrabold text-slate-800 text-sm leading-snug transition-colors line-clamp-1 ${!isLocked ? "group-hover:text-indigo-600" : ""}`}>
+                  {c.campaignName}
+                </h3>
+                <p className="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                  {c.description || "Thực hành nhận biết hành vi lừa đảo với các tình huống email giả lập thực tế."}
+                </p>
+              </div>
+
+              {/* Card Bottom: Progress & Details */}
+              <div className="mt-6 pt-4 border-t border-slate-50 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-medium">Tiến độ thực hiện</span>
+                  <span className="font-bold text-slate-700">
+                    {completed}/{total} email ({progressPercent}%)
+                  </span>
+                </div>
+                
+                {/* Custom Progress Bar */}
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${progressPercent}%`,
+                      background: completed === total && total > 0
+                        ? "linear-gradient(90deg, #10B981, #34D399)"
+                        : "linear-gradient(90deg, #6366F1, #818CF8)"
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    {c.endDate
+                      ? `Hạn chót: ${new Date(c.endDate).toLocaleDateString("vi-VN")}`
+                      : "Không giới hạn thời gian"}
+                  </span>
+                  
+                  <span className={`inline-flex items-center gap-1 text-xs font-bold transition-transform ${isLocked ? "text-slate-400" : "text-indigo-600 group-hover:translate-x-0.5"}`}>
+                    {isLocked
+                      ? "Khoá"
+                      : completed === total && total > 0 ? "Luyện tập lại" : "Bắt đầu ngay"}
+                    {isLocked ? <Lock size={12} /> : <ChevronRight size={14} />}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -605,42 +744,165 @@ function ResultsScreen({ score, total, onRestart }: { score: number; total: numb
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export function MoPhong() {
-  const [scenarios, setScenarios] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [current, setCurrent] = useState(0);
-  const [decision, setDecision] = useState<"phishing" | "safe" | null>(null);
-  const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const location  = useLocation();
+  const navigate  = useNavigate();
 
-  // States cho Backend Interaction
+  // campaignId từ navigate state (truyền từ trang Bài học)
+  const incomingCampaignId: number | null = (location.state as any)?.campaignId ?? null;
+
+  // ── Trạng thái picker (dùng khi KHÔNG có incomingCampaignId) ──
+  const [myCampaigns,        setMyCampaigns]        = useState<any[]>([]);
+  const [loadingMyCampaigns, setLoadingMyCampaigns] = useState(!incomingCampaignId);
+  const [myCampaignsError,   setMyCampaignsError]   = useState<string | null>(null);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(incomingCampaignId);
+
+  // ── Trạng thái campaign đang chạy ──
+  const [activeCampaign, setActiveCampaign]   = useState<any>(null);
+  const [loadingCampaign, setLoadingCampaign] = useState(!!incomingCampaignId); // F1a: true ngay khi đã có campaignId
+  const [campaignError,   setCampaignError]   = useState<string | null>(null);
+
+  // ── Trạng thái mô phỏng ──
+  const [scenarios,       setScenarios]       = useState<any[]>([]);
+  const [current,         setCurrent]         = useState(0);
+  const [decision,        setDecision]        = useState<"phishing" | "safe" | null>(null);
+  const [score,           setScore]           = useState(0);
+  const [finished,        setFinished]        = useState(false);
   const [loadingDecision, setLoadingDecision] = useState(false);
   const [backendFeedback, setBackendFeedback] = useState<any>(null);
+  const [clickedLink,     setClickedLink]     = useState(false);
 
+  // Bước 1: Nếu không có campaignId → fetch my-campaigns để hiện picker
+  // Phần D: lọc ẩn campaign tên chứa "Test"/"Verify" (chỉ FE, không xóa DB)
+  //         + enrich meta: số email (scenarios.length) + đã làm (attempts count)
   useEffect(() => {
-    scenarioService.getAllScenarios()
-      .then((data) => {
-        if (data && data.length > 0) {
-          const mapped = data.map((s: any) => mapDbScenario(s));
-          setScenarios(mapped);
-        } else {
-          setScenarios(phishingEmails);
-        }
-      })
-      .catch((err) => {
-        console.error("Lỗi khi tải kịch bản từ API:", err);
-        setScenarios(phishingEmails);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    if (incomingCampaignId) return; // đã có → bỏ qua picker
+    const HIDDEN_KEYWORDS = ["test", "verify"];
+    campaignService.getMyCampaigns()
+      .then(async (data: any[]) => {
+        const raw = data || [];
+        // Lọc ẩn campaign tên chứa "Test" hoặc "Verify" (case-insensitive)
+        const visible = raw.filter((c: any) => {
+          const name = (c.campaignName || "").toLowerCase();
+          return !HIDDEN_KEYWORDS.some(kw => name.includes(kw));
+        });
+        // Enrich meta cho mỗi campaign (số email + đã làm)
+        const enriched = await Promise.all(
+          visible.map(async (c: any) => {
+            try {
+              const [detail, attempts] = await Promise.all([
+                campaignService.getCampaignById(c.campaignId),
+                scenarioService.getMyAttempts(c.campaignId),
+              ]);
+              const totalEmails = detail?.scenarios?.length ?? 0;
+              // Đếm scenario đã làm (unique scenarioId trong attempts)
+              const doneIds = new Set((attempts || []).map((a: any) => a.scenarioId));
+              
+              // Tính độ khó trung bình của chiến dịch
+              const difficultyIds = detail?.scenarios?.map((s: any) => s.difficultyId) || [];
+              let avgDifficulty = "Chưa xác định";
+              if (difficultyIds.length > 0) {
+                const sum = difficultyIds.reduce((a: number, b: number) => a + b, 0);
+                const avg = sum / difficultyIds.length;
+                if (avg <= 1.5) avgDifficulty = "Dễ";
+                else if (avg <= 2.5) avgDifficulty = "Trung bình";
+                else avgDifficulty = "Khó";
+              }
 
-  if (loading) {
+              // Check eligibility cho campaign này
+              let eligible = true;
+              try {
+                eligible = !!(await lessonService.checkEligibility(c.campaignId));
+              } catch { eligible = true; } // fallback: nếu API lỗi thì không chặn
+
+              return {
+                ...c,
+                description: detail?.description || "",
+                _totalEmails: totalEmails,
+                _completedEmails: doneIds.size,
+                _difficulty: avgDifficulty,
+                _eligible: eligible,
+              };
+            } catch {
+              return {
+                ...c,
+                description: "",
+                _totalEmails: undefined,
+                _completedEmails: undefined,
+                _difficulty: undefined,
+                _eligible: true, // fallback: nếu lỗi thì không chặn
+              };
+            }
+          })
+        );
+        setMyCampaigns(enriched);
+      })
+      .catch(() => setMyCampaignsError("Không tải được danh sách chiến dịch. Vui lòng thử lại."))
+      .finally(() => setLoadingMyCampaigns(false));
+  }, [incomingCampaignId]);
+
+  // Bước 2: Khi có selectedCampaignId (từ picker hoặc incomingCampaignId) → load campaign + scenarios
+  useEffect(() => {
+    if (!selectedCampaignId) return;
+    setLoadingCampaign(true);
+    setCampaignError(null);
+    campaignService.getCampaignById(selectedCampaignId)
+      .then((c: any) => {
+        setActiveCampaign(c);
+        if (!c?.scenarios?.length) {
+          setCampaignError(`Campaign "${c?.campaignName || selectedCampaignId}" chưa có kịch bản nào.`);
+          return;
+        }
+        setScenarios(c.scenarios.map((s: any) => mapDbScenario(s)));
+      })
+      .catch(() => setCampaignError("Không tải được campaign. Vui lòng thử lại."))
+      .finally(() => setLoadingCampaign(false));
+  }, [selectedCampaignId]);
+
+  // ── Picker screen ──
+  if (!selectedCampaignId) {
+    return (
+      <CampaignPicker
+        campaigns={myCampaigns}
+        loading={loadingMyCampaigns}
+        error={myCampaignsError}
+        onPick={(id) => { setLoadingCampaign(true); setSelectedCampaignId(id); }} // F1b: loading trước khi re-render
+        onGoLessons={() => navigate("/nguoi-dung/lo-trinh")}
+      />
+    );
+  }
+
+  // ── Loading campaign ──
+  if (loadingCampaign) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
         <Loader2 className="animate-spin text-indigo-600" size={32} />
-        <p className="text-slate-400 text-sm font-medium">Đang tải kịch bản mô phỏng...</p>
+        <p className="text-slate-400 text-sm">Đang tải kịch bản mô phỏng...</p>
       </div>
     );
   }
+
+  // ── Campaign error (no scenarios / load failed) ──
+  if (campaignError) {
+    return (
+      <div className="max-w-lg mx-auto text-center py-16 space-y-4">
+        <AlertTriangle size={36} className="mx-auto text-amber-400" />
+        <p className="text-slate-700 font-semibold">{campaignError}</p>
+        <div className="flex justify-center gap-3">
+          <button onClick={() => { setSelectedCampaignId(null); setCampaignError(null); }}
+            className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all">
+            ← Chọn chiến dịch khác
+          </button>
+          <button onClick={() => navigate("/nguoi-dung/lo-trinh")}
+            className="px-4 py-2 rounded-xl text-sm font-semibold text-indigo-600 border border-indigo-200 hover:bg-indigo-50 transition-all">
+            Về bài học
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // F1c: safety net — không render khi scenarios chưa có (tránh crash email.bodyParts undefined)
+  if (scenarios.length === 0) return null;
 
   const email = scenarios[current];
   const answered = decision !== null;
@@ -652,15 +914,15 @@ export function MoPhong() {
     if (answered || loadingDecision || !email) return;
     setLoadingDecision(true);
 
-    const userAnswer = pick === "phishing" ? "Phishing" : "Safe";
-
     try {
       // Gửi nộp kết quả thực tế lên backend API
       const result = await scenarioService.submitAttempt({
         scenarioId: email.id,
-        campaignId: null,
-        userAnswer: userAnswer,
+        campaignId: activeCampaign?.campaignId ?? selectedCampaignId,
         timeTakenSeconds: 12,
+        isReported: pick === "phishing",   // "Báo cáo lừa đảo" = hành vi đúng nhất
+        isClickedLink: clickedLink,        // Tầng 2: set true khi user click link trong email
+        isCredentialLeaked: false,         // Tầng 3
       });
 
       setBackendFeedback(result);
@@ -687,45 +949,69 @@ export function MoPhong() {
       setCurrent((c) => c + 1);
       setDecision(null);
       setBackendFeedback(null);
+      setClickedLink(false);
     }
   };
 
   if (finished) {
-    return <ResultsScreen score={score} total={scenarios.length} onRestart={() => { setCurrent(0); setDecision(null); setBackendFeedback(null); setScore(0); setFinished(false); }} />;
+    const resetAll = () => {
+      setCurrent(0); setDecision(null); setBackendFeedback(null);
+      setScore(0); setFinished(false); setClickedLink(false);
+    };
+    return (
+      <ResultsScreen
+        score={score}
+        total={scenarios.length}
+        onRestart={resetAll}
+        onGoBack={() => {
+          resetAll();
+          setSelectedCampaignId(null); setScenarios([]); setActiveCampaign(null);
+        }}
+      />
+    );
   }
 
   return (
     <div className="space-y-5" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
 
       {/* ── Header ─────────────────────────────────────── */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 style={{ fontWeight: 800, fontSize: "1.35rem", color: "#0F172A" }}>
-            Mô phỏng Phishing
-          </h1>
-          <p className="text-slate-400" style={{ fontSize: "0.8rem" }}>
-          Basic Banking Phishing Awareness · Email {current + 1}/{scenarios.length}
-        </p>
-      </div>
-      <div className="flex items-center gap-3">
-        {/* Progress dots */}
-        <div className="flex items-center gap-1.5">
-          {scenarios.map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full transition-all"
-              style={{
-                width: i === current ? 20 : 8,
-                height: 8,
-                  background: i < current ? "#10B981" : i === current ? "#6366F1" : "#E2E8F0",
-                }}
-              />
-            ))}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <button onClick={() => { setSelectedCampaignId(null); setScenarios([]); setCurrent(0); setDecision(null); setScore(0); setFinished(false); setActiveCampaign(null); }}
+                className="text-xs text-slate-400 hover:text-indigo-600 font-semibold transition-colors">
+                ← Chiến dịch
+              </button>
+              <span className="text-slate-200 text-xs">·</span>
+              <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]">{activeCampaign?.campaignName}</span>
+            </div>
+            <h1 style={{ fontWeight: 800, fontSize: "1.35rem", color: "#0F172A" }}>
+              Mô phỏng Phishing
+            </h1>
           </div>
-          <div className="px-3.5 py-1.5 rounded-xl flex items-center gap-1.5" style={{ background: "#EEF2FF" }}>
+          <div className="px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shrink-0" style={{ background: "#EEF2FF" }}>
             <Sparkles size={13} className="text-indigo-500" />
             <span className="text-indigo-700 font-bold" style={{ fontSize: "0.82rem" }}>{score} điểm</span>
           </div>
+        </div>
+        {/* Progress bar — chỉ báo vị trí, không lộ đúng/sai */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-semibold text-slate-500 shrink-0">
+            Email {current + 1}/{scenarios.length}
+          </span>
+          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${Math.round((current / scenarios.length) * 100)}%`,
+                background: "linear-gradient(90deg, #6366F1, #818CF8)",
+              }}
+            />
+          </div>
+          <span className="text-xs text-slate-400 shrink-0 w-8 text-right">
+            {Math.round((current / scenarios.length) * 100)}%
+          </span>
         </div>
       </div>
 
@@ -841,8 +1127,8 @@ export function MoPhong() {
                       className="px-1.5 py-0.5 rounded font-mono"
                       style={{
                         fontSize: "0.72rem",
-                        background: email.isPhishing ? "#FEF2F2" : "#F0FDF4",
-                        color: email.isPhishing ? "#DC2626" : "#166534",
+                        background: answered ? (email.isPhishing ? "#FEF2F2" : "#F0FDF4") : "#F1F5F9",
+                        color: answered ? (email.isPhishing ? "#DC2626" : "#166534") : "#475569",
                         fontWeight: 600,
                       }}
                     >
@@ -870,6 +1156,7 @@ export function MoPhong() {
                 isPhishing={email.isPhishing}
                 answered={answered ? isCorrect : null}
                 isCorrect={isCorrect}
+                onLinkClick={() => setClickedLink(true)}
               />
 
               {/* Hint: hover links */}

@@ -16,6 +16,18 @@ export const lessonService = {
     }
   },
 
+  getMyLessons: async () => {
+    try {
+      const response = await axiosInstance.get("/Lesson/my-lessons");
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tải bài học được giao");
+    } catch (error) {
+      throw error;
+    }
+  },
+
   /**
    * Lấy chi tiết một bài học theo ID
    * @param {number} lessonId
@@ -73,8 +85,10 @@ export const lessonService = {
   createLesson: async (data) => {
     try {
       const response = await axiosInstance.post("/Lesson", data);
-      // LessonController trả về 201 CreatedAtAction, không wrap ApiResponse
-      return response;
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tạo bài học");
     } catch (error) {
       throw error;
     }
@@ -82,7 +96,6 @@ export const lessonService = {
 
   /**
    * Kiểm tra điều kiện User có đủ tiêu chuẩn tham gia chiến dịch thực hành không
-   * (Đã hoàn thành đầy đủ các bài học lý thuyết tiên quyết)
    * userId lấy từ JWT token phía backend — không truyền vào đây.
    * @param {number} campaignId - ID chiến dịch
    * @returns {Promise<boolean>} true nếu đủ điều kiện, false nếu chưa
@@ -92,7 +105,10 @@ export const lessonService = {
       const response = await axiosInstance.get(
         `/Lesson/check-eligibility?campaignId=${campaignId}`
       );
-      return response;
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể kiểm tra điều kiện");
     } catch (error) {
       throw error;
     }
@@ -110,7 +126,10 @@ export const lessonService = {
         campaignId,
         lessonIds,
       });
-      return response;
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể cấu hình bài học tiên quyết");
     } catch (error) {
       throw error;
     }

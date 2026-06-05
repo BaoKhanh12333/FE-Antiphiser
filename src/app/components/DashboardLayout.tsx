@@ -16,10 +16,8 @@ interface DashboardLayoutProps {
 
 const navByRole: Record<Role, { to: string; label: string; icon: React.ElementType; badge?: string; end?: boolean }[]> = {
   user: [
-    { to: "/nguoi-dung", label: "Tổng quan", icon: LayoutDashboard, end: true },
-    { to: "/nguoi-dung/lo-trinh", label: "Chiến dịch được giao", icon: BookOpen },
-    { to: "/nguoi-dung/mo-phong", label: "Mô phỏng Phishing", icon: ShieldAlert, badge: "Mới" },
-    { to: "/nguoi-dung/bao-cao", label: "Báo cáo & AI", icon: BarChart3 },
+    { to: "/nguoi-dung/lo-trinh", label: "Bài học", icon: BookOpen },
+    { to: "/nguoi-dung/mo-phong", label: "Mô phỏng", icon: ShieldAlert },
   ],
   manager: [
     { to: "/quan-ly", label: "Tổng quan", icon: LayoutDashboard, end: true },

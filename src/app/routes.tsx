@@ -7,6 +7,7 @@ import { ManagerLayout } from "./ManagerLayout";
 import { AdminLayout } from "./AdminLayout";
 import { TongQuan } from "./pages/TongQuan";
 import { LoTrinh } from "./pages/LoTrinh";
+import { BaiHoc } from "./pages/BaiHoc";
 import { MoPhong } from "./pages/MoPhong";
 import { BaoCao } from "./pages/BaoCao";
 import { ManagerDashboard } from "./pages/ManagerDashboard";
@@ -73,6 +74,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true, Component: TongQuan },
               { path: "lo-trinh", Component: LoTrinh },
+              { path: "bai-hoc/:lessonId", Component: BaiHoc },
               { path: "mo-phong", Component: MoPhong },
               { path: "bao-cao", Component: BaoCao },
               { path: "cai-dat", Component: Settings },
