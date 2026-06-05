@@ -1,0 +1,924 @@
+{
+  "meta": {
+    "source": "ANTIPHISHER Theory Section — REVIEW QUESTIONS",
+    "note": "lessonKey khớp theo số bài trong giáo trình (1.1..4.3). Khi áp vào DB, map lessonKey -> Lesson theo Title/OrderIndex của bài đã seed. true_false đã chuẩn hóa thành multiple_choice (Đúng/Sai). Các type spot_the_flag/matching/ordering có autoGradable=false.",
+    "schemaVersion": 1,
+    "totalLessons": 16,
+    "totalQuestions": 60,
+    "autoGradableQuestions": 51,
+    "nonAutoGradableQuestions": 9
+  },
+  "lessons": [
+    {
+      "lessonKey": "1.1",
+      "title": "What is Phishing?",
+      "phase": 1,
+      "phaseTitle": "Beginner Foundation",
+      "questions": [
+        {
+          "id": "1.1-q1",
+          "type": "multiple_choice",
+          "prompt": "Phishing là hành vi kẻ tấn công thực hiện điều gì?",
+          "options": [
+            "Tấn công trực tiếp vào phần mềm hoặc hệ điều hành của nạn nhân",
+            "Mạo danh tổ chức hoặc cá nhân đáng tin cậy để đánh lừa nạn nhân cung cấp thông tin hoặc thực hiện hành động có lợi cho kẻ tấn công",
+            "Cài virus vào máy tính thông qua USB hoặc thiết bị vật lý",
+            "Tấn công vào hạ tầng mạng của doanh nghiệp bằng kỹ thuật brute force"
+          ],
+          "correctIndex": 1,
+          "explanation": "Phishing không khai thác lỗ hổng phần mềm mà khai thác sự tin tưởng của con người. Kẻ tấn công giả mạo nguồn đáng tin để lừa nạn nhân tự nguyện hành động theo lời chúng."
+        },
+        {
+          "id": "1.1-q2",
+          "type": "multiple_choice",
+          "prompt": "Kẻ tấn công phishing thường nhắm đến mục tiêu nào dưới đây?",
+          "options": [
+            "Phá hủy dữ liệu trên máy chủ của công ty",
+            "Gây gián đoạn dịch vụ internet",
+            "Thu thập thông tin đăng nhập, thông tin tài chính, hoặc quyền truy cập hệ thống",
+            "Theo dõi vị trí địa lý của nạn nhân"
+          ],
+          "correctIndex": 2,
+          "explanation": "Mục tiêu của phishing là thu lợi — credentials dùng để xâm nhập hệ thống sâu hơn, thông tin tài chính để trực tiếp lấy tiền, hoặc quyền truy cập để triển khai mã độc."
+        },
+        {
+          "id": "1.1-q3",
+          "type": "multiple_choice",
+          "prompt": "Ransomware (mã hóa dữ liệu trong thiết bị để đòi tiền chuộc) có thể được triển khai thông qua một cuộc tấn công phishing.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 0,
+          "explanation": "Đúng. Phishing là vector tấn công phổ biến nhất để triển khai ransomware — nạn nhân mở file đính kèm hoặc click link, mã độc được cài đặt, dữ liệu bị mã hóa."
+        },
+        {
+          "id": "1.1-q4",
+          "type": "multiple_choice",
+          "prompt": "Theo Verizon DBIR 2024, bao nhiêu phần trăm vi phạm dữ liệu liên quan đến yếu tố con người?",
+          "options": [
+            "Dưới 36%",
+            "Khoảng 50–60%",
+            "Hơn 68%",
+            "Đúng 50%"
+          ],
+          "correctIndex": 2,
+          "explanation": "Verizon DBIR 2024 ghi nhận hơn 68% vi phạm dữ liệu liên quan đến yếu tố con người, với phishing là vector phổ biến nhất."
+        }
+      ]
+    },
+    {
+      "lessonKey": "1.2",
+      "title": "Why People Fall for Phishing?",
+      "phase": 1,
+      "phaseTitle": "Beginner Foundation",
+      "questions": [
+        {
+          "id": "1.2-q1",
+          "type": "multiple_choice",
+          "prompt": "Social Engineering trong bối cảnh an toàn thông tin là gì?",
+          "options": [
+            "Kỹ thuật hack vào hệ thống mạng xã hội",
+            "Khai thác tâm lý và hành vi con người để thao túng nạn nhân tự nguyện thực hiện hành động theo ý kẻ tấn công",
+            "Phần mềm tự động tạo email phishing hàng loạt",
+            "Kỹ thuật mã hóa dữ liệu nâng cao"
+          ],
+          "correctIndex": 1,
+          "explanation": "Social Engineering tấn công tâm lý con người chứ không tấn công máy tính. Đây là lý do công nghệ bảo mật tốt nhất cũng không thể thay thế nhận thức bảo mật của người dùng."
+        },
+        {
+          "id": "1.2-q2",
+          "type": "multiple_choice",
+          "prompt": "Email \"Tài khoản của bạn sẽ bị tạm khóa vĩnh viễn trong 2 giờ nếu không xác nhận ngay\" đang khai thác cơ chế tâm lý nào?",
+          "options": [
+            "Authority — Lợi dụng uy tín",
+            "Curiosity — Khai thác sự tò mò",
+            "Urgency — Tạo áp lực thời gian",
+            "Fear — Đe dọa hậu quả"
+          ],
+          "correctIndex": 2,
+          "explanation": "Deadline '2 giờ' là chiến thuật Urgency điển hình — tạo áp lực thời gian để não người kích hoạt phản xạ hành động nhanh, bỏ qua bước kiểm chứng."
+        },
+        {
+          "id": "1.2-q3",
+          "type": "multiple_choice",
+          "prompt": "Email giả danh Cục Thuế \"Bạn có khoản hoàn thuế 3.500.000đ đang chờ xử lý\" đang khai thác cơ chế tâm lý nào?",
+          "options": [
+            "Chỉ Curiosity — Khai thác sự tò mò",
+            "Chỉ Authority — Lợi dụng uy tín",
+            "Authority + Curiosity kết hợp",
+            "Urgency + Fear kết hợp",
+            "Chỉ Urgency — Áp lực thời gian",
+            "Chỉ Fear — Khai thác nỗi sợ"
+          ],
+          "correctIndex": 2,
+          "explanation": "Email này khai thác cả hai: Authority (Cục Thuế là cơ quan nhà nước có thẩm quyền) và Curiosity (tiền hoàn thuế là thông tin bất ngờ hấp dẫn). Kết hợp nhiều cơ chế làm email phishing hiệu quả hơn."
+        },
+        {
+          "id": "1.2-q4",
+          "type": "multiple_choice",
+          "prompt": "Khi nhận email tạo ra cảm xúc mạnh (hồi hộp, sợ hãi, hứng khởi), đó là dấu hiệu cần dừng lại và kiểm tra kỹ trước khi hành động.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 0,
+          "explanation": "Đúng. Cảm xúc mạnh là chỉ báo của Social Engineering. Kẻ tấn công cố tình tạo ra cảm xúc đó để làm giảm khả năng phân tích lý trí của nạn nhân."
+        },
+        {
+          "id": "1.2-q5",
+          "type": "spot_the_flag",
+          "autoGradable": false,
+          "prompt": "Đọc email dưới đây và xác định CÁC cơ chế tâm lý đang bị khai thác:",
+          "emailSample": "Từ: VPBank Security Team <security@vpbank-alerts.net>\nTiêu đề: KHẨN CẤP: Tài khoản của bạn bị đăng nhập trái phép từ nước ngoài\nKính gửi Quý Khách hàng, Hệ thống phát hiện đăng nhập bất thường từ địa chỉ IP tại Nga lúc 03:14 sáng nay. Nếu không xác minh trong 30 PHÚT, tài khoản sẽ bị đóng băng. → Xác minh ngay: http://vpbank-secure-login.xyz/verify",
+          "flags": [
+            "Fear — 'đăng nhập trái phép từ nước ngoài' → tạo nỗi sợ tài khoản bị xâm phạm",
+            "Urgency — '30 PHÚT' + 'KHẨN CẤP' → deadline cực ngắn để không kịp kiểm tra",
+            "Authority — 'VPBank Security Team' → giả danh bộ phận bảo mật ngân hàng",
+            "Fear — 'tài khoản sẽ bị đóng băng' → đe dọa hậu quả tài chính nghiêm trọng"
+          ]
+        }
+      ]
+    },
+    {
+      "lessonKey": "1.3",
+      "title": "Phishing Xuất Hiện Ở Đâu?",
+      "phase": 1,
+      "phaseTitle": "Beginner Foundation",
+      "questions": [
+        {
+          "id": "1.3-q1",
+          "type": "multiple_choice",
+          "prompt": "Smishing là gì?",
+          "options": [
+            "Phishing qua cuộc gọi điện thoại giả danh nhân viên hỗ trợ",
+            "Phishing qua tin nhắn SMS",
+            "Phishing qua mã QR Code",
+            "Phishing nhắm vào lãnh đạo cấp cao"
+          ],
+          "correctIndex": 1,
+          "explanation": "Smishing = SMS + Phishing. Tại Việt Nam rất phổ biến với kịch bản 'thanh toán tiền giao hàng' hoặc 'trợ cấp chưa nhận' kèm link giả mạo."
+        },
+        {
+          "id": "1.3-q2",
+          "type": "multiple_choice",
+          "prompt": "Điều gì khiến Quishing (QR Code Phishing) đặc biệt nguy hiểm so với email phishing thông thường?",
+          "options": [
+            "QR Code chứa virus trực tiếp có thể lây nhiễm ngay khi quét",
+            "Mắt thường không thể biết QR dẫn đến đâu trước khi quét và nhiều phần mềm bảo mật không quét được URL trong ảnh QR",
+            "QR Code chỉ hoạt động trên Android, không bị phát hiện trên iOS",
+            "QR Code tự động tải file mã độc mà không cần người dùng xác nhận"
+          ],
+          "correctIndex": 1,
+          "explanation": "Người dùng không thể xem trước URL trong QR bằng mắt thường, và hầu hết cổng bảo mật email không quét URL ẩn trong ảnh — khiến Quishing vượt qua nhiều lớp bảo vệ."
+        },
+        {
+          "id": "1.3-q3",
+          "type": "matching",
+          "autoGradable": false,
+          "prompt": "Ghép tên loại tấn công với mô tả phù hợp:",
+          "pairs": [
+            {
+              "term": "Vishing",
+              "desc": "Gọi điện giả danh công an/ngân hàng"
+            },
+            {
+              "term": "Whaling",
+              "desc": "Spear Phishing nhắm CEO/CFO"
+            },
+            {
+              "term": "Spear Phishing",
+              "desc": "Email cá nhân hóa cho một mục tiêu cụ thể"
+            }
+          ],
+          "explanation": "Vishing = Voice; Whaling nhắm lãnh đạo cấp cao; Spear Phishing là email cá nhân hóa có nghiên cứu kỹ mục tiêu."
+        },
+        {
+          "id": "1.3-q4",
+          "type": "multiple_choice",
+          "prompt": "Một cuộc tấn công phishing chỉ có thể xảy ra qua email công việc, không qua ứng dụng nhắn tin cá nhân như Zalo.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. Phishing xảy ra trên mọi kênh giao tiếp kỹ thuật số. Tại Việt Nam, Zalo và Telegram là kênh tấn công đang bùng nổ — đặc biệt chiêu đầu tư lãi cao và tuyển dụng việc làm."
+        }
+      ]
+    },
+    {
+      "lessonKey": "2.1",
+      "title": "Suspicious Sender Addresses",
+      "phase": 2,
+      "phaseTitle": "Email Awareness Core",
+      "questions": [
+        {
+          "id": "2.1-q1",
+          "type": "spot_the_flag",
+          "autoGradable": false,
+          "prompt": "Trong các địa chỉ email sau, địa chỉ nào là GIẢ MẠO? (có thể nhiều hơn một)",
+          "emailSample": "Cặp 1: no-reply@microsoft.com vs no-reply@micros0ft.com\nCặp 2: support@vietcombank.com.vn vs support@viet-combank-secure.com\nCặp 3: hr@company.com.vn vs HR Department <hr-noreply@gmail.com>",
+          "flags": [
+            "micros0ft.com — Giả: số '0' thay chữ 'o' (typosquatting)",
+            "viet-combank-secure.com — Giả: domain thêm '-secure'",
+            "hr-noreply@gmail.com — Giả: HR công ty không dùng Gmail cá nhân"
+          ]
+        },
+        {
+          "id": "2.1-q2",
+          "type": "spot_the_flag",
+          "autoGradable": false,
+          "prompt": "Email dưới đây có vấn đề gì ở phần người gửi? Xác định kỹ thuật giả mạo:",
+          "emailSample": "Từ: Google Security Alert <security-noreply@goog1e-accounts.com>\nTiêu đề: Your Google Account was accessed from a new device",
+          "flags": [
+            "goog1e-accounts.com — Typosquatting: số '1' thay chữ 'l'. Domain thật là accounts.google.com",
+            "Tên hiển thị 'Google Security Alert' — Display Name Spoofing",
+            "Nội dung tạo urgency nhẹ — 'someone signed in' + 'secure your account' khai thác Fear"
+          ]
+        },
+        {
+          "id": "2.1-q3",
+          "type": "multiple_choice",
+          "prompt": "Bạn nhận email từ 'Trần Thị B (Kế toán)' yêu cầu xác nhận thanh toán. Bước đầu tiên cần làm là gì?",
+          "options": [
+            "Đọc nội dung email và làm theo yêu cầu nếu hợp lý",
+            "Click vào tên người gửi để xem địa chỉ email đầy đủ, kiểm tra domain",
+            "Trả lời email hỏi lại để xác nhận",
+            "Chuyển email cho cấp trên xử lý"
+          ],
+          "correctIndex": 1,
+          "explanation": "Bước đầu tiên luôn là kiểm tra địa chỉ email đầy đủ — không chỉ tên hiển thị. Trả lời email (C) không giúp ích vì reply sẽ đến đúng địa chỉ kẻ tấn công."
+        }
+      ]
+    },
+    {
+      "lessonKey": "2.2",
+      "title": "Urgent & Emotional Language",
+      "phase": 2,
+      "phaseTitle": "Email Awareness Core",
+      "questions": [
+        {
+          "id": "2.2-q1",
+          "type": "spot_the_flag",
+          "autoGradable": false,
+          "prompt": "Đọc email dưới đây. Xác định TẤT CẢ Red Flags về ngôn từ và cấu trúc:",
+          "emailSample": "Từ: Shopee Security <no-reply@shopee-vn.alerts.com>\nTiêu đề: ⚠️ TÀI KHOẢN CỦA BẠN ĐÃ BỊ ĐÌNH CHỈ — HÀNH ĐỘNG NGAY!!!\nKính gửi Quý Khách hàng, tài khoản sẽ bị HỦY VĨNH VIỄN nếu không xác nhận trong 60 PHÚT. Đây là thông báo CUỐI CÙNG. → XÁC NHẬN NGAY TẠI ĐÂY",
+          "flags": [
+            "Tiêu đề VIẾT HOA toàn bộ + !!! — định dạng bất thường",
+            "'60 PHÚT' — Urgency cực đoan",
+            "'HỦY VĨNH VIỄN' + 'CUỐI CÙNG' — Fear, đe dọa không thể phục hồi",
+            "'Kính gửi Quý Khách hàng' — lời chào chung, Shopee thật sẽ dùng tên bạn",
+            "'Shopee sẽ không chịu trách nhiệm' — đe dọa pháp lý giả",
+            "shopee-vn.alerts.com — domain giả (thật là shopee.vn)"
+          ]
+        }
+      ]
+    },
+    {
+      "lessonKey": "2.3",
+      "title": "Suspicious Links",
+      "phase": 2,
+      "phaseTitle": "Email Awareness Core",
+      "questions": [
+        {
+          "id": "2.3-q1",
+          "type": "multiple_choice",
+          "prompt": "Email từ \"VPBank\": \"Tài khoản có hoạt động bất thường. Nhấp vào đây để xác minh ngay.\" Nút trông bình thường. Bước đầu tiên?",
+          "options": [
+            "Nhấp vào nút để xem trang dẫn đến đâu, nếu lạ thì thoát",
+            "Đưa chuột hover lên nút (không click) để xem URL thật ở góc trái màn hình",
+            "Nhấp vào nút, nếu trang yêu cầu mật khẩu thì mới cẩn thận",
+            "Forward email cho đồng nghiệp nhờ kiểm tra hộ"
+          ],
+          "correctIndex": 1,
+          "explanation": "Hover trước — click sau. URL thật hiện ở status bar giúp biết link dẫn đâu mà không cần mở. A và C đều quá muộn — một số trang độc hại cài mã độc ngay khi load."
+        },
+        {
+          "id": "2.3-q2",
+          "type": "multiple_choice",
+          "prompt": "Email có link rút gọn bit.ly/xK9mPq. Cách kiểm tra an toàn nhất trước khi click?",
+          "options": [
+            "Click thử xem dẫn đến đâu rồi thoát nhanh nếu lạ",
+            "Hover chuột lên link để xem URL đích ở thanh trạng thái",
+            "Dán link vào checkshorturl.com hoặc unshorten.it để xem URL gốc",
+            "Copy link gửi đồng nghiệp nhờ kiểm tra"
+          ],
+          "correctIndex": 2,
+          "explanation": "Hover không hiệu quả với link rút gọn vì status bar vẫn chỉ hiện bit.ly. Mở rộng link (C) cho phép xem URL đích thật trước khi truy cập."
+        },
+        {
+          "id": "2.3-q3",
+          "type": "multiple_choice",
+          "prompt": "Nếu URL bắt đầu bằng 'https://' và có biểu tượng ổ khóa, trang web đó chắc chắn an toàn.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. HTTPS chỉ mã hóa kết nối giữa bạn và máy chủ — không xác nhận máy chủ đó có hợp lệ hay không."
+        },
+        {
+          "id": "2.3-q4",
+          "type": "multiple_choice",
+          "prompt": "Trên điện thoại, cách kiểm tra URL của một link trước khi mở là gì?",
+          "options": [
+            "Tap nhanh vào link rồi thoát ngay",
+            "Giữ ngón tay lên link (long-press) để xem trước URL",
+            "Screenshot rồi zoom vào link",
+            "Không thể kiểm tra trên điện thoại"
+          ],
+          "correctIndex": 1,
+          "explanation": "Long-press trên iOS và Android đều hiển thị URL đầy đủ trong popup trước khi mở — kỹ năng cực kỳ quan trọng khi dùng điện thoại."
+        }
+      ]
+    },
+    {
+      "lessonKey": "2.4",
+      "title": "Malicious Attachments",
+      "phase": 2,
+      "phaseTitle": "Email Awareness Core",
+      "questions": [
+        {
+          "id": "2.4-q1",
+          "type": "multiple_choice",
+          "prompt": "Email từ địa chỉ lạ, tiêu đề \"Hợp đồng cần ký gấp trước 9h\", đính kèm HopDong_2025.pdf và Sign_Here.url. Bạn chưa từng liên hệ người này. Xử lý thế nào?",
+          "options": [
+            "Mở cả hai file để xem nội dung rồi mới quyết định",
+            "Chỉ mở PDF vì PDF luôn an toàn hơn",
+            "Không mở file nào — báo IT ngay, đặc biệt vì có file .url từ người lạ hoàn toàn",
+            "Mở PDF trước, nếu hợp lý thì mới mở file .url"
+          ],
+          "correctIndex": 2,
+          "explanation": "File .url là Windows shortcut — double-click mở URL độc hại ngay, không cảnh báo. Kết hợp người gửi lạ + urgency 'gấp trước 9h' → phishing rõ ràng. PDF từ người lạ cũng không nên mở tùy tiện."
+        },
+        {
+          "id": "2.4-q2",
+          "type": "multiple_choice",
+          "prompt": "Mở file Word từ ứng viên và thấy 'This document is protected. Enable Content to view.' Bạn làm gì?",
+          "options": [
+            "Bấm Enable Content vì đây là thông báo bảo mật bình thường của Microsoft",
+            "Đóng file ngay, không bấm — báo IT và không mở lại cho đến khi IT kiểm tra",
+            "Tắt internet trước rồi mới bấm Enable Content",
+            "Save As sang định dạng khác để tránh macro"
+          ],
+          "correctIndex": 1,
+          "explanation": "Thông báo 'Enable Content' là cơ chế mã độc dùng để tự kích hoạt. Đóng file ngay là bước đúng. Tắt internet (C) không giúp ích vì mã độc chạy được offline."
+        },
+        {
+          "id": "2.4-q3",
+          "type": "multiple_choice",
+          "prompt": "File đính kèm .html hoặc .url trong email nguy hiểm như thế nào? Chọn mô tả ĐÚNG nhất:",
+          "options": [
+            "Chỉ nguy hiểm nếu bạn điền thông tin vào trang mở ra",
+            ".html có thể chứa trang đăng nhập giả hoàn chỉnh không cần internet; .url là shortcut Windows mở URL độc hại ngay khi double-click — cả hai đều ở mức nguy hiểm nhất",
+            "Chỉ nguy hiểm trên Windows, an toàn trên Mac và điện thoại",
+            "Nguy hiểm như .exe nhưng chỉ khi được gửi kèm file khác"
+          ],
+          "correctIndex": 1,
+          "explanation": ".html được trình duyệt render ngay — kẻ tấn công nhúng sẵn form đánh cắp credential, không cần server. .url là shortcut Windows, double-click là mở URL độc hại ngay — kỹ thuật dùng nhiều từ 2023 để vượt bộ lọc email."
+        },
+        {
+          "id": "2.4-q4",
+          "type": "multiple_choice",
+          "prompt": "Trong môi trường doanh nghiệp, bạn có thể upload bất kỳ file nghi ngờ nào lên VirusTotal để kiểm tra mà không cần lo ngại gì.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. VirusTotal chia sẻ file upload với đối tác nghiên cứu. Upload tài liệu nội bộ/hợp đồng/dữ liệu khách hàng khi chưa được phép là vi phạm bảo mật dữ liệu. Chỉ upload file không nhạy cảm, hoặc hỏi IT trước."
+        }
+      ]
+    },
+    {
+      "lessonKey": "2.5",
+      "title": "Fake Login Pages",
+      "phase": 2,
+      "phaseTitle": "Email Awareness Core",
+      "questions": [
+        {
+          "id": "2.5-q1",
+          "type": "multiple_choice",
+          "prompt": "Trang đăng nhập trông y hệt Microsoft — logo đúng, màu đúng, ô nhập đúng. Trước khi làm gì, kiểm tra ở đâu để biết trang có thật không?",
+          "options": [
+            "Kiểm tra logo — nếu logo Microsoft đúng thì trang thật",
+            "Kiểm tra có ổ khóa HTTPS ở góc trái trình duyệt không",
+            "Nhìn vào thanh địa chỉ trình duyệt và đọc URL — domain có phải microsoft.com không",
+            "Thử nhập sai mật khẩu — nếu trang báo sai thì trang thật"
+          ],
+          "correctIndex": 2,
+          "explanation": "Logo và giao diện có thể sao chép trong vài phút. Nhập sai (D) không giúp gì vì trang giả vẫn báo 'mật khẩu sai' sau khi đã lấy thông tin. Chỉ URL trong thanh địa chỉ là thứ không thể giả."
+        },
+        {
+          "id": "2.5-q2",
+          "type": "multiple_choice",
+          "prompt": "Vừa đăng nhập Microsoft 365 và ngay lập tức bị yêu cầu đăng nhập lại. Đây là dấu hiệu của điều gì?",
+          "options": [
+            "Phiên đăng nhập hết hạn — bình thường",
+            "Máy tính đang cập nhật và cần refresh",
+            "Có thể bạn đang ở trang đăng nhập giả — credential harvesting thường chuyển về trang thật sau khi lấy được thông tin",
+            "Kết nối internet không ổn định"
+          ],
+          "correctIndex": 2,
+          "explanation": "Red Flag kinh điển của credential harvesting: trang giả lấy mật khẩu rồi chuyển bạn về trang thật, tạo cảm giác 'nhập sai lần đầu'. Nếu gặp, đổi mật khẩu ngay."
+        },
+        {
+          "id": "2.5-q3",
+          "type": "multiple_choice",
+          "prompt": "Khi nghi ngờ một trang đăng nhập, cách đúng là đóng tab và tự gõ URL chính thức vào thanh địa chỉ trình duyệt.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 0,
+          "explanation": "Đúng. Tự gõ URL là cách duy nhất đảm bảo truy cập đúng trang thật. Không bao giờ truy cập tài khoản quan trọng qua link trong email."
+        },
+        {
+          "id": "2.5-q4",
+          "type": "multiple_choice",
+          "prompt": "2FA bảo vệ bạn như thế nào ngay cả khi mật khẩu đã bị lộ?",
+          "options": [
+            "2FA xóa mật khẩu cũ ngay khi phát hiện rò rỉ",
+            "2FA yêu cầu thêm yếu tố xác thực thứ hai (thường là OTP từ điện thoại) mà kẻ tấn công không có",
+            "2FA khóa tài khoản sau 3 lần đăng nhập sai",
+            "2FA thông báo qua email khi có đăng nhập mới"
+          ],
+          "correctIndex": 1,
+          "explanation": "Ngay cả khi kẻ tấn công có mật khẩu (từ credential harvesting), họ vẫn cần OTP từ điện thoại vật lý của bạn để đăng nhập. Đây là lý do 2FA quan trọng nhất sau nhận thức bảo mật."
+        }
+      ]
+    },
+    {
+      "lessonKey": "3.1",
+      "title": "HR Scams",
+      "phase": 3,
+      "phaseTitle": "Workplace Phishing",
+      "questions": [
+        {
+          "id": "3.1-q1",
+          "type": "multiple_choice",
+          "prompt": "Email từ 'Nguyễn Văn An <nguyen.van.an@company-hr.net>' nhờ HR cập nhật tài khoản ngân hàng nhận lương. Quyết định đúng?",
+          "options": [
+            "Cập nhật ngay vì yêu cầu đơn giản và có deadline rõ ràng",
+            "Reply email hỏi lại để xác nhận thêm thông tin",
+            "Gọi điện cho Nguyễn Văn An theo số trong hệ thống HR để xác nhận trực tiếp trước khi cập nhật bất cứ điều gì",
+            "Chờ đến ngày 25 nếu không thấy gì thêm thì mới xử lý"
+          ],
+          "correctIndex": 2,
+          "explanation": "Domain 'company-hr.net' thay vì domain công ty là Red Flag. Mọi yêu cầu thay đổi thông tin ngân hàng phải xác nhận bằng cuộc gọi đến số ĐÃ BIẾT. Reply (B) không đủ vì về đúng địa chỉ kẻ tấn công."
+        },
+        {
+          "id": "3.1-q2",
+          "type": "multiple_choice",
+          "prompt": "Nguyên tắc vàng khi xử lý yêu cầu thay đổi thông tin tài chính qua email là gì?",
+          "options": [
+            "Xử lý nếu email đến từ địa chỉ nội bộ công ty",
+            "Xử lý nếu nội dung email hợp lý và đúng văn phong",
+            "Luôn xác nhận bằng cuộc gọi điện thoại đến số đã biết — không có ngoại lệ",
+            "Xử lý nếu yêu cầu đến từ người cùng phòng ban"
+          ],
+          "correctIndex": 2,
+          "explanation": "Không có ngoại lệ. Email nội bộ có thể bị giả mạo, văn phong có thể sao chép, người cùng phòng có thể bị mạo danh. Cuộc gọi đến số đã biết là cách xác minh duy nhất đáng tin."
+        },
+        {
+          "id": "3.1-q3",
+          "type": "multiple_choice",
+          "prompt": "Email 'Chính sách lương thưởng mới — Đăng nhập để xem chi tiết' kèm link từ HR là hoàn toàn bình thường và an toàn để click.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. HR và IT hợp lệ không gửi link đăng nhập qua email. Hãy tự mở trình duyệt vào cổng nội bộ bằng bookmark đã lưu. Thông báo quan trọng thường được xác nhận qua nhiều kênh."
+        }
+      ]
+    },
+    {
+      "lessonKey": "3.2",
+      "title": "CEO Fraud / BEC",
+      "phase": 3,
+      "phaseTitle": "Workplace Phishing",
+      "questions": [
+        {
+          "id": "3.2-q1",
+          "type": "spot_the_flag",
+          "autoGradable": false,
+          "prompt": "Phân tích email BEC dưới đây — xác định tất cả kỹ thuật thao túng:",
+          "emailSample": "Từ: Giám đốc Trần Minh Khoa <ceo@company-vnn.com>\nTiêu đề: Gấp — Chuyển khoản đối tác Singapore\nAnh đang họp với nhà đầu tư, không tiện nghe điện thoại. Cần em chuyển gấp 180.000.000đ cho đối tác Singapore. Việc này cần bảo mật tuyệt đối, chưa thông báo ai khác. Xong trước 16:30 hôm nay.",
+          "flags": [
+            "company-vnn.com — domain sai (typosquatting)",
+            "'Không tiện nghe điện thoại' — ngăn xác minh qua cuộc gọi, Red Flag số 1 của CEO Fraud",
+            "'Bảo mật tuyệt đối, chưa thông báo ai' — cô lập nạn nhân",
+            "'16:30 hôm nay' — Urgency, deadline cuối ngày tạo áp lực",
+            "Chuyển tiền quốc tế không có PO/hợp đồng"
+          ]
+        },
+        {
+          "id": "3.2-q2",
+          "type": "multiple_choice",
+          "prompt": "Yếu tố 'bảo mật tuyệt đối' trong email yêu cầu chuyển tiền có ý nghĩa gì từ góc độ bảo mật?",
+          "options": [
+            "Đây là giao dịch hợp pháp cần bảo vệ thông tin",
+            "Đây là Red Flag — 'bảo mật' được dùng để ngăn bạn xác minh với người khác trong công ty",
+            "Giao dịch quốc tế luôn cần bảo mật cao hơn",
+            "CEO có quyền yêu cầu bảo mật tuyệt đối cho bất kỳ giao dịch nào"
+          ],
+          "correctIndex": 1,
+          "explanation": "Trong BEC, 'bảo mật tuyệt đối' là chiến thuật cô lập nạn nhân — ngăn họ hỏi đồng nghiệp hoặc kiểm tra với CFO/kế toán trưởng. Tổ chức hợp pháp không yêu cầu bỏ qua quy trình phê duyệt vì 'bảo mật'."
+        },
+        {
+          "id": "3.2-q3",
+          "type": "multiple_choice",
+          "prompt": "16:00 thứ Sáu, kế toán nhận email 'CEO' yêu cầu chuyển tiền gấp trước 16:30. CEO đang dự hội nghị ở Hà Nội. Quy trình đúng?",
+          "options": [
+            "Thực hiện chuyển khoản vì CEO có thẩm quyền và đã có lệnh bằng email",
+            "Đợi đến thứ Hai hỏi lại CEO khi đi làm",
+            "Gọi điện cho CEO theo số đã lưu trong danh bạ công ty để xác nhận — nếu không liên lạc được, không thực hiện giao dịch",
+            "Hỏi ý kiến đồng nghiệp trong phòng kế toán rồi quyết định"
+          ],
+          "correctIndex": 2,
+          "explanation": "Dù CEO ở đâu, cuộc gọi đến số đã lưu là bắt buộc. Không liên lạc được → không thực hiện. Không có giao dịch nào quan trọng hơn quy trình xác minh."
+        },
+        {
+          "id": "3.2-q4",
+          "type": "multiple_choice",
+          "prompt": "BEC thường chỉ thành công với những nhân viên thiếu kinh nghiệm hoặc ít được đào tạo.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. BEC thành công cả với nhân viên có kinh nghiệm vì kẻ tấn công nghiên cứu kỹ: đọc email nội bộ trước, biết tên gọi, phong cách viết, thời điểm tấn công. Quy trình xác minh bắt buộc — không phải kiến thức cá nhân — là thứ duy nhất ngăn được BEC."
+        }
+      ]
+    },
+    {
+      "lessonKey": "3.3",
+      "title": "Cloud Service Phishing",
+      "phase": 3,
+      "phaseTitle": "Workplace Phishing",
+      "questions": [
+        {
+          "id": "3.3-q1",
+          "type": "multiple_choice",
+          "prompt": "Vì sao tài khoản Microsoft 365 là mục tiêu ưu tiên số 1 của kẻ tấn công trong doanh nghiệp?",
+          "options": [
+            "Vì M365 có nhiều lỗ hổng bảo mật hơn các nền tảng khác",
+            "Vì một tài khoản M365 bị chiếm = quyền truy cập toàn bộ email, file, Teams, SharePoint — mọi dữ liệu công ty trong một chìa khóa",
+            "Vì M365 không hỗ trợ 2FA",
+            "Vì phần lớn nhân viên dùng cùng mật khẩu cho M365 và email cá nhân"
+          ],
+          "correctIndex": 1,
+          "explanation": "M365 là trung tâm của mọi hoạt động doanh nghiệp hiện đại. Chiếm một tài khoản = truy cập toàn bộ lịch sử giao tiếp, file, dữ liệu khách hàng, và bàn đạp tấn công đồng nghiệp từ địa chỉ email thật."
+        },
+        {
+          "id": "3.3-q2",
+          "type": "spot_the_flag",
+          "autoGradable": false,
+          "prompt": "Email thông báo từ 'Microsoft' dưới đây có gì đáng ngờ?",
+          "emailSample": "Từ: Microsoft 365 <no-reply@microsoft365-support.net>\nTiêu đề: Action Required: Your Microsoft 365 password expires in 3 days\nDear user, please update your password immediately. → https://microsoft365-support.net/password-reset. If you do not update within 72 hours, your account will be suspended.",
+          "flags": [
+            "microsoft365-support.net — domain giả (thật là microsoft.com)",
+            "'Dear user' — lời chào chung, Microsoft thật dùng tên cụ thể",
+            "'Account will be suspended' — Fear + Urgency (deadline 72 giờ)",
+            "Link trỏ về cùng domain giả — credential harvesting"
+          ]
+        },
+        {
+          "id": "3.3-q3",
+          "type": "multiple_choice",
+          "prompt": "Sau khi bật 2FA cho tài khoản Microsoft 365, bạn hoàn toàn an toàn trước mọi cuộc tấn công phishing.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. 2FA giảm rủi ro đáng kể nhưng không bất khả xâm phạm. Nhận thức + 2FA + kiểm tra URL + quy trình xác minh là phòng thủ nhiều lớp — không lớp nào đủ khi đứng một mình."
+        },
+        {
+          "id": "3.3-q4",
+          "type": "multiple_choice",
+          "prompt": "Đồng nghiệp gửi link Google Drive 'Báo cáo Q1 2025.xlsx' qua email. Bước an toàn nhất?",
+          "options": [
+            "Click link ngay vì là email từ đồng nghiệp quen biết",
+            "Kiểm tra địa chỉ email người gửi trước, sau đó xác nhận nhanh qua Teams/chat rằng họ có ý định gửi file này",
+            "Download file về máy trước khi mở để tránh rủi ro online",
+            "Chỉ mở nếu file dưới 10MB"
+          ],
+          "correctIndex": 1,
+          "explanation": "Tài khoản đồng nghiệp có thể đã bị chiếm. Xác nhận qua kênh thứ hai tốn 30 giây nhưng loại bỏ hoàn toàn rủi ro. Download về máy (C) không giảm rủi ro mà còn tăng thêm."
+        }
+      ]
+    },
+    {
+      "lessonKey": "3.4",
+      "title": "Vendor & Invoice Scams",
+      "phase": 3,
+      "phaseTitle": "Workplace Phishing",
+      "questions": [
+        {
+          "id": "3.4-q1",
+          "type": "spot_the_flag",
+          "autoGradable": false,
+          "prompt": "Nhân viên kế toán nhận hóa đơn sau. Tìm điểm đáng ngờ:",
+          "emailSample": "Từ: Công ty ABC Supplies <accounting@abc-supplies.vnn.com>\nTiêu đề: Hóa đơn #INV-2025-089 — Thanh toán trước 30/4\nLƯU Ý: Chúng tôi vừa thay đổi ngân hàng giao dịch. Thanh toán vào TK MỚI: 9988776655 — VPBank (TK cũ Vietcombank đã đóng). File đính kèm: Invoice_Apr2025.xlsm",
+          "flags": [
+            "abc-supplies.vnn.com — domain đáng ngờ ('.vnn.com' có thể typosquatting)",
+            "'Vừa thay đổi ngân hàng' gần kỳ thanh toán — Red Flag kinh điển của Invoice Scam",
+            "Invoice_Apr2025.xlsm — file Excel có macro nguy hiểm",
+            "Yêu cầu thanh toán vào tài khoản mới chỉ qua email"
+          ]
+        },
+        {
+          "id": "3.4-q2",
+          "type": "multiple_choice",
+          "prompt": "Man-in-the-Email là kỹ thuật tấn công như thế nào?",
+          "options": [
+            "Kẻ tấn công gửi email giả từ địa chỉ lạ hoàn toàn không liên quan",
+            "Kẻ tấn công chiếm tài khoản email của một bên trong giao dịch, theo dõi chuỗi email thật, rồi chen vào đúng lúc để chuyển hướng thanh toán",
+            "Kẻ tấn công đọc email của bạn qua WiFi công cộng",
+            "Kẻ tấn công tự động reply mọi email bằng nội dung giả"
+          ],
+          "correctIndex": 1,
+          "explanation": "Man-in-the-Email nguy hiểm vì toàn bộ ngữ cảnh giao dịch đều thật — số hợp đồng, tên đối tác, lịch sử trao đổi. Chỉ thông tin tài khoản ngân hàng là giả. Vì vậy xác minh qua điện thoại là bắt buộc."
+        },
+        {
+          "id": "3.4-q3",
+          "type": "multiple_choice",
+          "prompt": "Nhà cung cấp lâu năm gửi email đổi tài khoản ngân hàng 3 ngày trước kỳ thanh toán lớn. Quy trình đúng?",
+          "options": [
+            "Thực hiện thanh toán vì là đối tác lâu năm và email trông hợp lệ",
+            "Reply email hỏi lại để xác nhận thông tin ngân hàng",
+            "Gọi điện cho người liên hệ theo số đã lưu trong hệ thống, yêu cầu xác nhận bằng văn bản có chữ ký",
+            "Trì hoãn thanh toán thêm 1 tuần để chờ xem"
+          ],
+          "correctIndex": 2,
+          "explanation": "Quan hệ lâu năm không loại trừ rủi ro — tài khoản email đối tác có thể đã bị chiếm. Gọi theo số đã biết (không phải số trong email vừa nhận) và yêu cầu xác nhận văn bản là quy trình đúng."
+        }
+      ]
+    },
+    {
+      "lessonKey": "3.5",
+      "title": "Recruitment Scams",
+      "phase": 3,
+      "phaseTitle": "Workplace Phishing",
+      "questions": [
+        {
+          "id": "3.5-q1",
+          "type": "multiple_choice",
+          "prompt": "HR mở file CV và thấy ngay: 'This document is protected. Please click Enable Content to view the full CV.' Đây là dấu hiệu gì và bước đúng tiếp theo?",
+          "options": [
+            "File bị lỗi định dạng — bấm Enable Content để xem bình thường",
+            "Đây là bảo vệ bản quyền của ứng viên — bấm Enable Content là an toàn",
+            "Đây là dấu hiệu file chứa macro có thể độc hại — đóng file ngay, không bấm, báo IT",
+            "Tắt internet trước rồi bấm Enable Content để an toàn hơn"
+          ],
+          "correctIndex": 2,
+          "explanation": "'Enable Content' là cách mã độc yêu cầu bạn tự kích hoạt. CV thật không bao giờ cần điều này. Tắt internet (D) không giúp ích vì macro chạy được offline. Đóng file và báo IT là hành động duy nhất đúng."
+        },
+        {
+          "id": "3.5-q2",
+          "type": "multiple_choice",
+          "prompt": "Tin nhắn LinkedIn: 'Vị trí remote lương $4,000/tháng, không cần phỏng vấn, chỉ cần điền form để nhận offer.' Đây là dấu hiệu gì?",
+          "options": [
+            "Cơ hội việc làm tốt nên cân nhắc thêm",
+            "Recruitment Scam — không có nhà tuyển dụng hợp pháp nào offer việc mà không phỏng vấn",
+            "Có thể hợp lệ nếu công ty có trụ sở ở nước ngoài",
+            "Cần hỏi thêm về phúc lợi trước khi quyết định"
+          ],
+          "correctIndex": 1,
+          "explanation": "'Không cần phỏng vấn + lương cao bất thường + điền form ngay' là bộ ba dấu hiệu đặc trưng của Recruitment Scam. Mục đích form thường là thu thập CCCD, tài khoản ngân hàng, hoặc cài mã độc qua file 'bài test'."
+        },
+        {
+          "id": "3.5-q3",
+          "type": "multiple_choice",
+          "prompt": "Nhà tuyển dụng hợp lệ có thể yêu cầu ứng viên đóng 'phí xử lý visa' hoặc 'phí bảo hiểm nhân sự' trước khi nhận việc.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. Quy tắc tuyệt đối: KHÔNG nhà tuyển dụng hợp pháp nào yêu cầu ứng viên đóng tiền trước khi nhận việc, dưới bất kỳ hình thức nào. Phí visa, phí training, phí bảo lãnh — tất cả đều là dấu hiệu lừa đảo."
+        },
+        {
+          "id": "3.5-q4",
+          "type": "multiple_choice",
+          "prompt": "HR mở file CV và máy hoạt động chậm bất thường, ổ cứng liên tục được truy cập. Bước đúng ngay lập tức?",
+          "options": [
+            "Restart máy để xem có hết không",
+            "Tắt máy ngay để ngăn mã độc lây lan",
+            "Ngắt kết nối mạng ngay (rút cáp hoặc tắt WiFi) — KHÔNG tắt máy — và gọi IT ngay lập tức",
+            "Chạy Windows Defender để quét virus trước khi làm gì khác"
+          ],
+          "correctIndex": 2,
+          "explanation": "Ngắt mạng ngăn mã độc liên lạc ra ngoài và lây sang máy khác. Không tắt máy vì IT cần phân tích trạng thái bộ nhớ. Windows Defender có thể đã bị mã độc vô hiệu hóa."
+        }
+      ]
+    },
+    {
+      "lessonKey": "4.1",
+      "title": "How to Verify Suspicious Emails",
+      "phase": 4,
+      "phaseTitle": "Response & Incident Handling",
+      "questions": [
+        {
+          "id": "4.1-q1",
+          "type": "ordering",
+          "autoGradable": false,
+          "prompt": "Sắp xếp các bước theo đúng thứ tự quy trình STOP — THINK — VERIFY — ACT:",
+          "items": [
+            {
+              "label": "A",
+              "text": "Dừng lại — không click, không reply, không tải file"
+            },
+            {
+              "label": "B",
+              "text": "Kiểm tra địa chỉ email đầy đủ, hover link, đọc kỹ nội dung"
+            },
+            {
+              "label": "C",
+              "text": "Gọi điện hoặc nhắn tin qua kênh thứ hai để xác nhận"
+            },
+            {
+              "label": "D",
+              "text": "Thực hiện hành động hoặc chuyển cho IT nếu còn nghi ngờ"
+            }
+          ],
+          "correctOrder": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "explanation": "STOP (A) → THINK/VERIFY (B) → VERIFY qua kênh thứ hai (C) → ACT (D). Bước C quan trọng nhất — xác nhận qua điện thoại loại bỏ gần như mọi rủi ro."
+        },
+        {
+          "id": "4.1-q2",
+          "type": "multiple_choice",
+          "prompt": "Nghi ngờ email từ 'ngân hàng' yêu cầu xác minh tài khoản. Cách xác minh đúng?",
+          "options": [
+            "Reply email hỏi lại để xác nhận",
+            "Click link trong email và kiểm tra trang có hợp lệ không",
+            "Tự mở trình duyệt, gõ URL chính thức của ngân hàng bằng tay, và đăng nhập qua kênh thông thường",
+            "Gọi đến số điện thoại được ghi trong email nghi ngờ"
+          ],
+          "correctIndex": 2,
+          "explanation": "A: reply về đúng địa chỉ kẻ tấn công. B: nguy hiểm vì đã vào trang giả. D: số trong email có thể là số kẻ tấn công. C: tự gõ URL là cách duy nhất đảm bảo truy cập đúng trang thật."
+        },
+        {
+          "id": "4.1-q3",
+          "type": "multiple_choice",
+          "prompt": "Nếu email đến từ địa chỉ nội bộ công ty (đúng domain), nó chắc chắn hợp lệ và không cần xác minh thêm.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. Tài khoản email nội bộ có thể đã bị chiếm. Trong BEC, kẻ xấu thường chiếm tài khoản thật trước rồi gửi email lừa đảo từ địa chỉ hợp lệ. Domain đúng là điều kiện cần — không phải điều kiện đủ."
+        },
+        {
+          "id": "4.1-q4",
+          "type": "multiple_choice",
+          "prompt": "Khi nào bạn nên chuyển email cho IT thay vì tự xử lý?",
+          "options": [
+            "Chỉ khi đã click nhầm vào link phishing",
+            "Chỉ khi email đến từ địa chỉ rõ ràng là giả mạo",
+            "Bất cứ khi nào còn nghi ngờ — báo cáo nhầm không sao, không báo cáo mới là vấn đề",
+            "Chỉ khi email yêu cầu chuyển tiền hoặc cung cấp mật khẩu"
+          ],
+          "correctIndex": 2,
+          "explanation": "Ngưỡng báo cáo nên cực thấp. IT thà nhận 10 báo cáo nhầm còn hơn bỏ qua 1 tấn công thật. Văn hóa 'báo cáo thoải mái' là lớp phòng thủ quan trọng nhất của tổ chức."
+        }
+      ]
+    },
+    {
+      "lessonKey": "4.2",
+      "title": "What If You Clicked?",
+      "phase": 4,
+      "phaseTitle": "Response & Incident Handling",
+      "questions": [
+        {
+          "id": "4.2-q1",
+          "type": "multiple_choice",
+          "prompt": "Bạn vô tình click link và nhận ra ngay là trang giả mạo — nhưng chưa điền gì. Bước đúng ngay lập tức?",
+          "options": [
+            "Để nguyên trang đó và tiếp tục làm việc",
+            "Đóng ngay tab trình duyệt — không điền gì, chụp màn hình URL, chạy quét virus, báo IT",
+            "Tắt máy ngay để ngăn mã độc",
+            "Xóa lịch sử trình duyệt để xóa dấu vết"
+          ],
+          "correctIndex": 1,
+          "explanation": "Đây là tình huống may mắn nhất — chưa điền thông tin. Đóng tab ngay, không tương tác thêm. Chụp màn hình URL cho IT. Không tắt máy (IT cần trạng thái hiện tại). Không xóa lịch sử (đó là bằng chứng)."
+        },
+        {
+          "id": "4.2-q2",
+          "type": "multiple_choice",
+          "prompt": "Bạn đã điền email và mật khẩu vào trang đăng nhập trước khi nhận ra là trang giả. Thứ tự hành động đúng?",
+          "options": [
+            "Báo IT trước, chờ IT hướng dẫn rồi mới đổi mật khẩu",
+            "Đổi mật khẩu ngay lập tức, bật 2FA, kiểm tra lịch sử đăng nhập, sau đó báo IT",
+            "Không cần làm gì nếu chưa thấy dấu hiệu bất thường",
+            "Chỉ đổi mật khẩu là đủ"
+          ],
+          "correctIndex": 1,
+          "explanation": "Tốc độ là sống còn. Kẻ tấn công có thể đăng nhập trong vài phút sau khi nhận credentials. Đổi mật khẩu ngay + bật 2FA + kiểm tra lịch sử phải làm SONG SONG với báo IT — không chờ nhau."
+        },
+        {
+          "id": "4.2-q3",
+          "type": "multiple_choice",
+          "prompt": "Bạn mở file đính kèm đáng ngờ và máy bắt đầu hoạt động bất thường. Hành động đầu tiên?",
+          "options": [
+            "Tắt máy ngay để ngăn mã độc lây lan",
+            "Chạy quét virus toàn bộ máy",
+            "Ngắt kết nối mạng ngay (rút cáp/tắt WiFi) — KHÔNG tắt máy — gọi IT ngay",
+            "Backup dữ liệu quan trọng trước khi làm gì khác"
+          ],
+          "correctIndex": 2,
+          "explanation": "Ngắt mạng ngăn mã độc liên lạc với server kẻ tấn công và ngăn lây lan. Không tắt máy vì IT cần phân tích bộ nhớ. Không backup vì có thể backup cả mã độc."
+        },
+        {
+          "id": "4.2-q4",
+          "type": "multiple_choice",
+          "prompt": "Nếu click nhầm vào phishing, nên giấu để tự xử lý vì sợ bị kỷ luật hoặc bị đánh giá tiêu cực.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai — một trong những hiểu lầm nguy hiểm nhất. Im lặng cho phép mã độc lan rộng, kẻ tấn công truy cập sâu hơn, thiệt hại tăng theo từng phút. Tổ chức tốt không phạt nhân viên vì báo cáo sự cố — họ khen thưởng vì hành động nhanh."
+        }
+      ]
+    },
+    {
+      "lessonKey": "4.3",
+      "title": "How to Report Phishing",
+      "phase": 4,
+      "phaseTitle": "Response & Incident Handling",
+      "questions": [
+        {
+          "id": "4.3-q1",
+          "type": "multiple_choice",
+          "prompt": "Khi phát hiện email phishing trong inbox, bước đầu tiên cần làm là gì?",
+          "options": [
+            "Xóa email ngay để khỏi click nhầm",
+            "Forward cho đồng nghiệp để cảnh báo",
+            "Không xóa — giữ lại email, dùng 'Forward as Attachment' gửi đến địa chỉ bảo mật công ty hoặc dùng nút Report Phishing tích hợp sẵn",
+            "Reply cho người gửi thông báo đây là email giả mạo"
+          ],
+          "correctIndex": 2,
+          "explanation": "Email phishing là bằng chứng — không xóa. 'Forward as Attachment' giữ nguyên header kỹ thuật giúp IT điều tra. Forward thường (B) mất header và có thể khiến đồng nghiệp click nhầm. Reply (D) xác nhận địa chỉ email của bạn đang hoạt động."
+        },
+        {
+          "id": "4.3-q2",
+          "type": "multiple_choice",
+          "prompt": "Tại sao nên dùng 'Forward as Attachment' thay vì forward thông thường khi báo cáo phishing cho IT?",
+          "options": [
+            "Vì forward thông thường gửi email đến sai địa chỉ",
+            "Vì 'Forward as Attachment' giữ nguyên toàn bộ thông tin kỹ thuật của email giúp IT điều tra nguồn gốc tấn công",
+            "Vì forward thông thường làm file đính kèm bị mất",
+            "Vì Gmail và Outlook không hỗ trợ forward thông thường cho email phishing"
+          ],
+          "correctIndex": 1,
+          "explanation": "Email header chứa thông tin kỹ thuật quan trọng giúp IT xem nguồn email, phân tích domain giả, xem đường đi của email. Forward thông thường mất phần lớn thông tin này; Forward as Attachment giữ nguyên file .eml/.msg."
+        },
+        {
+          "id": "4.3-q3",
+          "type": "multiple_choice",
+          "prompt": "Thông tin nào quan trọng nhất cần cung cấp khi báo cáo sự cố phishing cho IT?",
+          "options": [
+            "Tên và chức vụ của người gửi email đáng ngờ",
+            "Địa chỉ email đầy đủ người gửi, tiêu đề email, và mô tả chính xác bạn đã tương tác gì (chỉ đọc / hover / click / mở file / điền thông tin)",
+            "Thời gian nhận email chính xác đến từng giây",
+            "Số lượng email tương tự bạn đã nhận trước đó"
+          ],
+          "correctIndex": 1,
+          "explanation": "IT cần: (1) nguồn tấn công để chặn — địa chỉ email và domain; (2) phạm vi ảnh hưởng để ứng phó — bạn đã làm gì với email đó. Hai thông tin này quyết định mức độ khẩn cấp và biện pháp xử lý."
+        },
+        {
+          "id": "4.3-q4",
+          "type": "multiple_choice",
+          "prompt": "Báo cáo một email mà sau đó phát hiện ra là email hợp lệ (không phải phishing) là hành động sai và nên tránh.",
+          "options": [
+            "Đúng",
+            "Sai"
+          ],
+          "correctIndex": 1,
+          "explanation": "Sai. Báo cáo nhầm hoàn toàn chấp nhận được. IT thà nhận nhiều báo cáo nhầm còn hơn bỏ qua một tấn công thật. Ngưỡng báo cáo nên cực thấp: 'nghi ngờ' là đủ lý do để báo."
+        },
+        {
+          "id": "4.3-q5",
+          "type": "multiple_choice",
+          "prompt": "Bạn phát hiện email phishing lúc 17:30 thứ Sáu — IT đã hết giờ làm việc. Bạn làm gì?",
+          "options": [
+            "Chờ đến thứ Hai báo cáo vì không khẩn cấp",
+            "Xóa email và không báo cáo vì IT đã về",
+            "Giữ email, ghi chú thông tin cần thiết, báo cáo qua email IT/hotline khẩn cấp ngay — nhiều tổ chức có kênh báo cáo 24/7 cho sự cố bảo mật",
+            "Forward cho đồng nghiệp để họ cũng biết cảnh báo"
+          ],
+          "correctIndex": 2,
+          "explanation": "Tấn công mạng không theo giờ hành chính. Nếu đã click nhầm hoặc mã độc đã cài, chờ đến thứ Hai là thảm họa. Tổ chức nên có hotline/email khẩn cấp. Nếu chỉ phát hiện email mà chưa tương tác, giữ email và báo cáo sáng thứ Hai là chấp nhận được."
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { authService } from "../services/authService";
 import {
   Shield, Brain, Zap, Mail, BarChart3, FileText, Bell, Users,
   Lock, Infinity, Star, Check, ChevronDown, ChevronRight,
@@ -238,7 +239,7 @@ const accentMap = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function Navbar({ onLogin }: { onLogin: () => void }) {
+function Navbar({ onLogin, isAuth }: { onLogin: () => void; isAuth?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -286,24 +287,40 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={onLogin}
-            className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-200"
-            style={{ color: "#64748B", border: "1px solid rgba(99,102,241,0.18)" }}
-          >
-            Đăng nhập
-          </button>
-          <button
-            onClick={onLogin}
-            className="text-sm font-bold px-5 py-2 rounded-lg transition-all duration-200 active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, #6366F1, #4F46E5)",
-              color: "#fff",
-              boxShadow: "0 0 18px rgba(99,102,241,0.4)",
-            }}
-          >
-            Dùng thử miễn phí
-          </button>
+          {isAuth ? (
+            <button
+              onClick={onLogin}
+              className="text-sm font-bold px-5 py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center gap-2"
+              style={{
+                background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+                color: "#fff",
+                boxShadow: "0 0 18px rgba(99,102,241,0.4)",
+              }}
+            >
+              Vào ứng dụng →
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={onLogin}
+                className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-200"
+                style={{ color: "#64748B", border: "1px solid rgba(99,102,241,0.18)" }}
+              >
+                Đăng nhập
+              </button>
+              <button
+                onClick={onLogin}
+                className="text-sm font-bold px-5 py-2 rounded-lg transition-all duration-200 active:scale-95"
+                style={{
+                  background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+                  color: "#fff",
+                  boxShadow: "0 0 18px rgba(99,102,241,0.4)",
+                }}
+              >
+                Dùng thử miễn phí
+              </button>
+            </>
+          )}
         </div>
       </div>
     </nav>
@@ -915,8 +932,17 @@ function Footer({ onLogin }: { onLogin: () => void }) {
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
 export function LandingPage() {
-  const navigate = useNavigate();
-  const handleLogin = () => navigate("/dang-nhap");
+  const navigate  = useNavigate();
+  const isAuth    = authService.isAuthenticated();
+  const appPath   = (() => {
+    const role = authService.getCurrentRole()?.toLowerCase() || "";
+    if (role === "manager") return "/quan-ly";
+    if (role === "admin")   return "/quan-tri";
+    return "/nguoi-dung";
+  })();
+
+  // Nếu đã đăng nhập → vào app; chưa → vào trang đăng nhập
+  const handleCTA = () => navigate(isAuth ? appPath : "/dang-nhap");
 
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', Inter, sans-serif", background: "#F8FAFF" }}>
@@ -927,13 +953,13 @@ export function LandingPage() {
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
       `}</style>
-      <Navbar onLogin={handleLogin} />
-      <HeroSection onLogin={handleLogin} />
+      <Navbar onLogin={handleCTA} isAuth={isAuth} />
+      <HeroSection onLogin={handleCTA} />
       <FeaturesSection />
-      <BenefitsSection onLogin={handleLogin} />
-      <PricingSection onLogin={handleLogin} />
+      <BenefitsSection onLogin={handleCTA} />
+      <PricingSection onLogin={handleCTA} />
       <FAQSection />
-      <Footer onLogin={handleLogin} />
+      <Footer onLogin={handleCTA} />
     </div>
   );
 }

@@ -16,6 +16,18 @@ export const campaignService = {
     }
   },
 
+  getMyCampaigns: async () => {
+    try {
+      const response = await axiosInstance.get("/Campaigns/my-campaigns");
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tải chiến dịch được giao");
+    } catch (error) {
+      throw error;
+    }
+  },
+
   /**
    * Lấy chi tiết chiến dịch theo ID
    * @param {number} id

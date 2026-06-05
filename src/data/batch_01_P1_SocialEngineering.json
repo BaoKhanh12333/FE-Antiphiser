@@ -1,0 +1,630 @@
+{
+  "batch_id": "01",
+  "batch_name": "Phase 1 — Social Engineering",
+  "phase": 1,
+  "lesson": "1.2",
+  "total": 10,
+  "distribution": {
+    "difficulty": {
+      "easy": 6,
+      "medium": 2,
+      "hard": 2
+    },
+    "type": {
+      "malicious": 9,
+      "legitimate": 1
+    }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P1-SE-001",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Urgency",
+      "attack_type": "Banking Scam",
+      "learning_objective": "Nhận diện chiến thuật Urgency — deadline giả tạo trong email ngân hàng",
+      "email": {
+        "sender_name": "Vietcombank Thông Báo",
+        "sender_email": "alert@vietcombank-secure-vn.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "KHẨN: Tài khoản bị hạn chế — Xác minh trước 15:00",
+        "body": "Kính gửi Quý Khách hàng,\n\nTài khoản Vietcombank của bạn bị hạn chế giao dịch do phát hiện đăng nhập bất thường. Vui lòng xác minh danh tính trước 15:00 hôm nay.\n\nSau thời hạn, tài khoản sẽ bị đình chỉ vĩnh viễn. Nhấp vào liên kết để xác minh ngay.",
+        "cta_text": "Xác minh ngay",
+        "cta_link": "http://vietcombank-secure-vn.com/verify"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alert@vietcombank-secure-vn.com",
+          "explanation": "'vietcombank-secure-vn.com' là domain giả. Domain thật của Vietcombank là vietcombank.com.vn — không có đuôi '-vn.com' riêng biệt.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "urgency_language",
+          "visible_text": "trước 15:00 hôm nay",
+          "explanation": "Deadline vài giờ là chiến thuật Urgency điển hình — ngân hàng thật không đình chỉ tài khoản chỉ sau vài giờ qua email.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "đình chỉ vĩnh viễn",
+          "explanation": "Đe dọa 'vĩnh viễn' tạo nỗi sợ mất tài khoản — chiến thuật Fear để buộc hành động ngay không suy nghĩ.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "KHẨN",
+        "trước 15:00 hôm nay",
+        "đình chỉ vĩnh viễn"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email dùng deadline '15:00 hôm nay' (Urgency) kết hợp đe dọa 'đình chỉ vĩnh viễn' (Fear). Đây là công thức phổ biến nhất trong Banking Scam tại Việt Nam.",
+        "learning_point": "Khi nhận email ngân hàng có deadline vài giờ — đó là dấu hiệu phishing. Mở thẳng app ngân hàng để kiểm tra, không click link email.",
+        "psychology_display": "Urgency + Fear",
+        "attack_type_display": "Banking Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-002",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Fear",
+      "attack_type": "Account Takeover",
+      "learning_objective": "Nhận diện chiến thuật Fear — đe dọa mất tài khoản để tạo hoảng loạn",
+      "email": {
+        "sender_name": "Facebook Security",
+        "sender_email": "security@fb-account-protect.net",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Tài khoản Facebook sắp bị xóa — Hành động ngay",
+        "body": "Xin chào,\n\nChúng tôi nhận được báo cáo vi phạm từ tài khoản của bạn. Tài khoản sẽ bị xóa vĩnh viễn sau 48 giờ nếu bạn không xác minh danh tính.\n\nNhấp vào đây để kháng cáo và giữ tài khoản.",
+        "cta_text": "Kháng cáo ngay",
+        "cta_link": "http://fb-account-protect.net/appeal"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@fb-account-protect.net",
+          "explanation": "'fb-account-protect.net' là domain giả. Email Facebook thật đến từ @facebookmail.com hoặc @meta.com.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "bị xóa vĩnh viễn sau 48 giờ",
+          "explanation": "Facebook không xóa tài khoản chỉ sau 48 giờ qua email — đây là đe dọa giả tạo để gây hoảng loạn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "generic_greeting",
+          "visible_text": "Xin chào",
+          "explanation": "Facebook biết tên bạn — email thật luôn dùng tên đầy đủ, không dùng 'Xin chào' chung chung.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "xóa vĩnh viễn sau 48 giờ",
+        "fb-account-protect.net"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email dùng Fear mạnh ('xóa vĩnh viễn') để khiến bạn không kịp suy nghĩ. Mọi tổ chức hợp pháp đều cho phép thời gian xử lý dài hơn và thông báo qua nhiều kênh.",
+        "learning_point": "Khi email đe dọa xóa tài khoản — hãy vào thẳng app hoặc website chính thức để kiểm tra. Nếu không thấy thông báo tương tự trong app, email là giả.",
+        "psychology_display": "Fear",
+        "attack_type_display": "Account Takeover"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-003",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Authority",
+      "attack_type": "Government Impersonation",
+      "learning_objective": "Nhận diện chiến thuật Authority — giả danh cơ quan nhà nước để tạo áp lực tuân thủ",
+      "email": {
+        "sender_name": "Cục Thuế TP.HCM",
+        "sender_email": "thongbao@cuc-thue-hcm.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Thông báo nợ thuế — Thanh toán trước 30/06/2026",
+        "body": "Kính gửi Người nộp thuế,\n\nHệ thống ghi nhận bạn còn nợ thuế thu nhập cá nhân 2.340.000đ năm 2025. Vui lòng thanh toán trước ngày 30/06/2026 để tránh bị phạt và truy thu.\n\nTruy cập cổng thanh toán để hoàn tất nghĩa vụ thuế.",
+        "cta_text": "Thanh toán thuế",
+        "cta_link": "http://cuc-thue-hcm.com/payment"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@cuc-thue-hcm.com",
+          "explanation": "Cơ quan thuế nhà nước dùng domain .gov.vn — 'cuc-thue-hcm.com' là domain tư nhân giả mạo. Website thật là gdt.gov.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "Cục Thuế TP.HCM",
+          "explanation": "Giả mạo cơ quan thuế nhà nước để tạo áp lực tuân thủ pháp lý — người dùng thường không dám bỏ qua thông báo từ 'cơ quan nhà nước'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "payment_request",
+          "visible_text": "2.340.000đ",
+          "explanation": "Cơ quan thuế thật thông báo qua hệ thống eTax và văn bản giấy — không yêu cầu thanh toán qua link email.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "Cục Thuế TP.HCM",
+        "2.340.000đ",
+        "cuc-thue-hcm.com"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email giả danh Cục Thuế để khai thác Authority — người dùng thường tuân thủ mà không đặt câu hỏi khi thấy tên cơ quan nhà nước.",
+        "learning_point": "Cơ quan nhà nước Việt Nam dùng domain .gov.vn. Thông báo thuế thật đến qua hệ thống eTax (etax.gdt.gov.vn) hoặc văn bản giấy — không qua link email.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Government Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-004",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Curiosity",
+      "attack_type": "Prize Scam",
+      "learning_objective": "Nhận diện chiến thuật Curiosity — mồi nhử phần thưởng quá hấp dẫn để kích thích tò mò",
+      "email": {
+        "sender_name": "Shopee Khuyến Mãi",
+        "sender_email": "prize@shopee-reward-event.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Bạn trúng thưởng iPhone 16 — Nhận ngay hôm nay",
+        "body": "Xin chào,\n\nChúc mừng! Bạn là 1 trong 5 khách hàng may mắn được chọn nhận iPhone 16 từ chương trình tri ân khách hàng Shopee tháng 6/2026.\n\nXác nhận nhận thưởng trong 24 giờ. Chỉ cần thanh toán 50.000đ phí vận chuyển.",
+        "cta_text": "Nhận thưởng ngay",
+        "cta_link": "http://shopee-reward-event.com/claim"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "prize@shopee-reward-event.com",
+          "explanation": "'shopee-reward-event.com' là domain giả. Shopee thật dùng @shopee.vn — không có domain khuyến mãi riêng biệt.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "payment_request",
+          "visible_text": "50.000đ phí vận chuyển",
+          "explanation": "Yêu cầu thanh toán phí nhỏ để nhận quà lớn là chiêu lừa đảo kinh điển — mục tiêu thật là lấy thông tin thanh toán của bạn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trong 24 giờ",
+          "explanation": "Deadline 24 giờ kết hợp phần thưởng hấp dẫn tạo FOMO — sợ mất cơ hội nếu không hành động ngay.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "trúng thưởng iPhone 16",
+        "50.000đ phí vận chuyển",
+        "shopee-reward-event.com"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email dùng Curiosity (iPhone 16 miễn phí) để thu hút, sau đó lấy thông tin thanh toán qua 'phí vận chuyển' nhỏ. Phần thưởng càng hấp dẫn — cần cảnh giác càng cao.",
+        "learning_point": "Không có tổ chức hợp pháp nào trao giải thưởng lớn mà yêu cầu 'phí nhỏ' trước. Kiểm tra chương trình khuyến mãi trực tiếp trong app Shopee.",
+        "psychology_display": "Curiosity",
+        "attack_type_display": "Prize Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-005",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Banking Scam",
+      "learning_objective": "Nhận diện khi Urgency và Fear kết hợp cùng nhau — hiệu lực tâm lý mạnh hơn gấp đôi",
+      "email": {
+        "sender_name": "MB Bank Alert",
+        "sender_email": "no-reply@mbbank-security-center.org",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Giao dịch 18.500.000đ bất thường — Khóa ngay",
+        "body": "Kính gửi Quý Khách,\n\nLúc 03:22 sáng nay phát hiện giao dịch chuyển tiền 18.500.000đ từ tài khoản của bạn đến số tài khoản lạ tại ngân hàng nước ngoài.\n\nHãy khóa tài khoản NGAY để ngăn mất thêm tiền.",
+        "cta_text": "Khóa tài khoản ngay",
+        "cta_link": "http://mbbank-security-center.org/lock"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "no-reply@mbbank-security-center.org",
+          "explanation": "'mbbank-security-center.org' là domain giả — MB Bank thật dùng @mbbank.com.vn. Đuôi .org không dùng cho ngân hàng thương mại.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "18.500.000đ",
+          "explanation": "Số tiền lớn và cụ thể kết hợp thời gian '03:22 sáng nay' tạo cảm giác tấn công thật đang xảy ra — Fear cực mạnh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "NGAY",
+          "explanation": "'NGAY' viết hoa là chiến thuật Urgency — ngăn bạn dành thời gian kiểm tra qua kênh chính thức.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "03:22 sáng nay",
+        "18.500.000đ",
+        "NGAY",
+        "mbbank-security-center.org"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email kết hợp Urgency (NGAY) + Fear (số tiền lớn lúc nửa đêm) — hiệu lực tâm lý mạnh nhất khi hai chiến thuật này xuất hiện cùng nhau.",
+        "learning_point": "Khi nhận email về giao dịch lạ: mở app MB Bank để kiểm tra lịch sử giao dịch. Nếu không thấy giao dịch đó trong app — email là giả.",
+        "psychology_display": "Urgency + Fear",
+        "attack_type_display": "Banking Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-006",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Authority",
+      "attack_type": "IT Support Scam",
+      "learning_objective": "Nhận diện giả mạo bộ phận IT nội bộ để khai thác Authority trong môi trường công ty",
+      "email": {
+        "sender_name": "IT Support — ABC Technology",
+        "sender_email": "itsupport@abctech-helpdesk.net",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Bắt buộc: Cập nhật mật khẩu VPN trước 17:00",
+        "body": "Xin chào,\n\nBộ phận IT thông báo hệ thống VPN sẽ nâng cấp bảo mật lúc 18:00 hôm nay. Tất cả nhân viên phải cập nhật mật khẩu qua cổng bảo mật trước 17:00.\n\nTài khoản chưa cập nhật sẽ bị khóa quyền truy cập VPN.",
+        "cta_text": "Cập nhật mật khẩu",
+        "cta_link": "http://abctech-helpdesk.net/vpn-update"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "itsupport@abctech-helpdesk.net",
+          "explanation": "Email IT nội bộ thật phải đến từ @abctech.com.vn — 'abctech-helpdesk.net' là domain bên ngoài giả mạo bộ phận IT công ty.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "IT Support — ABC Technology",
+          "explanation": "Giả mạo bộ phận IT nội bộ để khai thác Authority — nhân viên thường tuân thủ yêu cầu IT mà không đặt câu hỏi.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "credential_request",
+          "visible_text": "cập nhật mật khẩu qua cổng bảo mật",
+          "explanation": "IT hợp lệ không yêu cầu cập nhật mật khẩu qua link email — đây là credential harvesting.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "trước 17:00",
+        "abctech-helpdesk.net",
+        "cập nhật mật khẩu"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email giả mạo IT nội bộ từ domain bên ngoài — dấu hiệu rõ nhất là @abctech-helpdesk.net thay vì @abctech.com.vn.",
+        "learning_point": "Email IT nội bộ thật luôn đến từ domain công ty. Khi nhận yêu cầu IT từ domain lạ: gọi trực tiếp cho bộ phận IT để xác nhận trước khi làm gì.",
+        "psychology_display": "Authority",
+        "attack_type_display": "IT Support Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-007",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Regulatory Compliance Scam",
+      "learning_objective": "Nhận diện kết hợp Authority (quy định pháp lý giả) và Urgency (deadline ngắn) — chiến thuật tinh vi hơn email easy",
+      "email": {
+        "sender_name": "Bộ Thông tin và Truyền thông",
+        "sender_email": "thongbao@btttt-gov-vn.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Yêu cầu xác minh danh tính online theo NĐ 13/2023",
+        "body": "Kính gửi Công dân Nguyễn Thị Lan,\n\nTheo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, Bộ TT&TT yêu cầu tất cả người dùng dịch vụ internet tại Việt Nam hoàn thành xác minh danh tính trực tuyến trước ngày 30/06/2026.\n\nTài khoản chưa xác minh sẽ bị hạn chế truy cập một số dịch vụ số. Vui lòng hoàn tất xác minh qua Cổng Dịch vụ công.",
+        "cta_text": "Xác minh danh tính",
+        "cta_link": "http://btttt-gov-vn.com/verify-identity"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@btttt-gov-vn.com",
+          "explanation": "Cơ quan nhà nước dùng .gov.vn — 'btttt-gov-vn.com' dùng .com giả mạo, thêm 'gov-vn' vào tên domain để đánh lừa. Website thật là mic.gov.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "Nghị định 13/2023/NĐ-CP",
+          "explanation": "Nghị định 13 có thật nhưng không có quy định yêu cầu xác minh danh tính qua link email — số văn bản thật được dùng sai ngữ cảnh để tăng tính xác thực giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trước ngày 30/06/2026",
+          "explanation": "Deadline ngày cụ thể tạo áp lực theo quy trình — được thiết kế để trông như thông báo hành chính chính thống.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "Nghị định 13/2023/NĐ-CP",
+        "trước ngày 30/06/2026",
+        "btttt-gov-vn.com"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email dùng số nghị định có thật (NĐ 13/2023) nhưng trong ngữ cảnh sai để tạo Authority giả. Kẻ tấn công biết người dùng ít khi tra cứu nội dung nghị định ngay lập tức.",
+        "learning_point": "Cơ quan nhà nước chỉ dùng domain .gov.vn. Khi email tham chiếu văn bản pháp lý: tra cứu trực tiếp trên thuvienphapluat.vn hoặc vào website .gov.vn chính thức.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "Government Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-008",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Curiosity + Fear",
+      "attack_type": "Account Takeover",
+      "learning_objective": "Nhận diện kết hợp Curiosity (thông tin bí mật về bạn) và Fear (tài khoản bị theo dõi) — chiến thuật tinh vi nhắm người dùng trung cấp",
+      "email": {
+        "sender_name": "Google Security Alert",
+        "sender_email": "security-alert@google-accounts-team.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Ai đó đang xem lịch sử tìm kiếm của bạn — Kiểm tra ngay",
+        "body": "Xin chào Nguyễn Thị Lan,\n\nChúng tôi phát hiện tài khoản Google của bạn đang được truy cập từ một ứng dụng bên thứ ba không được cấp phép. Ứng dụng này có thể đang đọc email, lịch sử tìm kiếm và vị trí của bạn.\n\nĐể thu hồi quyền truy cập và bảo vệ dữ liệu cá nhân, hãy xem xét và xóa ứng dụng ngay.",
+        "cta_text": "Xem ứng dụng đang truy cập",
+        "cta_link": "http://google-accounts-team.com/app-permissions"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security-alert@google-accounts-team.com",
+          "explanation": "'google-accounts-team.com' là domain giả — email Google thật đến từ @google.com hoặc @accounts.google.com.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "đang đọc email, lịch sử tìm kiếm và vị trí của bạn",
+          "explanation": "Liệt kê dữ liệu cá nhân cụ thể tạo nỗi sợ mất quyền riêng tư — kích hoạt cả Curiosity (ai đang xem?) lẫn Fear (dữ liệu bị lộ).",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_link",
+          "visible_text": "http://google-accounts-team.com/app-permissions",
+          "explanation": "Link dùng HTTP (không HTTPS) và domain giả — trang myaccount.google.com/permissions mới là nơi kiểm tra app thật.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "đang đọc email, lịch sử tìm kiếm và vị trí",
+        "google-accounts-team.com"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email kết hợp Curiosity (ai đang xem dữ liệu của bạn?) và Fear (dữ liệu cá nhân bị theo dõi). Liệt kê dữ liệu cụ thể làm email trông thuyết phục hơn nhưng tất cả đều bịa đặt.",
+        "learning_point": "Để kiểm tra app nào có quyền truy cập Google: vào thẳng myaccount.google.com/permissions — gõ tay URL, không click link email.",
+        "psychology_display": "Curiosity + Fear",
+        "attack_type_display": "Account Takeover"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-009",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Social Engineering",
+      "psychology": "Authority + Fear + Urgency",
+      "attack_type": "BEC / CEO Fraud",
+      "learning_objective": "Nhận diện BEC sử dụng cả ba chiến thuật tâm lý — tinh vi nhất vì không có link đáng ngờ rõ ràng",
+      "email": {
+        "sender_name": "Trần Minh Khoa — CEO",
+        "sender_email": "tran.minh.khoa@abctech-group.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Cần xử lý gấp — Chuyển khoản đối tác Singapore",
+        "body": "Lan,\n\nAnh đang họp với nhà đầu tư Series B tại Singapore, không tiện gọi điện. Em xử lý gấp chuyển khoản 95.000.000đ cho đối tác theo thông tin dưới đây:\n\nCông ty: Pacific Trade Solutions Pte Ltd\nSố TK: 078-1234567-8\nNgân hàng: DBS Singapore\nSwift: DBSSSGSG\n\nĐây là thỏa thuận NDA, chưa thông báo nội bộ. Cần xong trước 16:00 hôm nay vì múi giờ Singapore. Chuyển xong báo anh qua Zalo nhé.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "tran.minh.khoa@abctech-group.com",
+          "explanation": "'abctech-group.com' khác với 'abctech.com.vn' — chênh lệch một chữ '-group' là typosquatting tinh vi, khó nhận ra khi đọc nhanh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "chưa thông báo nội bộ",
+          "explanation": "Yêu cầu 'NDA, chưa thông báo nội bộ' cố ý ngăn nạn nhân xác minh với đồng nghiệp — đây là Red Flag số 1 của BEC.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trước 16:00 hôm nay vì múi giờ Singapore",
+          "explanation": "Deadline gấp với lý do nghe có vẻ hợp lý (múi giờ) — tạo áp lực không thể trì hoãn để xác minh.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2",
+        "rf3"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "abctech-group.com",
+        "chưa thông báo nội bộ",
+        "trước 16:00 hôm nay"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email BEC — Business Email Compromise!",
+        "summary": "Email này không có link đáng ngờ — chỉ cần chuyển tiền vào số tài khoản. Ba yếu tố ngăn xác minh: (1) CEO không nghe máy, (2) NDA bí mật, (3) deadline gấp. Đây là cấu trúc BEC điển hình.",
+        "learning_point": "Mọi yêu cầu chuyển tiền qua email — dù từ CEO — phải xác nhận bằng cuộc gọi đến số đã biết. Không có ngoại lệ dù lý do nghe hợp lý đến đâu.",
+        "psychology_display": "Authority + Fear + Urgency",
+        "attack_type_display": "BEC / CEO Fraud"
+      }
+    },
+    {
+      "simulation_id": "P1-SE-010",
+      "batch": "01",
+      "phase": 1,
+      "lesson": "1.2",
+      "difficulty": "hard",
+      "email_type": "legitimate",
+      "category": "Social Engineering",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email thông báo hợp lệ từ ngân hàng với phishing — email thật cũng có thể chứa yếu tố trông suspicious",
+      "email": {
+        "sender_name": "Techcombank",
+        "sender_email": "notification@techcombank.com.vn",
+        "subject": "Xác nhận giao dịch — Chuyển tiền thành công 2.500.000đ",
+        "body": "Kính gửi Nguyễn Thị Lan,\n\nTechcombank xác nhận giao dịch chuyển tiền của bạn đã được thực hiện thành công:\n\nSố tiền: 2.500.000đ\nTài khoản nhận: ****4521 — Nguyễn Văn B\nThời gian: 14:32 ngày 18/06/2026\nMã giao dịch: TCB2026061814320089\n\nNếu bạn không thực hiện giao dịch này, liên hệ ngay hotline 1800 588 822 hoặc khóa thẻ tại app Techcombank.\n\nEmail này được gửi tự động, vui lòng không trả lời.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Thông báo giao dịch có số tiền và tài khoản cụ thể — người dùng mới có thể lo ngại đây là phishing dạng 'giao dịch bất thường'",
+        "why_legitimate": "Domain @techcombank.com.vn chính thức. Có tên người nhận cụ thể. Mã giao dịch TCB2026061814320089 có format thật. Hotline 1800 588 822 xác minh được. Không có link — chỉ thông báo kết quả. Email thật về giao dịch không bao giờ có link 'click để hủy'."
+      },
+      "feedback": {
+        "title": "Đây là email hợp lệ!",
+        "summary": "Email xác nhận giao dịch từ Techcombank với đầy đủ tín hiệu hợp lệ: domain chính thức, tên người nhận, mã giao dịch có format chuẩn, hotline xác minh được, và không có link nào để click.",
+        "learning_point": "Email xác nhận giao dịch hợp lệ thường KHÔNG có link — chỉ thông báo kết quả và hướng dẫn dùng app/hotline nếu có vấn đề. Phân biệt với phishing 'giao dịch bất thường' luôn có link 'khóa ngay' hoặc 'hủy giao dịch'.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    }
+  ]
+}

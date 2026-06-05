@@ -36,6 +36,18 @@ export const scenarioService = {
    * Nộp kết quả làm bài của kịch bản giả lập
    * @param {object} attemptData - { scenarioId, answeredCorrectly, isPhishingSelected }
    */
+  getMyAttempts: async (campaignId) => {
+    try {
+      const response = await axiosInstance.get(`/Scenarios/my-campaign-attempts?campaignId=${campaignId}`);
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tải lịch sử làm bài");
+    } catch (error) {
+      throw error;
+    }
+  },
+
   submitAttempt: async (attemptData) => {
     try {
       const response = await axiosInstance.post("/Scenarios/submit-attempt", attemptData);
