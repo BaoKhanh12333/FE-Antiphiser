@@ -76,5 +76,21 @@ export const campaignService = {
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  /**
+   * Activate (hoặc deactivate) campaign.
+   * PUT /api/Campaigns/{id}/status  { isActive: true/false }
+   */
+  activateCampaign: async (id, isActive = true) => {
+    try {
+      const response = await axiosInstance.put(`/Campaigns/${id}/status`, { isActive });
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể cập nhật trạng thái chiến dịch");
+    } catch (error) {
+      throw error;
+    }
+  },
 };
