@@ -75,5 +75,23 @@ export const userService = {
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  /**
+   * Manager: lấy nhân viên cùng công ty (RoleId=3, cùng CompanyId).
+   * Trả về CompanyEmployeePagedResponse { items, totalCount, pageIndex, pageSize }.
+   */
+  getCompanyEmployees: async (pageIndex = 1, pageSize = 100) => {
+    try {
+      const response = await axiosInstance.get(
+        `/UserAccount/company-employees?pageIndex=${pageIndex}&pageSize=${pageSize}`
+      );
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể tải danh sách nhân viên");
+    } catch (error) {
+      throw error;
+    }
+  },
 };

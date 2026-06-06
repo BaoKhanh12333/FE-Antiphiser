@@ -13,7 +13,6 @@ import {
   Quote,
   Loader2,
   Mail,
-  AlertTriangle,
   X,
 } from "lucide-react";
 
@@ -317,6 +316,10 @@ export function LoginPage() {
   const [loginState, setLoginState] = useState<"idle" | "loading" | "success">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotDone, setForgotDone] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPassValid = password.length >= 4;
@@ -388,6 +391,28 @@ export function LoginPage() {
       setLoginState("idle");
       setErrorMsg(error?.message || error?.errorMessage || "Đăng nhập thất bại. Email hoặc mật khẩu không chính xác!");
     }
+  };
+
+  const closeForgotModal = () => {
+    setShowForgotModal(false);
+    setForgotEmail("");
+    setForgotError("");
+    setForgotDone(false);
+    setForgotLoading(false);
+  };
+
+  const handleForgotSubmit = async () => {
+    if (!forgotEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail)) {
+      setForgotError("Vui lòng nhập địa chỉ email hợp lệ.");
+      return;
+    }
+    setForgotLoading(true);
+    setForgotError("");
+    try {
+      await authService.forgotPassword({ email: forgotEmail });
+    } catch (_) {}
+    setForgotDone(true);
+    setForgotLoading(false);
   };
 
   return (
@@ -789,7 +814,7 @@ export function LoginPage() {
             background: "rgba(15,23,42,0.6)",
             backdropFilter: "blur(8px)",
           }}
-          onClick={() => setShowForgotModal(false)}
+          onClick={closeForgotModal}
         >
           <div
             className="relative bg-white w-full mx-4 overflow-hidden"
@@ -804,7 +829,7 @@ export function LoginPage() {
           >
             {/* Close button */}
             <button
-              onClick={() => setShowForgotModal(false)}
+              onClick={closeForgotModal}
               className="absolute top-4 right-4 text-slate-300 hover:text-slate-600 transition-colors"
               style={{ background: "none", border: "none", cursor: "pointer" }}
             >
@@ -826,11 +851,11 @@ export function LoginPage() {
                 className="w-16 h-16 flex items-center justify-center mx-auto mb-5"
                 style={{
                   borderRadius: 20,
-                  background: "linear-gradient(135deg, #FEF3C7, #FDE68A)",
-                  boxShadow: "0 4px 16px rgba(245,158,11,0.15)",
+                  background: "linear-gradient(135deg, #EEF2FF, #E0E7FF)",
+                  boxShadow: "0 4px 16px rgba(99,102,241,0.12)",
                 }}
               >
-                <AlertTriangle size={28} className="text-amber-600" />
+                <Mail size={28} className="text-indigo-600" />
               </div>
 
               <h3
@@ -845,59 +870,80 @@ export function LoginPage() {
                 Quên mật khẩu?
               </h3>
 
-              <p
-                style={{
-                  fontSize: "0.88rem",
-                  color: "#64748B",
-                  lineHeight: 1.7,
-                  marginBottom: 24,
-                }}
-              >
-                Hiện tại hệ thống chưa hỗ trợ tự đặt lại mật khẩu.
-                Vui lòng liên hệ <strong style={{ color: "#4338CA" }}>Quản trị viên</strong> để được hỗ trợ đặt lại mật khẩu cho tài khoản của bạn.
-              </p>
-
-              {/* Contact info box */}
-              <div
-                className="rounded-2xl p-4 flex items-center gap-3 text-left mb-6"
-                style={{
-                  background: "#F8FAFF",
-                  border: "1.5px solid rgba(99,102,241,0.1)",
-                }}
-              >
-                <div
-                  className="w-10 h-10 flex items-center justify-center shrink-0"
-                  style={{
-                    borderRadius: 12,
-                    background: "linear-gradient(135deg, #6366F1, #818CF8)",
-                  }}
-                >
-                  <Mail size={18} className="text-white" />
-                </div>
-                <div>
-                  <p style={{ fontSize: "0.75rem", color: "#94A3B8", fontWeight: 600 }}>
-                    Email hỗ trợ
+              {forgotDone ? (
+                <>
+                  <div
+                    className="rounded-2xl p-4 mb-6"
+                    style={{
+                      background: "#F0FDF4",
+                      border: "1px solid rgba(16,185,129,0.25)",
+                    }}
+                  >
+                    <p style={{ fontSize: "0.87rem", color: "#065F46", fontWeight: 600, lineHeight: 1.6 }}>
+                      Nếu email tồn tại, link đặt lại đã được gửi. Vui lòng kiểm tra hộp thư (cả Spam).
+                    </p>
+                  </div>
+                  <button
+                    onClick={closeForgotModal}
+                    className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all hover:scale-[1.01] active:scale-[0.99]"
+                    style={{
+                      background: "linear-gradient(135deg, #6366F1, #818CF8)",
+                      color: "#fff",
+                      border: "none",
+                      cursor: "pointer",
+                      boxShadow: "0 8px 24px rgba(99,102,241,0.2)",
+                    }}
+                  >
+                    Quay lại đăng nhập
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p style={{ fontSize: "0.87rem", color: "#64748B", lineHeight: 1.7, marginBottom: 20 }}>
+                    Nhập email tài khoản, chúng tôi sẽ gửi link đặt lại mật khẩu.
                   </p>
-                  <p style={{ fontSize: "0.88rem", color: "#1E293B", fontWeight: 700 }}>
-                    admin@antiphisher.vn
-                  </p>
-                </div>
-              </div>
 
-              {/* Close button */}
-              <button
-                onClick={() => setShowForgotModal(false)}
-                className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all hover:scale-[1.01] active:scale-[0.99]"
-                style={{
-                  background: "linear-gradient(135deg, #6366F1, #818CF8)",
-                  color: "#fff",
-                  border: "none",
-                  cursor: "pointer",
-                  boxShadow: "0 8px 24px rgba(99,102,241,0.2)",
-                }}
-              >
-                Đã hiểu, quay lại đăng nhập
-              </button>
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleForgotSubmit()}
+                    placeholder="Email của bạn"
+                    className="w-full outline-none text-slate-700"
+                    style={{
+                      border: "1.5px solid #E2E8F0",
+                      borderRadius: 12,
+                      padding: "12px 16px",
+                      fontSize: "0.9rem",
+                      background: "#FAFAFF",
+                      marginBottom: forgotError ? 8 : 20,
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = "#6366F1"; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = "#E2E8F0"; }}
+                  />
+
+                  {forgotError && (
+                    <p style={{ color: "#EF4444", fontSize: "0.8rem", marginBottom: 12, textAlign: "left" }}>
+                      {forgotError}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={handleForgotSubmit}
+                    disabled={forgotLoading}
+                    className="w-full py-3.5 rounded-2xl font-bold text-sm transition-all hover:scale-[1.01] active:scale-[0.99]"
+                    style={{
+                      background: forgotLoading ? "#A5B4FC" : "linear-gradient(135deg, #6366F1, #818CF8)",
+                      color: "#fff",
+                      border: "none",
+                      cursor: forgotLoading ? "not-allowed" : "pointer",
+                      boxShadow: forgotLoading ? "none" : "0 8px 24px rgba(99,102,241,0.2)",
+                    }}
+                  >
+                    {forgotLoading ? "Đang gửi..." : "Gửi link đặt lại"}
+                  </button>
+                </>
+              )}
             </div>
           </div>
 

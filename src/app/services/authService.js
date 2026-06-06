@@ -107,6 +107,38 @@ export const authService = {
   },
 
   /**
+   * Đổi mật khẩu khi đã đăng nhập
+   * @param {{ currentPassword: string, newPassword: string, confirmPassword: string }} payload
+   */
+  changePassword: async ({ currentPassword, newPassword, confirmPassword }) => {
+    return await axiosInstance.post("/Auth/change-password", {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    });
+  },
+
+  /**
+   * Gửi link đặt lại mật khẩu qua email
+   * @param {{ email: string }} payload
+   */
+  forgotPassword: async ({ email }) => {
+    return await axiosInstance.post("/Auth/forgot-password", { email });
+  },
+
+  /**
+   * Đặt lại mật khẩu bằng token từ email
+   * @param {{ token: string, newPassword: string, confirmPassword: string }} payload
+   */
+  resetPassword: async ({ token, newPassword, confirmPassword }) => {
+    return await axiosInstance.post("/Auth/reset-password", {
+      token,
+      newPassword,
+      confirmPassword,
+    });
+  },
+
+  /**
    * Đăng xuất hệ thống
    */
   logout: () => {
