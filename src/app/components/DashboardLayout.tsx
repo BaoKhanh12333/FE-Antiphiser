@@ -5,7 +5,7 @@ import { userService } from "../services/userService";
 import {
   LayoutDashboard, BookOpen, ShieldAlert, BarChart3,
   X, Shield, LogOut, Settings, Menu, Bell, Search,
-  Users, FileCheck, LayoutGrid, Sliders, Library, ChevronDown,
+  Users, FileCheck, LayoutGrid, Sliders, Library, ChevronDown, PlusCircle,
 } from "lucide-react";
 
 type Role = "user" | "manager" | "admin";
@@ -21,6 +21,7 @@ const navByRole: Record<Role, { to: string; label: string; icon: React.ElementTy
   ],
   manager: [
     { to: "/quan-ly", label: "Tổng quan", icon: LayoutDashboard, end: true },
+    { to: "/quan-ly/tao-chien-dich", label: "Tạo chiến dịch", icon: PlusCircle },
     { to: "/quan-ly/doi-ngu", label: "Đội ngũ", icon: Users },
     { to: "/quan-ly/bao-cao", label: "Báo cáo & AI", icon: BarChart3 },
   ],

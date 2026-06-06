@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { User, Mail, Save, CheckCircle2 } from "lucide-react";
+import { User, Mail, Save, CheckCircle2, Lock } from "lucide-react";
 import { userService } from "../services/userService";
+import { authService } from "../services/authService";
 import { lessonService } from "../services/lessonService";
 import { campaignService } from "../services/campaignService";
 import { scenarioService } from "../services/scenarioService";
@@ -82,6 +83,14 @@ export function Settings() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
+  // ── Đổi mật khẩu ────────────────────────────────────
+  const [pwdCurrent, setPwdCurrent] = useState("");
+  const [pwdNew, setPwdNew]         = useState("");
+  const [pwdConfirm, setPwdConfirm] = useState("");
+  const [pwdError, setPwdError]     = useState("");
+  const [pwdSuccess, setPwdSuccess] = useState("");
+  const [pwdLoading, setPwdLoading] = useState(false);
+
   // Progress Summary Stats
   const [stats, setStats] = useState({
     completedLessons: 0,
@@ -157,6 +166,45 @@ export function Settings() {
       setTimeout(() => setSaved(false), 2000);
     } catch (err: any) {
       setError(err?.message || "Đã xảy ra lỗi khi lưu thông tin");
+    }
+  }
+
+  async function handleChangePassword() {
+    setPwdError("");
+    setPwdSuccess("");
+
+    if (!pwdCurrent || !pwdNew || !pwdConfirm) {
+      setPwdError("Vui lòng điền đầy đủ 3 ô mật khẩu.");
+      return;
+    }
+    if (pwdNew.length < 6) {
+      setPwdError("Mật khẩu mới phải có ít nhất 6 ký tự.");
+      return;
+    }
+    if (pwdNew !== pwdConfirm) {
+      setPwdError("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+
+    setPwdLoading(true);
+    try {
+      const res = await authService.changePassword({
+        currentPassword: pwdCurrent,
+        newPassword: pwdNew,
+        confirmPassword: pwdConfirm,
+      });
+      if (res && res.isSuccess) {
+        setPwdSuccess("Đổi mật khẩu thành công!");
+        setPwdCurrent("");
+        setPwdNew("");
+        setPwdConfirm("");
+      } else {
+        setPwdError(res?.errorMessage || "Đổi mật khẩu thất bại.");
+      }
+    } catch (err: any) {
+      setPwdError(err?.message || "Đã xảy ra lỗi, vui lòng thử lại.");
+    } finally {
+      setPwdLoading(false);
     }
   }
 
@@ -273,6 +321,83 @@ export function Settings() {
           )}
         </button>
       </div>
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 2 — Đổi mật khẩu
+      ══════════════════════════════════════════════════ */}
+      <SettingsCard>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-50 border border-indigo-100 shrink-0">
+            <Lock size={18} className="text-indigo-600" />
+          </div>
+          <div>
+            <h2 className="font-bold text-sm text-slate-800">Đổi mật khẩu</h2>
+            <p className="text-xs text-slate-400">Cập nhật mật khẩu đăng nhập của bạn</p>
+          </div>
+        </div>
+
+        {pwdError && (
+          <div className="mb-4 p-3 rounded-xl text-red-500 text-xs font-semibold bg-red-50 border border-red-100">
+            {pwdError}
+          </div>
+        )}
+        {pwdSuccess && (
+          <div className="mb-4 p-3 rounded-xl text-emerald-600 text-xs font-semibold bg-emerald-50 border border-emerald-100">
+            {pwdSuccess}
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <LightInput
+            label="Mật khẩu hiện tại"
+            icon={Lock}
+            type="password"
+            value={pwdCurrent}
+            onChange={setPwdCurrent}
+            placeholder="Nhập mật khẩu hiện tại"
+          />
+          <LightInput
+            label="Mật khẩu mới"
+            icon={Lock}
+            type="password"
+            value={pwdNew}
+            onChange={setPwdNew}
+            placeholder="Ít nhất 6 ký tự"
+          />
+          <LightInput
+            label="Xác nhận mật khẩu mới"
+            icon={Lock}
+            type="password"
+            value={pwdConfirm}
+            onChange={setPwdConfirm}
+            placeholder="Nhập lại mật khẩu mới"
+          />
+        </div>
+
+        <div className="flex justify-end mt-5">
+          <button
+            onClick={handleChangePassword}
+            disabled={pwdLoading}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.03] active:scale-[0.97]"
+            style={{
+              background: pwdLoading ? "#A5B4FC" : "#4F46E5",
+              boxShadow: pwdLoading ? "none" : "0 4px 14px rgba(79, 70, 229, 0.3)",
+              cursor: pwdLoading ? "not-allowed" : "pointer",
+              minWidth: 160,
+              justifyContent: "center",
+            }}
+          >
+            {pwdLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Đang xử lý...
+              </>
+            ) : (
+              <><Lock size={15} /> Đổi mật khẩu</>
+            )}
+          </button>
+        </div>
+      </SettingsCard>
     </div>
   );
 }

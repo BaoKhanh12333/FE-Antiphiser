@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   ResponsiveContainer, Legend, Cell,
 } from "recharts";
 import {
   TrendingUp, Users, AlertTriangle, Award, ChevronRight, Star,
-  Loader2, Send,
+  Loader2, PlusCircle,
 } from "lucide-react";
 import { analyticsService } from "../services/analyticsService";
 
@@ -28,6 +29,7 @@ function initials(name: string): string {
 
 /* ── MAIN ─────────────────────────────────────────────── */
 export function ManagerDashboard() {
+  const navigate = useNavigate();
   const [overview, setOverview] = useState<any>(null);
   const [employees, setEmployees] = useState<any[]>([]);
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -118,6 +120,7 @@ export function ManagerDashboard() {
           </p>
         </div>
         <button
+          onClick={() => navigate("/quan-ly/tao-chien-dich")}
           className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
           style={{
             background: "linear-gradient(135deg, #6366F1, #818CF8)",
@@ -127,7 +130,7 @@ export function ManagerDashboard() {
             boxShadow: "0 8px 24px rgba(99,102,241,0.35)",
           }}
         >
-          <Send size={15} /> Gửi nhắc nhở học tập
+          <PlusCircle size={15} /> Tạo chiến dịch
         </button>
       </div>
 

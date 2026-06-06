@@ -13,11 +13,13 @@ import { BaoCao } from "./pages/BaoCao";
 import { ManagerDashboard } from "./pages/ManagerDashboard";
 import { ManagerDoiNgu } from "./pages/manager/ManagerDoiNgu";
 import { ManagerBaoCao } from "./pages/manager/ManagerBaoCao";
+import { ManagerTaoCampaign } from "./pages/manager/ManagerTaoCampaign";
 import { AdminTongQuan } from "./pages/admin/AdminTongQuan";
 import { AdminThuVien } from "./pages/admin/AdminThuVien";
 import { AdminAIController } from "./pages/admin/AdminAIController";
 import { AdminQuanLyNguoiDung } from "./pages/admin/AdminQuanLyNguoiDung";
 import { Settings } from "./pages/Settings";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
 import { PaymentFail } from "./pages/PaymentFail";
@@ -59,6 +61,7 @@ export const router = createBrowserRouter([
       { index: true, Component: LandingPage },
       { path: "dang-nhap", Component: LoginPage },
       { path: "dang-ky", Component: RegisterPage },
+      { path: "dat-lai-mat-khau", Component: ResetPasswordPage },
 
       // Payment Callback Pages (from VNPAY)
       { path: "paymentsuccess", Component: PaymentSuccess },
@@ -94,6 +97,7 @@ export const router = createBrowserRouter([
               { index: true, Component: ManagerDashboard },
               { path: "doi-ngu", Component: ManagerDoiNgu },
               { path: "bao-cao", Component: ManagerBaoCao },
+              { path: "tao-chien-dich", Component: ManagerTaoCampaign },
               { path: "cai-dat", Component: Settings },
             ],
           },
