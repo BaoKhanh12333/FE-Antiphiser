@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { useReducedMotion } from "motion/react";
 import { lessonService } from "../services/lessonService";
 import { campaignService } from "../services/campaignService";
+import { subscriptionService } from "../services/subscriptionService";
 import { getCurrentUserId } from "../utils/currentUser";
 import {
   CheckCircle2, Loader2, BookOpen, Shield, Mail,
   Building2, ShieldAlert, ChevronRight, PlayCircle, ArrowRight, AlertTriangle,
+  Lock, X, Star, Zap,
 } from "lucide-react";
 
 // ─── Entrance animation CSS ───────────────────────────────────────────────────
@@ -22,60 +24,75 @@ const lotrinhCSS = `
 `;
 
 // ─── Phase config (icon + pastel per phase) ──────────────────────────────────
-// Màu pastel chỉ là nền nhẹ — trạng thái Đã học/Chưa học override bằng border + badge
-const PHASE: Record<number, {
-  name: string; lessons: string;
-  Icon: React.ElementType; accent: string; iconBg: string; border: string;
-}> = {
-  1: { name: "Nền tảng cơ bản",            lessons: "3 bài",  Icon: Shield,      accent: "#7C3AED", iconBg: "#EDE9FE", border: "rgba(124,58,237,0.15)" },
-  2: { name: "Nhận diện email đáng ngờ",    lessons: "5 bài",  Icon: Mail,        accent: "#2563EB", iconBg: "#DBEAFE", border: "rgba(37,99,235,0.15)"  },
-  3: { name: "Phishing môi trường doanh nghiệp", lessons: "5 bài", Icon: Building2, accent: "#B45309", iconBg: "#FEF3C7", border: "rgba(180,83,9,0.15)" },
-  4: { name: "Ứng phó & Báo cáo",           lessons: "3 bài",  Icon: ShieldAlert, accent: "#059669", iconBg: "#D1FAE5", border: "rgba(5,150,105,0.15)" },
-};
+const PHASE_DEFAULTS: { Icon: React.ElementType; accent: string; iconBg: string }[] = [
+  { Icon: Shield,      accent: "#7C3AED", iconBg: "#EDE9FE" },
+  { Icon: Mail,        accent: "#2563EB", iconBg: "#DBEAFE" },
+  { Icon: Building2,   accent: "#B45309", iconBg: "#FEF3C7" },
+  { Icon: ShieldAlert, accent: "#059669", iconBg: "#D1FAE5" },
+  { Icon: BookOpen,    accent: "#0891B2", iconBg: "#CFFAFE" },
+  { Icon: Shield,      accent: "#7C3AED", iconBg: "#EDE9FE" },
+];
 
-// Map lessonId → phase (theo seed: 4-6 = P1, 7-11 = P2, 12-16 = P3, 17-19 = P4)
-function getPhase(id: number) {
-  if (id <= 6)  return 1;
-  if (id <= 11) return 2;
-  if (id <= 16) return 3;
-  return 4;
+function getPhaseConfig(phaseNum: number, phaseName?: string) {
+  const idx = (phaseNum - 1) % PHASE_DEFAULTS.length;
+  const d = PHASE_DEFAULTS[Math.max(0, idx)];
+  return {
+    name:    phaseName ?? `Phase ${phaseNum}`,
+    Icon:    d.Icon,
+    accent:  d.accent,
+    iconBg:  d.iconBg,
+    border:  `${d.accent}26`,
+  };
+}
+
+function getPhase(lesson: any) {
+  return lesson.phaseNumber ?? 1;
 }
 
 // ─── Lesson Card ─────────────────────────────────────────────────────────────
-function LessonCard({ lesson, isCompleted, phaseNum, onOpen }: {
-  lesson: any; isCompleted: boolean; phaseNum: number; onOpen: () => void;
+function LessonCard({ lesson, isCompleted, phaseNum, isLocked, onOpen }: {
+  lesson: any; isCompleted: boolean; phaseNum: number; isLocked: boolean; onOpen: () => void;
 }) {
-  const cfg = PHASE[phaseNum];
+  const cfg = getPhaseConfig(phaseNum, lesson.phaseName);
   const Icon = cfg.Icon;
   const preview = lesson.content?.replace(/<[^>]*>/g, "").slice(0, 90) || "Nhấn để xem chi tiết bài học...";
 
   return (
     <div
       onClick={onOpen}
-      className="group flex items-center gap-4 p-4 bg-white rounded-2xl cursor-pointer
-                 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+      className={`group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 ${
+        isLocked
+          ? "cursor-pointer opacity-60 grayscale"
+          : "cursor-pointer hover:-translate-y-0.5 hover:shadow-lg"
+      }`}
       style={{
-        border: isCompleted
-          ? "1.5px solid rgba(16,185,129,0.3)"
-          : "1px solid rgba(0,0,0,0.07)",
-        background: isCompleted ? "#FAFFFE" : "#fff",
+        border: isLocked
+          ? "1px solid rgba(0,0,0,0.07)"
+          : isCompleted
+            ? "1.5px solid rgba(16,185,129,0.3)"
+            : "1px solid rgba(0,0,0,0.07)",
+        background: isLocked ? "#F8FAFC" : isCompleted ? "#FAFFFE" : "#fff",
       }}
     >
       {/* Phase icon */}
       <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
         style={{ background: cfg.iconBg }}
       >
-        <Icon size={22} style={{ color: cfg.accent }} />
+        {isLocked ? <Lock size={20} style={{ color: "#94A3B8" }} /> : <Icon size={22} style={{ color: cfg.accent }} />}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-0.5">
-          <h3 className="font-semibold text-slate-800 text-sm leading-snug line-clamp-1">
+          <h3 className="font-semibold text-slate-700 text-sm leading-snug line-clamp-1">
             {lesson.title}
           </h3>
-          {isCompleted ? (
+          {isLocked ? (
+            <span className="shrink-0 flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
+              <Lock size={8} /> Cần nâng cấp
+            </span>
+          ) : isCompleted ? (
             <span className="shrink-0 flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
               <CheckCircle2 size={9} /> Đã học
             </span>
@@ -85,11 +102,11 @@ function LessonCard({ lesson, isCompleted, phaseNum, onOpen }: {
             </span>
           )}
         </div>
-        <p className="text-xs text-slate-400 line-clamp-1">{preview}</p>
+        <p className="text-xs text-slate-400 line-clamp-1">{isLocked ? "Nâng cấp gói để mở khoá nội dung này" : preview}</p>
         <p className="text-[10px] text-slate-300 mt-1">{lesson.estimatedMinutes || 10} phút đọc</p>
       </div>
 
-      {/* Arrow */}
+      {/* Arrow / Lock */}
       <ChevronRight
         size={15}
         className="shrink-0 text-slate-300 group-hover:text-indigo-400 transition-colors"
@@ -99,13 +116,17 @@ function LessonCard({ lesson, isCompleted, phaseNum, onOpen }: {
 }
 
 // ─── Phase Group ─────────────────────────────────────────────────────────────
-function PhaseGroup({ phaseNum, lessons, completedIds, onOpen }: {
-  phaseNum: number; lessons: any[]; completedIds: number[]; onOpen: (id: number) => void;
+function PhaseGroup({ phaseNum, lessons, completedIds, onOpen, onLockedClick }: {
+  phaseNum: number; lessons: any[]; completedIds: number[];
+  onOpen: (id: number) => void; onLockedClick: () => void;
 }) {
-  const cfg  = PHASE[phaseNum];
-  const done = lessons.filter(l => completedIds.includes(l.lessonId)).length;
-  const allDone = done === lessons.length && lessons.length > 0;
-  const Icon = cfg.Icon;
+  const phaseName = lessons[0]?.phaseName;
+  const cfg       = getPhaseConfig(phaseNum, phaseName);
+  const unlocked  = lessons.filter(l => !l.isLocked);
+  const done      = unlocked.filter(l => completedIds.includes(l.lessonId)).length;
+  const allDone   = unlocked.length > 0 && done === unlocked.length;
+  const Icon      = cfg.Icon;
+  const lockedCount = lessons.filter(l => l.isLocked).length;
 
   return (
     <div className="space-y-2">
@@ -119,7 +140,10 @@ function PhaseGroup({ phaseNum, lessons, completedIds, onOpen }: {
           <p className="font-bold text-slate-800" style={{ fontSize: "0.9rem" }}>
             Phase {phaseNum}: {cfg.name}
           </p>
-          <p className="text-xs text-slate-400">{done}/{lessons.length} bài hoàn thành</p>
+          <p className="text-xs text-slate-400">
+            {done}/{unlocked.length} bài hoàn thành
+            {lockedCount > 0 && <span className="ml-2 text-slate-300">· {lockedCount} bài cần nâng cấp</span>}
+          </p>
         </div>
         {allDone && (
           <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
@@ -134,8 +158,9 @@ function PhaseGroup({ phaseNum, lessons, completedIds, onOpen }: {
           key={l.lessonId}
           lesson={l}
           phaseNum={phaseNum}
-          isCompleted={completedIds.includes(l.lessonId)}
-          onOpen={() => onOpen(l.lessonId)}
+          isLocked={!!l.isLocked}
+          isCompleted={!l.isLocked && completedIds.includes(l.lessonId)}
+          onOpen={() => l.isLocked ? onLockedClick() : onOpen(l.lessonId)}
         />
       ))}
     </div>
@@ -150,6 +175,9 @@ function ProgressSidebar({ lessons, completedIds, onGoToSimulation }: {
   const total = lessons.length;
   const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
   const allDone = done === total && total > 0;
+
+  // Build unique sorted phase list from lessons
+  const phaseNums = [...new Set(lessons.map(getPhase))].sort((a, b) => a - b);
 
   return (
     <div className="w-64 shrink-0 space-y-4 hidden lg:block" style={{ position: "sticky", top: "1.5rem" }}>
@@ -171,10 +199,11 @@ function ProgressSidebar({ lessons, completedIds, onGoToSimulation }: {
       {/* Phase breakdown */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Phase</p>
-        {[1, 2, 3, 4].map(ph => {
-          const cfg       = PHASE[ph];
+        {phaseNums.map(ph => {
+          const phaseLs   = lessons.filter(l => getPhase(l) === ph);
+          const phaseName = phaseLs[0]?.phaseName;
+          const cfg       = getPhaseConfig(ph, phaseName);
           const Icon      = cfg.Icon;
-          const phaseLs   = lessons.filter(l => getPhase(l.lessonId) === ph);
           const phaseDone = phaseLs.filter(l => completedIds.includes(l.lessonId)).length;
           const phDone    = phaseLs.length > 0 && phaseDone === phaseLs.length;
           return (
@@ -234,6 +263,8 @@ export function LoTrinh() {
   const [completedLessonIds, setCompletedLessonIds] = useState<number[]>([]);
   // Eligibility per campaign: { campaignId: { name, eligible } }
   const [campaignEligibility, setCampaignEligibility] = useState<{campaignId: number; campaignName: string; eligible: boolean}[]>([]);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [plans, setPlans] = useState<any[]>([]);
 
   useEffect(() => {
     const userId = getCurrentUserId();
@@ -268,6 +299,7 @@ export function LoTrinh() {
       })
       .catch(err => console.error("Lỗi tải bài học:", err))
       .finally(() => setLoading(false));
+    subscriptionService.getAllPlans().then(p => setPlans(p || [])).catch(() => {});
   }, []);
 
   if (loading) return (
@@ -277,12 +309,14 @@ export function LoTrinh() {
     </div>
   );
 
-  // Nhóm theo phase
-  const phaseGroups: Record<number, any[]> = { 1: [], 2: [], 3: [], 4: [] };
+  // Nhóm theo phase — dynamic, không hardcode 1-4
+  const phaseGroups: Record<number, any[]> = {};
   lessons.forEach(l => {
-    const ph = getPhase(l.lessonId);
+    const ph = getPhase(l);
+    if (!phaseGroups[ph]) phaseGroups[ph] = [];
     phaseGroups[ph].push(l);
   });
+  const sortedPhaseNums = Object.keys(phaseGroups).map(Number).sort((a, b) => a - b);
 
   // Eligibility tổng hợp: tất cả campaign đều đủ điều kiện?
   const allEligible = campaignEligibility.length > 0 && campaignEligibility.every(e => e.eligible);
@@ -384,17 +418,16 @@ export function LoTrinh() {
         {/* Cột trái — phase groups */}
         {lessons.length > 0 ? (
           <div className="flex-1 min-w-0 space-y-8">
-            {[1, 2, 3, 4].map(ph =>
-              phaseGroups[ph].length > 0 ? (
-                <PhaseGroup
-                  key={ph}
-                  phaseNum={ph}
-                  lessons={phaseGroups[ph]}
-                  completedIds={completedLessonIds}
-                  onOpen={id => navigate(`/nguoi-dung/bai-hoc/${id}`)}
-                />
-              ) : null
-            )}
+            {sortedPhaseNums.map(ph => (
+              <PhaseGroup
+                key={ph}
+                phaseNum={ph}
+                lessons={phaseGroups[ph]}
+                completedIds={completedLessonIds}
+                onOpen={id => navigate(`/nguoi-dung/bai-hoc/${id}`)}
+                onLockedClick={() => setShowUpgradeModal(true)}
+              />
+            ))}
           </div>
         ) : (
           <div className="flex-1 text-center p-10 bg-white rounded-2xl border border-slate-100">
@@ -411,6 +444,96 @@ export function LoTrinh() {
           onGoToSimulation={() => navigate("/nguoi-dung/mo-phong")}
         />
       </div>
+
+      {/* Modal nâng cấp gói */}
+      {showUpgradeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
+          onClick={() => setShowUpgradeModal(false)}
+        >
+          <div
+            className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl"
+            style={{ background: "#fff" }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4" style={{ background: "linear-gradient(135deg, #1e1b4b, #3730a3)" }}>
+              <button
+                onClick={() => setShowUpgradeModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X size={16} />
+              </button>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)" }}>
+                  <Lock size={20} className="text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-white" style={{ fontSize: "1.05rem" }}>Nội dung yêu cầu nâng cấp</p>
+                  <p className="text-indigo-300 text-xs">Chọn gói phù hợp để mở khoá toàn bộ bài học</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Plan list */}
+            <div className="px-6 py-5 space-y-3 max-h-[60vh] overflow-y-auto">
+              {plans.length === 0 ? (
+                <p className="text-center text-slate-400 text-sm py-4">Đang tải danh sách gói...</p>
+              ) : (
+                plans.map((plan: any, idx: number) => (
+                  <div
+                    key={plan.planId ?? idx}
+                    className="flex items-start gap-4 p-4 rounded-xl border transition-colors"
+                    style={{ border: idx === 0 ? "1.5px solid #6366F1" : "1px solid #E2E8F0", background: idx === 0 ? "#F5F3FF" : "#FAFAFA" }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                      style={{ background: idx === 0 ? "#6366F1" : "#E2E8F0" }}
+                    >
+                      {idx === 0 ? <Star size={18} className="text-white" /> : <Zap size={18} style={{ color: "#64748B" }} />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-bold text-slate-800" style={{ fontSize: "0.95rem" }}>
+                          {plan.planName || plan.name || `Gói ${idx + 1}`}
+                        </p>
+                        <p className="font-extrabold shrink-0"
+                          style={{ color: idx === 0 ? "#6366F1" : "#334155", fontSize: "0.95rem" }}>
+                          {plan.price != null
+                            ? plan.price === 0
+                              ? "Miễn phí"
+                              : `${Number(plan.price).toLocaleString("vi-VN")}đ`
+                            : "Liên hệ"}
+                        </p>
+                      </div>
+                      {plan.description && (
+                        <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{plan.description}</p>
+                      )}
+                      {plan.durationDays && (
+                        <p className="text-[11px] text-slate-400 mt-1">{plan.durationDays} ngày · {plan.maxUsers ?? "Không giới hạn"} người dùng</p>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 pb-6 pt-2 border-t border-slate-100">
+              <p className="text-center text-xs text-slate-400 mb-3">
+                Để đăng ký gói, vui lòng liên hệ quản lý của bạn hoặc bộ phận hỗ trợ.
+              </p>
+              <button
+                onClick={() => setShowUpgradeModal(false)}
+                className="w-full py-2.5 rounded-xl text-slate-500 text-sm font-medium hover:bg-slate-50 transition-colors border border-slate-200"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

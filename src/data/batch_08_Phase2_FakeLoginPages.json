@@ -1,0 +1,1666 @@
+{
+  "batch_id": "08",
+  "batch_name": "Phase 2 — Fake Login Pages",
+  "phase": 2,
+  "lesson": "2.5",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P2-FL-001",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Fear",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện email dẫn đến trang đăng nhập giả — dấu hiệu domain không khớp",
+      "email": {
+        "sender_name": "Zalo Security Team",
+        "sender_email": "security@zalo-account-protection.com",
+        "recipient_email": "nguyen.thi.bich.hanh@hoanglong-group.com",
+        "subject": "Tài khoản Zalo của bạn đăng nhập từ thiết bị lạ — Xác minh ngay",
+        "body": "Xin chào Nguyễn Thị Bích Hạnh,\n\nChúng tôi phát hiện đăng nhập vào Zalo của bạn từ:\nThiết bị: iPhone 15 — iOS 17\nVị trí: Đà Nẵng\nThời gian: 09:22 hôm nay\n\nNếu không phải bạn, tài khoản Zalo (liên kết với số điện thoại của bạn) đang trong nguy cơ bị chiếm quyền. Đăng nhập ngay để bảo mật tài khoản và xem xét hoạt động đáng ngờ.",
+        "cta_text": "Đăng nhập bảo mật",
+        "cta_link": "http://zalo-account-protection.com/login-secure"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@zalo-account-protection.com",
+          "explanation": "Zalo dùng @zalo.me hoặc @vng.com.vn — 'zalo-account-protection.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_login_page",
+          "visible_text": "http://zalo-account-protection.com/login-secure",
+          "explanation": "Link dẫn đến trang đăng nhập Zalo giả. Nhập mật khẩu vào trang này = mật khẩu bị đánh cắp ngay lập tức.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "http_not_https",
+          "visible_text": "http://",
+          "explanation": "Dùng HTTP thay HTTPS — trang đăng nhập hợp lệ luôn dùng HTTPS (có ổ khóa).",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["zalo-account-protection.com", "http://", "Đà Nẵng"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Link dẫn đến trang đăng nhập Zalo giả!",
+        "summary": "Trang đăng nhập giả trông y hệt Zalo thật nhưng mọi thông tin bạn nhập đều bị gửi đến kẻ tấn công.",
+        "learning_point": "Trước khi nhập mật khẩu bất kỳ đâu: kiểm tra URL trong thanh địa chỉ. Zalo thật chỉ có tại zalo.me — không có domain nào khác.",
+        "psychology_display": "Fear",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-002",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Urgency",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện link phishing dùng subdomain để đánh lừa — 'vietcombank.com.secure-login.net'",
+      "email": {
+        "sender_name": "Vietcombank — Bảo mật",
+        "sender_email": "baomatk@vietcombank.com.vn.secure-login.net",
+        "recipient_email": "tran.minh.tuan@tuananh-pharma.vn",
+        "subject": "OTP sắp hết hiệu lực — Đăng nhập ngay để duy trì bảo mật",
+        "body": "Kính gửi Trần Minh Tuấn,\n\nHệ thống Vietcombank phát hiện token bảo mật tài khoản Internet Banking của bạn sắp hết hiệu lực sau 15 phút.\n\nVui lòng đăng nhập ngay để gia hạn token bảo mật và tránh bị khóa phiên giao dịch.\n\nĐăng nhập qua liên kết bảo mật dưới đây.",
+        "cta_text": "Đăng nhập Vietcombank",
+        "cta_link": "https://vietcombank.com.vn.secure-login.net/ibanking"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "subdomain_spoofing",
+          "visible_text": "vietcombank.com.vn.secure-login.net",
+          "explanation": "Domain thật là phần sau cùng trước /: 'secure-login.net' — không phải 'vietcombank.com.vn'. Kẻ tấn công dùng 'vietcombank.com.vn' làm subdomain để đánh lừa khi đọc nhanh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_urgency",
+          "visible_text": "sau 15 phút",
+          "explanation": "Token bảo mật không hết hạn sau 15 phút và không cần gia hạn qua link email — đây là cớ giả để tạo Urgency.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": [],
+      "highlight_keywords": ["secure-login.net", "15 phút", "vietcombank.com.vn.secure-login.net"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Subdomain spoofing — kỹ thuật đánh lừa URL!",
+        "summary": "URL 'vietcombank.com.vn.secure-login.net' dùng tên ngân hàng làm subdomain — domain thật là 'secure-login.net', không liên quan Vietcombank.",
+        "learning_point": "Cách đọc URL: domain chính là phần ngay trước /path đầu tiên. Vietcombank.com.vn.secure-login.net → domain chính là secure-login.net.",
+        "psychology_display": "Urgency",
+        "attack_type_display": "Subdomain Spoofing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-003",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Authority",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện trang đăng nhập giả Microsoft 365 nhắm vào tài khoản công ty",
+      "email": {
+        "sender_name": "Microsoft 365 Admin",
+        "sender_email": "admin@microsoft365-admin-portal.com",
+        "recipient_email": "do.thi.phuong.thao@saigon-law.com.vn",
+        "subject": "Tài khoản Microsoft 365 của bạn cần xác minh đa yếu tố — Bắt buộc",
+        "body": "Kính gửi Đỗ Thị Phương Thảo,\n\nTheo chính sách bảo mật mới của tổ chức, tất cả người dùng Microsoft 365 cần thiết lập xác minh đa yếu tố (MFA) trước ngày 10/06/2026.\n\nTài khoản chưa thiết lập MFA sẽ bị tắt quyền truy cập email và Teams kể từ ngày 11/06/2026.\n\nĐăng nhập để thiết lập MFA ngay.",
+        "cta_text": "Thiết lập MFA",
+        "cta_link": "https://microsoft365-admin-portal.com/mfa-setup"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "admin@microsoft365-admin-portal.com",
+          "explanation": "Microsoft gửi thông báo từ @microsoft.com — 'microsoft365-admin-portal.com' là domain giả mạo thêm '365-admin-portal'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_login_page",
+          "visible_text": "https://microsoft365-admin-portal.com/mfa-setup",
+          "explanation": "Link dẫn đến trang đăng nhập Microsoft giả — nhập thông tin đăng nhập vào đây sẽ bị đánh cắp toàn bộ tài khoản công ty.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "tắt quyền truy cập email và Teams",
+          "explanation": "Đe dọa mất quyền truy cập email và Teams tạo áp lực công việc — người dùng sợ ảnh hưởng công việc và hành động ngay.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["microsoft365-admin-portal.com", "MFA", "tắt quyền truy cập"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Trang MFA giả nhắm vào tài khoản công ty!",
+        "summary": "Yêu cầu thiết lập MFA nghe có vẻ bảo mật nhưng thực chất là để đánh cắp thông tin đăng nhập. Nếu nhập vào đây, kẻ tấn công có thể vào toàn bộ email và dữ liệu công ty.",
+        "learning_point": "IT admin thiết lập MFA qua cổng nội bộ hoặc thông báo Intranet — không qua link email. Liên hệ IT trực tiếp khi nhận yêu cầu dạng này.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-004",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Fake Login Pages",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email reset mật khẩu hợp lệ — có link nhưng hợp lệ vì chính người dùng yêu cầu",
+      "email": {
+        "sender_name": "GitHub",
+        "sender_email": "noreply@github.com",
+        "recipient_email": "le.van.toan@techvn-solutions.com",
+        "subject": "Đặt lại mật khẩu GitHub của bạn",
+        "body": "Chào Lê Văn Toàn,\n\nChúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản GitHub của bạn (@le.van.toan).\n\nNhấp vào liên kết dưới đây để đặt lại mật khẩu. Liên kết này có hiệu lực trong 1 giờ.\n\nNếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này. Tài khoản của bạn vẫn an toàn.\n\nLiên kết đặt lại: https://github.com/password_reset/...",
+        "cta_text": "Đặt lại mật khẩu",
+        "cta_link": "https://github.com/password_reset/abc123token"
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email có link đặt lại mật khẩu — người dùng có thể nghi ngờ bất kỳ email nào có link đăng nhập",
+        "why_legitimate": "Domain @github.com chính thức. Link trỏ về github.com — không có domain lạ. Email có nội dung 'nếu không yêu cầu — bỏ qua' (email thật luôn có câu này). Người dùng chính họ vừa yêu cầu reset."
+      },
+      "feedback": {
+        "title": "Đây là email reset mật khẩu hợp lệ!",
+        "summary": "Email reset mật khẩu từ @github.com với link trỏ đúng về github.com — hợp lệ khi chính bạn vừa yêu cầu reset.",
+        "learning_point": "Phân biệt reset mật khẩu thật và giả: (1) Bạn có vừa yêu cầu không? (2) Link có trỏ đúng domain không? (3) Email có câu 'bỏ qua nếu không yêu cầu' không?",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-005",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Adversary-in-the-Middle",
+      "learning_objective": "Nhận diện trang đăng nhập giả có SSL — HTTPS không đảm bảo trang web an toàn",
+      "email": {
+        "sender_name": "Sacombank e-Banking",
+        "sender_email": "alert@sacombank-ebanking-secure.com",
+        "recipient_email": "truong.thi.kim.oanh@an-phat-plastic.com",
+        "subject": "Tài khoản bị đình chỉ tạm thời — Xác minh ngay qua liên kết bảo mật",
+        "body": "Kính gửi Trương Thị Kim Oanh,\n\nTài khoản Sacombank e-Banking của bạn bị đình chỉ tạm thời do phát hiện hoạt động bất thường. Để khôi phục, vui lòng xác minh danh tính qua liên kết bảo mật.\n\nLiên kết sử dụng giao thức HTTPS đảm bảo an toàn tuyệt đối.",
+        "cta_text": "Xác minh tài khoản",
+        "cta_link": "https://sacombank-ebanking-secure.com/verify-identity"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alert@sacombank-ebanking-secure.com",
+          "explanation": "Sacombank dùng @sacombank.com.vn — 'sacombank-ebanking-secure.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "https_false_trust",
+          "visible_text": "HTTPS đảm bảo an toàn tuyệt đối",
+          "explanation": "HTTPS chỉ mã hóa kết nối — không xác nhận website là thật. Kẻ tấn công có thể lấy chứng chỉ SSL miễn phí (Let's Encrypt) cho domain giả của mình trong vài phút.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "đình chỉ tạm thời",
+          "explanation": "Đình chỉ tài khoản ngân hàng tạo lo lắng tài chính ngay lập tức — áp lực lớn nhất để người dùng hành động không suy nghĩ.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["sacombank-ebanking-secure.com", "HTTPS", "đình chỉ tạm thời"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "HTTPS không có nghĩa là website an toàn!",
+        "summary": "Trang phishing hoàn toàn có thể dùng HTTPS. 'Ổ khóa' chỉ nghĩa là kết nối được mã hóa — không nghĩa là website là Sacombank thật.",
+        "learning_point": "Kiểm tra URL không chỉ nhìn HTTPS — phải kiểm tra domain chính xác: sacombank.com.vn. Mọi tên miền khác đều là giả, dù có HTTPS.",
+        "psychology_display": "Fear + Urgency",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-006",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Curiosity + Authority",
+      "attack_type": "OAuth Phishing",
+      "learning_objective": "Nhận diện OAuth phishing — giả mạo trang cấp quyền ứng dụng thứ ba",
+      "email": {
+        "sender_name": "Google Workspace Admin",
+        "sender_email": "workspace-admin@google-workspace-vn.com",
+        "recipient_email": "vo.hoang.minh@namlong-real.com.vn",
+        "subject": "Yêu cầu cấp quyền ứng dụng mới — Nam Long Real Estate",
+        "body": "Kính gửi Võ Hoàng Minh,\n\nAdmin Google Workspace của tổ chức bạn đã thêm ứng dụng CRM mới và cần bạn cấp quyền truy cập dữ liệu để hoạt động.\n\nỨng dụng: SalesCRM Pro 2026\nQuyền yêu cầu: Đọc email, danh bạ, lịch Google\n\nVui lòng đăng nhập Google và phê duyệt yêu cầu để tiếp tục làm việc bình thường.",
+        "cta_text": "Phê duyệt quyền truy cập",
+        "cta_link": "https://google-workspace-vn.com/oauth-consent"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "workspace-admin@google-workspace-vn.com",
+          "explanation": "Google Workspace thông báo từ @google.com — 'google-workspace-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "oauth_phishing",
+          "visible_text": "Đọc email, danh bạ, lịch Google",
+          "explanation": "Ứng dụng độc hại yêu cầu quyền đọc email và danh bạ — nếu phê duyệt, kẻ tấn công có toàn bộ dữ liệu Google của bạn mà không cần mật khẩu.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unsolicited_app",
+          "visible_text": "ứng dụng CRM mới",
+          "explanation": "Cài ứng dụng mới vào Workspace được thông báo qua kênh nội bộ — không qua email với link phê duyệt ngay.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["google-workspace-vn.com", "Đọc email, danh bạ", "phê duyệt"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "OAuth phishing — đánh cắp không cần mật khẩu!",
+        "summary": "OAuth phishing không lấy mật khẩu — thay vào đó dụ bạn cấp quyền cho ứng dụng độc hại. Sau đó kẻ tấn công có thể đọc email và danh bạ của bạn mãi mãi.",
+        "learning_point": "Không phê duyệt OAuth request từ email. Xác nhận với IT admin qua Slack/Teams trước khi cấp quyền cho bất kỳ ứng dụng nào.",
+        "psychology_display": "Authority",
+        "attack_type_display": "OAuth Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-007",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Trust",
+      "attack_type": "Lookalike Domain",
+      "learning_objective": "Nhận diện lookalike domain dùng ký tự Unicode trông giống chữ Latin — tấn công IDN homograph",
+      "email": {
+        "sender_name": "Ngân hàng ACB",
+        "sender_email": "service@асb.com.vn",
+        "recipient_email": "phan.nguyen.huu.loc@galaxy-cinema.com.vn",
+        "subject": "Xác minh giao dịch thẻ — Trả lời trong 24h",
+        "body": "Kính gửi Phan Nguyễn Hữu Lộc,\n\nACB ghi nhận thẻ tín dụng của bạn được sử dụng cho giao dịch bất thường tại hệ thống POS nước ngoài. Để xác minh, vui lòng đăng nhập ACB Online và xem lại lịch sử giao dịch.\n\nNếu không xác minh trong 24 giờ, giao dịch sẽ được xử lý hoàn toàn.",
+        "cta_text": "Đăng nhập ACB Online",
+        "cta_link": "https://асb.com.vn/online-banking"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "homograph_attack",
+          "visible_text": "service@асb.com.vn",
+          "explanation": "Ký tự 'а' trong 'асb' là chữ Cyrillic — trông giống hệt chữ 'a' Latin nhưng là ký tự khác. Tên miền thật của ACB là acb.com.vn với ký tự Latin thuần.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "urgency_language",
+          "visible_text": "24 giờ",
+          "explanation": "Deadline 24 giờ cộng với đe dọa 'giao dịch được xử lý hoàn toàn' tạo áp lực buộc người dùng đăng nhập nhanh.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": [],
+      "highlight_keywords": ["асb.com.vn (Cyrillic)", "24 giờ", "POS nước ngoài"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "IDN Homograph Attack — ký tự giả trông y hệt thật!",
+        "summary": "Chữ 'а' trong 'асb.com.vn' là Cyrillic — mắt người gần như không phân biệt được. Đây là kỹ thuật tấn công rất tinh vi.",
+        "learning_point": "Không thể phân biệt homograph bằng mắt thường. Luôn đăng nhập ngân hàng bằng cách: gõ tay URL đã biết, dùng bookmark đã lưu, hoặc mở app ngân hàng trực tiếp.",
+        "psychology_display": "Trust + Urgency",
+        "attack_type_display": "IDN Homograph"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-008",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Fake Login Pages",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email yêu cầu đăng nhập hợp lệ — khi link dẫn đúng đến domain chính thức",
+      "email": {
+        "sender_name": "LinkedIn",
+        "sender_email": "messages-noreply@linkedin.com",
+        "recipient_email": "nguyen.duc.cuong@viettel-solutions.com.vn",
+        "subject": "Bạn có 3 tin nhắn mới chưa đọc trên LinkedIn",
+        "body": "Xin chào Nguyễn Đức Cường,\n\nBạn có 3 tin nhắn mới trên LinkedIn từ các nhà tuyển dụng.\n\nĐể xem và trả lời tin nhắn, vui lòng đăng nhập tại linkedin.com.\n\nLinkedIn sẽ không bao giờ yêu cầu bạn cung cấp mật khẩu qua email.",
+        "cta_text": "Xem tin nhắn",
+        "cta_link": "https://www.linkedin.com/messaging/"
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email thông báo có link đăng nhập — có thể bị nhầm với phishing LinkedIn",
+        "why_legitimate": "Domain @linkedin.com chính thức. Link trỏ về www.linkedin.com — domain chuẩn. Email có câu 'LinkedIn không yêu cầu mật khẩu qua email' — thực hành tốt. Nội dung không áp lực, không deadline."
+      },
+      "feedback": {
+        "title": "Đây là email LinkedIn hợp lệ!",
+        "summary": "Email từ @linkedin.com với link trỏ đúng về linkedin.com, không áp lực, và có cảnh báo bảo mật chủ động.",
+        "learning_point": "Email hợp lệ từ dịch vụ uy tín thường: dùng domain chính thức, link trỏ đúng, không tạo áp lực, và đôi khi có nhắc nhở bảo mật.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-009",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Trust + Authority",
+      "attack_type": "AiTM Phishing",
+      "learning_objective": "Nhận diện Adversary-in-the-Middle phishing — trang giả relay thật để bypass MFA",
+      "email": {
+        "sender_name": "Microsoft Security",
+        "sender_email": "security@microsoftonline-verify.com",
+        "recipient_email": "bui.thi.thu.trang@pvcombank.com.vn",
+        "subject": "Xác minh bắt buộc MFA — Chính sách bảo mật mới Tháng 6/2026",
+        "body": "Kính gửi Bùi Thị Thu Trang,\n\nTheo chính sách bảo mật mới của Microsoft cho tổ chức bạn, tất cả tài khoản cần xác minh lại phương thức MFA.\n\nQuá trình xác minh chỉ mất 2 phút và bạn sẽ đăng nhập bình thường vào Microsoft 365 trong suốt quá trình.",
+        "cta_text": "Xác minh MFA ngay",
+        "cta_link": "https://microsoftonline-verify.com/mfa-reauth"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@microsoftonline-verify.com",
+          "explanation": "Domain thật của Microsoft 365 là microsoftonline.com — 'microsoftonline-verify.com' là domain giả, thêm '-verify' để đánh lừa.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "aitm_indicator",
+          "visible_text": "bạn sẽ đăng nhập bình thường vào Microsoft 365 trong suốt quá trình",
+          "explanation": "AiTM (Adversary-in-the-Middle) hoạt động như proxy — bạn thật sự đăng nhập được và MFA thật sự hoạt động, nhưng kẻ tấn công đã lấy session token. Câu 'đăng nhập bình thường' là dấu hiệu AiTM.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "authority_pressure",
+          "visible_text": "Chính sách bảo mật mới Tháng 6/2026",
+          "explanation": "Viện dẫn chính sách mới tạo cảm giác bắt buộc và hợp lệ — người dùng ít đặt câu hỏi khi nghe 'chính sách mới'.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["microsoftonline-verify.com", "đăng nhập bình thường", "MFA"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "AiTM phishing — bypass được cả MFA!",
+        "summary": "Kỹ thuật AiTM cho phép kẻ tấn công đứng giữa bạn và Microsoft thật. Bạn đăng nhập thành công (kể cả MFA), nhưng kẻ tấn công đã lấy session cookie — không cần mật khẩu của bạn.",
+        "learning_point": "Ngay cả khi có MFA, đừng đăng nhập qua link email. Microsoft không yêu cầu xác minh lại MFA qua link email. Luôn truy cập portal.microsoft.com trực tiếp.",
+        "psychology_display": "Authority + Trust",
+        "attack_type_display": "AiTM Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-010",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Curiosity + Urgency",
+      "attack_type": "Reverse Proxy Phishing",
+      "learning_objective": "Nhận diện trang đăng nhập giả dùng URL shortener để che giấu domain thật",
+      "email": {
+        "sender_name": "Confluence — Atlassian",
+        "sender_email": "notify@atlassian-confluence-vn.com",
+        "recipient_email": "nguyen.quoc.hung@vinfast.com.vn",
+        "subject": "Bạn được mention trong trang Confluence — Project VF9 Launch",
+        "body": "Xin chào Nguyễn Quốc Hùng,\n\nTrương Thanh Hà đã mention bạn trong trang Confluence:\n'Project VF9 Launch — Technical Checklist Q3'\n\nXem comment và trả lời để không delay dự án.",
+        "cta_text": "Xem mention",
+        "cta_link": "https://bit.ly/3VF9Launch-Confluence"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "notify@atlassian-confluence-vn.com",
+          "explanation": "Atlassian gửi thông báo từ @atlassian.com hoặc @confluence-mail.atlassian.net — 'atlassian-confluence-vn.com' là domain giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "url_shortener",
+          "visible_text": "https://bit.ly/3VF9Launch-Confluence",
+          "explanation": "URL shortener (bit.ly) che giấu domain đích — không biết link dẫn đến đâu cho đến khi click. Email Confluence thật luôn dùng link atlassian.net trực tiếp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fomo",
+          "visible_text": "không delay dự án",
+          "explanation": "Sợ delay dự án tạo áp lực công việc — người dùng click ngay để không ảnh hưởng tiến độ.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["atlassian-confluence-vn.com", "bit.ly", "delay dự án"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "URL shortener trong email công việc — dấu hiệu nguy hiểm!",
+        "summary": "Email Confluence thật dùng link atlassian.net trực tiếp — không bao giờ dùng bit.ly. URL shortener che giấu domain đích là dấu hiệu phishing rõ ràng.",
+        "learning_point": "Không click URL shortener (bit.ly, tinyurl...) từ email. Truy cập Confluence trực tiếp tại confluence.atlassian.net và kiểm tra notification trong app.",
+        "psychology_display": "FOMO + Urgency",
+        "attack_type_display": "URL Shortener Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-011",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Trust",
+      "attack_type": "Open Redirect Exploitation",
+      "learning_objective": "Nhận diện open redirect — link bắt đầu từ domain hợp lệ nhưng redirect đến trang phishing",
+      "email": {
+        "sender_name": "Google Drive",
+        "sender_email": "drive-shares@google-drive-notify.com",
+        "recipient_email": "hoang.thi.yen.nhi@tan-hiep-phat.com",
+        "subject": "Tài liệu được chia sẻ: Kế hoạch kinh doanh H2/2026 — Xem ngay",
+        "body": "Xin chào Hoàng Thị Yến Nhi,\n\nBùi Văn Khoa đã chia sẻ tài liệu Google Drive với bạn:\n'Ke_Hoach_KinhDoanh_H2_2026_TanHiepPhat.xlsx'\n\nBạn cần đăng nhập Google để xem tài liệu được chia sẻ.",
+        "cta_text": "Mở tài liệu",
+        "cta_link": "https://www.google.com/url?q=https://docs-google-view.com/file/kh-h2-2026"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "drive-shares@google-drive-notify.com",
+          "explanation": "Google Drive gửi thông báo từ @google.com — 'google-drive-notify.com' là domain giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "open_redirect",
+          "visible_text": "https://www.google.com/url?q=https://docs-google-view.com/",
+          "explanation": "Link bắt đầu bằng 'google.com' nhưng phần '?q=' redirect đến 'docs-google-view.com' — một domain giả. Đây là open redirect exploitation — lợi dụng google.com làm bảng chỉ đường đến trang phishing.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "credential_request",
+          "visible_text": "cần đăng nhập Google để xem",
+          "explanation": "Trang đích (docs-google-view.com) sẽ hiển thị form đăng nhập Google giả — người dùng nhập mật khẩu vì nghĩ link từ google.com là an toàn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["google.com/url?q=", "docs-google-view.com", "đăng nhập Google"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Open redirect — link google.com thật nhưng dẫn đến trang giả!",
+        "summary": "Kẻ tấn công lợi dụng tính năng redirect của Google để tạo link bắt đầu bằng google.com — nhưng thực sự dẫn đến trang phishing. Đây là kỹ thuật rất tinh vi.",
+        "learning_point": "Kiểm tra kỹ URL: nếu thấy google.com/url?q= hoặc tương tự, phần ?q= mới là địa chỉ thật. Google Drive thật chia sẻ file qua drive.google.com, không có redirect phức tạp.",
+        "psychology_display": "Trust",
+        "attack_type_display": "Open Redirect"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-012",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Fear",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện link đăng nhập giả Shopee để chiếm tài khoản mua sắm",
+      "email": {
+        "sender_name": "Shopee Bảo mật",
+        "sender_email": "security@shopee-vn-alert.com",
+        "recipient_email": "nguyen.bich.van@gmail.com",
+        "subject": "Tài khoản Shopee đăng nhập từ thiết bị lạ — Xác nhận ngay",
+        "body": "Xin chào Nguyễn Bích Vân,\n\nShopee phát hiện đăng nhập vào tài khoản của bạn từ thiết bị lạ tại Hà Nội lúc 23:15 tối qua.\n\nNếu không phải bạn, tài khoản và ví ShopeePay của bạn đang trong nguy hiểm. Xác nhận danh tính ngay để bảo vệ số dư ví.",
+        "cta_text": "Bảo vệ tài khoản Shopee",
+        "cta_link": "http://shopee-vn-alert.com/verify-login"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@shopee-vn-alert.com",
+          "explanation": "Shopee dùng @shopee.vn — 'shopee-vn-alert.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_login_page",
+          "visible_text": "http://shopee-vn-alert.com/verify-login",
+          "explanation": "Link dùng HTTP và domain giả — trang đăng nhập giả sẽ đánh cắp mật khẩu và thông tin ví ShopeePay.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "shopeepay_threat",
+          "visible_text": "số dư ví đang trong nguy hiểm",
+          "explanation": "Đề cập số dư ví điện tử tạo lo lắng tài chính trực tiếp — hiệu quả hơn chỉ đe dọa mất tài khoản.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "shopee-vn-alert.com",
+        "ví ShopeePay",
+        "23:15 tối qua"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Shopee để chiếm tài khoản và ví ShopeePay!",
+        "summary": "Shopee dùng @shopee.vn. Đăng nhập bất thường được thông báo qua app Shopee — không qua link email.",
+        "learning_point": "Kiểm tra hoạt động đăng nhập Shopee trong app: Tôi → Cài đặt → Bảo mật. Không đăng nhập qua link email.",
+        "psychology_display": "Fear",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-013",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Urgency",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện link đăng nhập giả ViettelPay/MoMo đe dọa khóa ví điện tử",
+      "email": {
+        "sender_name": "MoMo Hỗ trợ",
+        "sender_email": "hotro@momo-wallet-secure.com",
+        "recipient_email": "le.van.hai.duong@gmail.com",
+        "subject": "Ví MoMo của bạn bị hạn chế — Xác minh KYC để tiếp tục sử dụng",
+        "body": "Kính gửi Le Van Hai Duong,\n\nTheo quy định mới của Ngân hàng Nhà nước về định danh điện tử (eKYC), ví MoMo của bạn cần xác minh KYC trước ngày 10/06/2026.\n\nSau thời hạn, ví sẽ bị hạn chế giao dịch và số dư có thể bị phong tỏa. Đăng nhập để hoàn tất KYC ngay.",
+        "cta_text": "Xác minh KYC MoMo",
+        "cta_link": "http://momo-wallet-secure.com/ekyc-verify"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hotro@momo-wallet-secure.com",
+          "explanation": "MoMo dùng @momo.vn — 'momo-wallet-secure.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_regulatory_pretext",
+          "visible_text": "quy định mới của Ngân hàng Nhà nước về eKYC",
+          "explanation": "Viện dẫn quy định NHNN nghe có vẻ chính thống — nhưng MoMo thông báo KYC trực tiếp qua app, không qua email từ domain ngoài.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "momo-wallet-secure.com",
+        "eKYC",
+        "số dư bị phong tỏa"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả MoMo yêu cầu KYC để chiếm ví điện tử!",
+        "summary": "MoMo dùng @momo.vn và yêu cầu KYC trực tiếp trong app — không qua link email từ domain ngoài.",
+        "learning_point": "Xác minh KYC ví điện tử thật được thực hiện trong app (chụp CCCD, selfie). Không đăng nhập ví điện tử qua link email.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-014",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Authority + Fear",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện trang đăng nhập giả hệ thống nội bộ công ty (ERP/HRM)",
+      "email": {
+        "sender_name": "IT Department — Vincom Retail",
+        "sender_email": "it-dept@vincom-erp-system.com",
+        "recipient_email": "nguyen.thi.phuong@vincom.com.vn",
+        "subject": "Hệ thống ERP nâng cấp — Đăng nhập lại để xác nhận tài khoản",
+        "body": "Kính gửi Nguyễn Thị Phương,\n\nHệ thống ERP Vincom đã hoàn tất nâng cấp lên phiên bản mới. Tất cả người dùng cần đăng nhập lại để xác nhận tài khoản và quyền truy cập.\n\nNếu không đăng nhập lại trước 17:00 hôm nay, tài khoản ERP của bạn sẽ bị reset và cần làm thủ tục cấp lại quyền tốn 3–5 ngày làm việc.",
+        "cta_text": "Đăng nhập lại ERP",
+        "cta_link": "https://vincom-erp-system.com/reactivate-account"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "it-dept@vincom-erp-system.com",
+          "explanation": "IT Vincom Retail dùng @vincom.com.vn — 'vincom-erp-system.com' là domain ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "work_disruption_threat",
+          "visible_text": "cần làm thủ tục cấp lại quyền tốn 3–5 ngày",
+          "explanation": "Đe dọa mất quyền truy cập ERP 3–5 ngày tạo áp lực công việc — nhân viên không muốn ảnh hưởng năng suất làm việc.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "vincom-erp-system.com",
+        "reset tài khoản ERP",
+        "3–5 ngày"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Trang ERP giả để lấy thông tin đăng nhập hệ thống nội bộ!",
+        "summary": "Hệ thống ERP nội bộ không yêu cầu đăng nhập lại qua link email từ domain ngoài. Nâng cấp ERP thật được IT thông báo qua Intranet.",
+        "learning_point": "Đăng nhập hệ thống nội bộ (ERP, HRM) chỉ qua URL đã biết của tổ chức — không qua link email. Xác nhận với IT qua Teams/email nội bộ.",
+        "psychology_display": "Authority + Work Pressure",
+        "attack_type_display": "Internal System Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-015",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Curiosity",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện phishing giả thông báo bình luận/mention trên mạng xã hội LinkedIn",
+      "email": {
+        "sender_name": "LinkedIn Notifications",
+        "sender_email": "notifications@linkedin-vn-alerts.com",
+        "recipient_email": "tran.hoang.nam@gmail.com",
+        "subject": "Giám đốc điều hành Vinamilk vừa comment bài đăng của bạn",
+        "body": "Xin chào Trần Hoàng Nam,\n\nGiám đốc điều hành Vinamilk vừa bình luận vào bài đăng của bạn trên LinkedIn. Bài đăng của bạn đang nhận được nhiều tương tác từ các lãnh đạo cấp cao.\n\nĐăng nhập để xem bình luận và phản hồi ngay trong khi còn nóng.",
+        "cta_text": "Xem bình luận LinkedIn",
+        "cta_link": "https://linkedin-vn-alerts.com/view-comment"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "notifications@linkedin-vn-alerts.com",
+          "explanation": "LinkedIn gửi thông báo từ @linkedin.com hoặc @notifications.linkedin.com — 'linkedin-vn-alerts.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "vanity_bait",
+          "visible_text": "Giám đốc điều hành Vinamilk vừa comment",
+          "explanation": "Đề cập tên người nổi tiếng/có uy tín để kích thích tò mò và tự hào — người dùng muốn xem ngay ai đang chú ý đến họ.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "linkedin-vn-alerts.com",
+        "Giám đốc Vinamilk comment",
+        "đang còn nóng"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả thông báo LinkedIn dùng tên người nổi tiếng!",
+        "summary": "LinkedIn dùng @linkedin.com. Thông báo thật hiển thị trong app LinkedIn — không qua domain 'linkedin-vn-alerts.com'.",
+        "learning_point": "Mở app LinkedIn trực tiếp để kiểm tra thông báo. Không đăng nhập LinkedIn qua link email dù được đề cập tên người nổi tiếng.",
+        "psychology_display": "Curiosity + Vanity",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-016",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Fear",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện phishing giả cảnh báo đăng nhập Apple ID từ thiết bị lạ",
+      "email": {
+        "sender_name": "Apple Support",
+        "sender_email": "noreply@apple-id-security.com",
+        "recipient_email": "pham.quynh.anh.1995@gmail.com",
+        "subject": "Apple ID của bạn đăng nhập tại Trung Quốc — Xác nhận ngay",
+        "body": "Xin chào Phạm Quỳnh Anh,\n\nApple phát hiện Apple ID của bạn (pham.quynh.anh.1995@gmail.com) đăng nhập từ thiết bị mới tại:\n\nThiết bị: iPhone 14 Pro\nVị trí: Thượng Hải, Trung Quốc\nThời gian: 04:22 sáng\n\nNếu không phải bạn, tài khoản và dữ liệu iCloud (ảnh, danh bạ, tin nhắn) đang bị truy cập trái phép.",
+        "cta_text": "Bảo vệ Apple ID ngay",
+        "cta_link": "http://apple-id-security.com/secure-account"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "noreply@apple-id-security.com",
+          "explanation": "Apple gửi cảnh báo từ @apple.com hoặc @id.apple.com — 'apple-id-security.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "foreign_country_fear",
+          "visible_text": "Thượng Hải, Trung Quốc — 04:22 sáng",
+          "explanation": "Địa điểm Trung Quốc lúc nửa đêm tạo lo lắng tối đa — người dùng Việt Nam thường lo ngại hacker Trung Quốc.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "icloud_data_threat",
+          "visible_text": "ảnh, danh bạ, tin nhắn đang bị truy cập",
+          "explanation": "Liệt kê dữ liệu cá nhân nhạy cảm tạo nỗi sợ vi phạm quyền riêng tư mạnh — đặc biệt với ảnh cá nhân.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "apple-id-security.com",
+        "Thượng Hải Trung Quốc",
+        "04:22 sáng"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả cảnh báo Apple ID đăng nhập từ Trung Quốc!",
+        "summary": "Apple dùng @apple.com và cảnh báo đăng nhập hiển thị ngay trên thiết bị iPhone/Mac — không qua domain 'apple-id-security.com'.",
+        "learning_point": "Kiểm tra hoạt động Apple ID tại appleid.apple.com — gõ tay URL. Cảnh báo thật từ Apple hiển thị trực tiếp trên thiết bị Apple của bạn.",
+        "psychology_display": "Fear",
+        "attack_type_display": "Apple ID Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-017",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Fake Login Pages",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email xác nhận đặt lại mật khẩu hợp lệ từ Shopee",
+      "email": {
+        "sender_name": "Shopee",
+        "sender_email": "no-reply@shopee.vn",
+        "recipient_email": "vo.hoai.an@gmail.com",
+        "subject": "Yêu cầu đặt lại mật khẩu Shopee của bạn",
+        "body": "Xin chào Võ Hoài An,\n\nChúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Shopee của bạn (vo.hoai.an@gmail.com).\n\nNhấp vào liên kết dưới đây để đặt lại mật khẩu. Liên kết có hiệu lực trong 15 phút.\n\nNếu bạn không yêu cầu đặt lại mật khẩu, hãy bỏ qua email này. Tài khoản của bạn vẫn an toàn.\n\nShopee sẽ không bao giờ yêu cầu mật khẩu qua email hoặc điện thoại.",
+        "cta_text": "Đặt lại mật khẩu",
+        "cta_link": "https://shopee.vn/reset-password?token=abc123..."
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email reset mật khẩu Shopee có link — dễ nhầm với phishing",
+        "why_legitimate": "Domain @shopee.vn chính thức. Link trỏ về shopee.vn. Người dùng vừa yêu cầu reset. Có câu 'bỏ qua nếu không yêu cầu'. Shopee chủ động nói không hỏi mật khẩu qua email."
+      },
+      "feedback": {
+        "title": "Đây là email reset mật khẩu Shopee hợp lệ!",
+        "summary": "Email từ @shopee.vn với link shopee.vn — hợp lệ khi chính bạn vừa yêu cầu reset mật khẩu.",
+        "learning_point": "Reset mật khẩu hợp lệ: bạn vừa yêu cầu, link về domain chính thức, có câu 'bỏ qua nếu không yêu cầu', có cảnh báo bảo mật chủ động.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-018",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Authority",
+      "attack_type": "Typosquatting Login Page",
+      "learning_objective": "Nhận diện typosquatting domain đăng nhập ngân hàng — 'vietcornbank' thay vì 'vietcombank'",
+      "email": {
+        "sender_name": "Vietcombank",
+        "sender_email": "alert@vietcornbank.com",
+        "recipient_email": "hoang.thi.mai.anh@gmail.com",
+        "subject": "Cập nhật bảo mật tài khoản Vietcombank — Bắt buộc trong 24h",
+        "body": "Kính gửi Hoàng Thị Mai Anh,\n\nVietcombank thông báo cập nhật hệ thống bảo mật Internet Banking. Bạn cần đăng nhập và xác nhận lại phương thức xác thực trước 24h.\n\nĐăng nhập để hoàn tất cập nhật bảo mật.",
+        "cta_text": "Đăng nhập Vietcombank",
+        "cta_link": "https://www.vietcornbank.com/login"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "typosquatting_domain",
+          "visible_text": "alert@vietcornbank.com",
+          "explanation": "'vietcornbank.com' — chữ 'corn' thay vì 'com'. Typosquatting tinh vi: chỉ một chữ cái khác biệt, dễ bỏ qua khi đọc nhanh. Domain thật là vietcombank.com.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_login_page",
+          "visible_text": "https://www.vietcornbank.com/login",
+          "explanation": "Trang đăng nhập giả với domain typosquatting — trông gần giống thật nhưng là trang giả mạo.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "vietcornbank (corn thay com)",
+        "typosquatting"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "'vietcornbank' — chỉ 1 chữ cái khác nhưng là trang giả!",
+        "summary": "Typosquatting dùng lỗi đánh máy nhỏ (corn vs com) để tạo domain gần giống. Đọc chậm và cẩn thận URL trước khi nhập mật khẩu.",
+        "learning_point": "Vietcombank thật: vietcombank.com.vn. Luôn đọc kỹ từng ký tự trong URL thanh địa chỉ — không chỉ nhìn lướt qua.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Typosquatting"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-019",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "FOMO + Urgency",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện phishing giả đăng nhập Netflix/streaming để chiếm tài khoản gia đình",
+      "email": {
+        "sender_name": "Netflix Vietnam",
+        "sender_email": "billing@netflix-vn-billing.com",
+        "recipient_email": "gia.dinh.nguyen@gmail.com",
+        "subject": "Tài khoản Netflix của bạn sắp bị hủy — Cập nhật thanh toán",
+        "body": "Xin chào,\n\nChúng tôi không thể xử lý thanh toán tháng 6/2026 cho gói Netflix của bạn. Nếu không cập nhật phương thức thanh toán trong 48 giờ, tài khoản sẽ bị hủy và bạn mất toàn bộ lịch sử xem phim và danh sách yêu thích.\n\nCập nhật thanh toán để tiếp tục xem phim.",
+        "cta_text": "Cập nhật thanh toán Netflix",
+        "cta_link": "https://netflix-vn-billing.com/update-payment"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "billing@netflix-vn-billing.com",
+          "explanation": "Netflix dùng @netflix.com — 'netflix-vn-billing.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "content_loss_threat",
+          "visible_text": "mất toàn bộ lịch sử xem phim và danh sách yêu thích",
+          "explanation": "Đe dọa mất nội dung đã lưu tạo FOMO — người dùng đặc biệt lo lắng khi nghĩ đến việc mất danh sách phim đã xem.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "netflix-vn-billing.com",
+        "lịch sử xem phim",
+        "48 giờ"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Netflix để lấy thông tin thẻ tín dụng!",
+        "summary": "Netflix dùng @netflix.com. Vấn đề thanh toán được thông báo trong app Netflix — không qua domain 'netflix-vn-billing.com'.",
+        "learning_point": "Kiểm tra thanh toán Netflix tại netflix.com/account — gõ tay URL. Netflix không gửi link cập nhật thanh toán từ domain ngoài.",
+        "psychology_display": "FOMO + Fear",
+        "attack_type_display": "Billing Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-020",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Authority",
+      "attack_type": "SSO Phishing",
+      "learning_objective": "Nhận diện phishing SSO (Single Sign-On) giả — trang đăng nhập giả qua 'Đăng nhập bằng Google'",
+      "email": {
+        "sender_name": "Vietnam HR Association",
+        "sender_email": "conference@vnhra-conference2026.com",
+        "recipient_email": "hr.manager@saigon-food-corp.com.vn",
+        "subject": "Xác nhận đăng ký: Vietnam HR Summit 2026 — Đăng nhập để nhận vé",
+        "body": "Kính gửi HR Manager Saigon Food Corp,\n\nBạn đã được đề cử tham dự Vietnam HR Summit 2026 — sự kiện HR lớn nhất Việt Nam.\n\nĐể nhận vé tham dự miễn phí, đăng nhập bằng tài khoản Google công ty để xác nhận suất tham dự.",
+        "cta_text": "Đăng nhập bằng Google để nhận vé",
+        "cta_link": "https://vnhra-conference2026.com/google-login-confirm"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "conference@vnhra-conference2026.com",
+          "explanation": "Cần xác minh domain chính thức của Vietnam HR Association — 'vnhra-conference2026.com' có thể là domain giả mạo hoặc tên miền mới đăng ký cho sự kiện giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "sso_phishing",
+          "visible_text": "Đăng nhập bằng tài khoản Google công ty",
+          "explanation": "Trang 'Đăng nhập bằng Google' giả trông y hệt trang OAuth Google thật nhưng đánh cắp token xác thực — sau đó có quyền truy cập toàn bộ tài khoản Google Workspace của bạn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unsolicited_invitation",
+          "visible_text": "được đề cử tham dự",
+          "explanation": "Lời mời không được yêu cầu kết hợp với 'vé miễn phí' tạo FOMO — người nhận không biết ai đề cử mình nhưng vẫn muốn tận dụng cơ hội.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vnhra-conference2026.com",
+        "Đăng nhập bằng Google công ty",
+        "vé miễn phí"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "SSO phishing — trang 'Đăng nhập Google' giả!",
+        "summary": "Trang OAuth Google giả đánh cắp access token — không cần mật khẩu, nhưng kẻ tấn công có quyền truy cập toàn bộ Google Workspace của bạn.",
+        "learning_point": "Trước khi đăng nhập Google/Microsoft qua website bên thứ ba: kiểm tra URL trong popup đăng nhập phải là accounts.google.com hoặc login.microsoftonline.com.",
+        "psychology_display": "Authority + FOMO",
+        "attack_type_display": "SSO Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-021",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Trust + Authority",
+      "attack_type": "Government Portal Fake Login",
+      "learning_objective": "Nhận diện trang đăng nhập giả cổng dịch vụ công VNeID/VNPT",
+      "email": {
+        "sender_name": "Cổng Dịch vụ công Quốc gia",
+        "sender_email": "thongbao@dichvucong-vn-portal.com",
+        "recipient_email": "nguyen.duc.tuan@pvn.vn",
+        "subject": "Cập nhật định danh VNeID — Đăng nhập để xác nhận thông tin",
+        "body": "Kính gửi Công dân Nguyễn Đức Tuấn,\n\nBộ Công an thông báo cập nhật hệ thống định danh điện tử VNeID phiên bản 3.0. Công dân cần đăng nhập và xác nhận thông tin định danh trước ngày 30/06/2026 để tránh gián đoạn sử dụng dịch vụ công.\n\nĐăng nhập Cổng Dịch vụ công để cập nhật.",
+        "cta_text": "Đăng nhập Cổng Dịch vụ công",
+        "cta_link": "https://dichvucong-vn-portal.com/vneid-update"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@dichvucong-vn-portal.com",
+          "explanation": "Cổng Dịch vụ công Quốc gia thật tại dichvucong.gov.vn — 'dichvucong-vn-portal.com' là domain .com giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_login_page",
+          "visible_text": "https://dichvucong-vn-portal.com/vneid-update",
+          "explanation": "Trang đăng nhập VNeID giả — thông tin đăng nhập vào đây sẽ cho phép kẻ tấn công truy cập toàn bộ dịch vụ công điện tử của bạn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "dichvucong-vn-portal.com (.com thay .gov.vn)",
+        "VNeID",
+        "30/06/2026"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả cổng dịch vụ công để chiếm tài khoản VNeID!",
+        "summary": "Cổng Dịch vụ công Quốc gia thật tại dichvucong.gov.vn — .gov.vn không phải .com. Tài khoản VNeID bị chiếm có thể dùng để thực hiện nhiều giao dịch điện tử thay bạn.",
+        "learning_point": "Dịch vụ công điện tử chỉ trên .gov.vn. VNeID cập nhật trong app VNeID chính thức — không qua link email.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Government Portal Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-022",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Banking App Fake Login",
+      "learning_objective": "Nhận diện phishing giả trang đăng nhập app ngân hàng TPBank/OCB với URL có số ngẫu nhiên",
+      "email": {
+        "sender_name": "OCB — Online Banking",
+        "sender_email": "security@ocb-banking-alert.net",
+        "recipient_email": "do.van.hieu@gmail.com",
+        "subject": "Phát hiện đăng nhập bất thường — OCB OMNI — Khóa khẩn cấp",
+        "body": "Kính gửi Đỗ Văn Hiếu,\n\nHệ thống OCB phát hiện 5 lần đăng nhập sai mật khẩu liên tiếp vào OCB OMNI của bạn từ IP 103.45.xxx.xxx.\n\nĐây là dấu hiệu brute-force attack. Tài khoản sẽ tự động khóa sau 2 lần thất bại nữa. Vào ngay để đổi mật khẩu trước khi bị khóa.",
+        "cta_text": "Đổi mật khẩu OCB OMNI ngay",
+        "cta_link": "https://ocb-banking-alert.net/emergency-password-change"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@ocb-banking-alert.net",
+          "explanation": "OCB dùng @ocb.com.vn — 'ocb-banking-alert.net' là domain giả mạo dùng .net.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "brute_force_fake_alert",
+          "visible_text": "5 lần đăng nhập sai liên tiếp — brute-force attack",
+          "explanation": "Thuật ngữ kỹ thuật 'brute-force attack' tạo lo lắng cụ thể — người dùng nghĩ hacker đang tấn công ngay lúc này.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "ocb-banking-alert.net",
+        "brute-force attack",
+        "5 lần sai"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả cảnh báo brute-force để dụ đổi mật khẩu vào trang giả!",
+        "summary": "OCB dùng @ocb.com.vn. Cảnh báo đăng nhập sai thật hiển thị trong app OCB OMNI — không qua email từ domain .net.",
+        "learning_point": "Mở app OCB OMNI trực tiếp để kiểm tra trạng thái tài khoản. Không đổi mật khẩu ngân hàng qua link email.",
+        "psychology_display": "Fear + Technical Authority",
+        "attack_type_display": "Banking Credential Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-023",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Fake Login Pages",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email thông báo đăng nhập mới hợp lệ từ Google — không yêu cầu hành động",
+      "email": {
+        "sender_name": "Google",
+        "sender_email": "no-reply@accounts.google.com",
+        "recipient_email": "tran.thi.bich.phuong@viettel.com.vn",
+        "subject": "Đăng nhập mới vào tài khoản Google của bạn",
+        "body": "Tài khoản Google của bạn (tran.thi.bich.phuong@viettel.com.vn) vừa được đăng nhập trên:\n\nThiết bị: MacBook Pro\nVị trí: TP.HCM, Việt Nam\nThời gian: Thứ Sáu, 07 tháng 6, 2026, 08:45 SA\n\nNếu đây là bạn, không cần thực hiện thêm bước nào.\n\nNếu không phải bạn, hãy bảo mật tài khoản tại myaccount.google.com/security\n\nĐây là email tự động. Vui lòng không trả lời email này.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email thông báo đăng nhập Google — dễ nhầm với phishing",
+        "why_legitimate": "Domain @accounts.google.com chính thức. Không có link đáng ngờ trong email. Hướng dẫn vào myaccount.google.com (gõ tay). Không yêu cầu hành động nếu là bạn. Email không thể reply."
+      },
+      "feedback": {
+        "title": "Đây là thông báo đăng nhập Google hợp lệ!",
+        "summary": "Email từ @accounts.google.com, không có link, hướng dẫn vào myaccount.google.com để xử lý nếu cần — hoàn toàn hợp lệ.",
+        "learning_point": "Google gửi thông báo đăng nhập từ @accounts.google.com. Email hợp lệ không cần click link — nếu cần xử lý, gõ tay myaccount.google.com.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-024",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Trust",
+      "attack_type": "Browser-in-Browser (BitB) Attack",
+      "learning_objective": "Nhận diện Browser-in-Browser attack — popup đăng nhập giả được render bằng HTML trông y hệt cửa sổ trình duyệt thật",
+      "email": {
+        "sender_name": "Steam Vietnam Community",
+        "sender_email": "events@steam-vn-gaming.com",
+        "recipient_email": "gamer.viet.nam.pro@gmail.com",
+        "subject": "Bạn được tặng game CS2 Premier Pass — Nhận ngay",
+        "body": "Xin chào Gamer,\n\nBạn được chọn nhận CS2 Premier Pass (trị giá $14.99) từ chương trình Steam Vietnam Community Event.\n\nNhận quà qua Steam — hệ thống sẽ mở cửa sổ đăng nhập Steam để xác nhận tài khoản của bạn.",
+        "cta_text": "Nhận CS2 Premier Pass",
+        "cta_link": "https://steam-vn-gaming.com/claim-gift"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "events@steam-vn-gaming.com",
+          "explanation": "Steam dùng @steampowered.com — 'steam-vn-gaming.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "bitb_attack",
+          "visible_text": "hệ thống sẽ mở cửa sổ đăng nhập Steam",
+          "explanation": "Browser-in-Browser (BitB): trang web giả render một popup trông y hệt cửa sổ đăng nhập Steam thật (kể cả URL bar hiện steamcommunity.com) nhưng toàn bộ là HTML giả. Không thể drag popup ra ngoài cửa sổ trình duyệt.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "gaming_gift_bait",
+          "visible_text": "CS2 Premier Pass — trị giá $14.99",
+          "explanation": "Quà tặng game cụ thể với giá trị thật tạo cảm giác offer thật — gamer biết giá CS2 Premier Pass nên tin tưởng hơn.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "steam-vn-gaming.com",
+        "cửa sổ đăng nhập Steam",
+        "BitB"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Browser-in-Browser — popup đăng nhập Steam GIẢ trông y hệt thật!",
+        "summary": "BitB là kỹ thuật tiên tiến: popup đăng nhập hiển thị URL 'steamcommunity.com' nhưng là HTML giả. Không thể drag popup ra ngoài trình duyệt là dấu hiệu nhận biết BitB.",
+        "learning_point": "Dấu hiệu nhận biết BitB: popup đăng nhập không thể kéo ra ngoài cửa sổ trình duyệt. Steam tặng quà qua Steam client — không qua link email từ domain ngoài.",
+        "psychology_display": "Trust + Gaming FOMO",
+        "attack_type_display": "Browser-in-Browser Attack"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-025",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Authority + Urgency",
+      "attack_type": "FIDO/Passkey Phishing",
+      "learning_objective": "Nhận diện phishing giả yêu cầu đăng ký passkey mới — kỹ thuật nhắm người dùng doanh nghiệp tiên tiến",
+      "email": {
+        "sender_name": "Microsoft Security — Passkey Enrollment",
+        "sender_email": "passkey-enroll@ms-passkey-vn.com",
+        "recipient_email": "nguyen.hoang.trung@bidv.com.vn",
+        "subject": "Bắt buộc: Đăng ký Passkey Microsoft theo chính sách bảo mật BIDV 2026",
+        "body": "Kính gửi Nguyễn Hoàng Trung,\n\nBIDV và Microsoft triển khai Passkey (xác thực không mật khẩu) cho toàn bộ nhân viên theo chính sách Zero Trust 2026. Bạn cần đăng ký Passkey trước 15/06/2026.\n\nBước 1: Đăng nhập Microsoft 365 để bắt đầu đăng ký Passkey.\nBước 2: Xác nhận danh tính bằng mật khẩu hiện tại một lần cuối.\nBước 3: Passkey được tạo — không cần mật khẩu nữa.\n\nBắt đầu đăng ký Passkey.",
+        "cta_text": "Đăng ký Passkey Microsoft",
+        "cta_link": "https://ms-passkey-vn.com/enroll-passkey"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "passkey-enroll@ms-passkey-vn.com",
+          "explanation": "Microsoft và BIDV IT thông báo qua @microsoft.com và @bidv.com.vn — 'ms-passkey-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "current_password_harvest",
+          "visible_text": "Xác nhận danh tính bằng mật khẩu hiện tại một lần cuối",
+          "explanation": "Đăng ký passkey thật không yêu cầu nhập lại mật khẩu cũ qua website ngoài — đây là cách lấy mật khẩu Microsoft 365 của bạn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "zero_trust_buzzword",
+          "visible_text": "chính sách Zero Trust 2026",
+          "explanation": "Dùng thuật ngữ bảo mật chuyên môn (Zero Trust) để tạo cảm giác email đến từ bộ phận IT chuyên nghiệp — người dùng kỹ thuật ít cảnh giác hơn với ngôn ngữ quen thuộc.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "ms-passkey-vn.com",
+        "mật khẩu hiện tại một lần cuối",
+        "Zero Trust"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả đăng ký Passkey để lấy mật khẩu Microsoft 365!",
+        "summary": "Đăng ký passkey thật qua Microsoft Authenticator hoặc Windows Hello — không qua link email từ domain ngoài và không cần nhập mật khẩu cũ vào website bên thứ ba.",
+        "learning_point": "Passkey enrollment thật thực hiện trong Microsoft Authenticator app hoặc account.microsoft.com — không qua link email. IT triển khai passkey qua Microsoft Entra (Azure AD).",
+        "psychology_display": "Authority + Technical Trust",
+        "attack_type_display": "Passkey Enrollment Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-026",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Trust",
+      "attack_type": "Device Code Phishing",
+      "learning_objective": "Nhận diện Device Code phishing — kẻ tấn công dùng luồng xác thực thiết bị hợp lệ để chiếm tài khoản",
+      "email": {
+        "sender_name": "Microsoft Teams IT Support",
+        "sender_email": "teams-support@ms-device-auth.com",
+        "recipient_email": "le.thi.thu.hang@techvina.com.vn",
+        "subject": "Teams trên thiết bị mới của bạn cần xác thực — Nhập mã trên máy tính",
+        "body": "Kính gửi Lê Thị Thu Hằng,\n\nĐể kết nối Microsoft Teams trên thiết bị mới (Surface Pro 9 mà IT vừa cấp), bạn cần nhập mã xác thực trên máy tính hiện tại.\n\nMã xác thực thiết bị: KXMB-7249\n\nTruy cập microsoft.com/devicelogin và nhập mã trên để hoàn tất kết nối thiết bị mới.",
+        "cta_text": "Nhập mã tại microsoft.com/devicelogin",
+        "cta_link": "https://microsoft.com/devicelogin"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "teams-support@ms-device-auth.com",
+          "explanation": "IT Support Microsoft Teams thật liên lạc qua @microsoft.com hoặc email nội bộ công ty — 'ms-device-auth.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "device_code_phishing",
+          "visible_text": "Mã xác thực thiết bị: KXMB-7249",
+          "explanation": "Device Code Phishing: kẻ tấn công tạo mã device code từ Microsoft thật, sau đó dụ nạn nhân nhập mã vào microsoft.com/devicelogin — URL là thật nhưng mã do kẻ tấn công tạo, nghĩa là kẻ tấn công sẽ được cấp token truy cập tài khoản của bạn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "legitimate_url_deception",
+          "visible_text": "https://microsoft.com/devicelogin",
+          "explanation": "Đây là URL Microsoft thật — đây chính là điểm tinh vi nhất của Device Code Phishing. Bạn đang nhập mã vào URL thật của Microsoft nhưng mã đó do kẻ tấn công kiểm soát.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "ms-device-auth.com",
+        "KXMB-7249",
+        "microsoft.com/devicelogin"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Device Code Phishing — nhập mã vào URL Microsoft THẬT nhưng vẫn bị chiếm!",
+        "summary": "Đây là kỹ thuật tiên vi nhất: URL microsoft.com/devicelogin là thật 100%, nhưng mã do kẻ tấn công tạo — khi bạn nhập mã, kẻ tấn công được cấp token truy cập tài khoản của bạn.",
+        "learning_point": "Không bao giờ nhập Device Code từ email vào microsoft.com/devicelogin trừ khi chính bạn đang cài đặt thiết bị mới lúc đó. IT không gửi mã device code qua email.",
+        "psychology_display": "Trust + Technical Confusion",
+        "attack_type_display": "Device Code Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-027",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Authority",
+      "attack_type": "Reverse Tunnel Phishing",
+      "learning_objective": "Nhận diện phishing dùng reverse tunnel (ngrok/cloudflared) để ẩn trang giả sau domain đáng tin cậy",
+      "email": {
+        "sender_name": "AWS Support — Vietnam",
+        "sender_email": "support@aws-vietnam-partner.com",
+        "recipient_email": "devops.lead@vng-cloud.com.vn",
+        "subject": "AWS Console — Cảnh báo bảo mật IAM: Root account login detected",
+        "body": "Kính gửi DevOps Lead,\n\nAWS Security Hub phát hiện đăng nhập vào root account AWS của tổ chức bạn từ IP không xác định lúc 01:34 sáng.\n\nRoot account access là nghiêm trọng nhất trong AWS — kẻ tấn công có thể xóa toàn bộ infrastructure.\n\nĐăng nhập AWS Console ngay để thu hồi credentials và kiểm tra CloudTrail logs.",
+        "cta_text": "Đăng nhập AWS Console khẩn cấp",
+        "cta_link": "https://abc123.ngrok.io/aws-console-login"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "support@aws-vietnam-partner.com",
+          "explanation": "AWS gửi cảnh báo từ @amazon.com hoặc @aws.amazon.com — 'aws-vietnam-partner.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "reverse_tunnel_url",
+          "visible_text": "https://abc123.ngrok.io/aws-console-login",
+          "explanation": "ngrok.io là dịch vụ reverse tunnel — trang giả được host trên máy tính của kẻ tấn công nhưng hiển thị qua ngrok domain. Mọi link đăng nhập AWS hợp lệ đều là console.aws.amazon.com.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "root_account_panic",
+          "visible_text": "Root account access — kẻ tấn công có thể xóa toàn bộ infrastructure",
+          "explanation": "Root account threat tạo nỗi sợ tối đa với DevOps/Cloud engineer — họ phản ứng cực nhanh khi nghe đến root account bị xâm phạm.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "aws-vietnam-partner.com",
+        "ngrok.io",
+        "root account"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Phishing dùng ngrok ẩn trang giả sau domain ngrok.io!",
+        "summary": "ngrok.io là reverse tunnel hợp lệ — nhưng kẻ tấn công dùng để host trang AWS Console giả. URL đăng nhập AWS thật luôn là console.aws.amazon.com.",
+        "learning_point": "AWS Console chỉ tại console.aws.amazon.com. Cảnh báo bảo mật AWS thật hiển thị trong AWS Console và gửi từ @amazon.com. Không click link ngrok/tunnel trong email cảnh báo bảo mật.",
+        "psychology_display": "Authority + Technical Fear",
+        "attack_type_display": "Reverse Tunnel Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-028",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Trust",
+      "attack_type": "Credential Stuffing Setup",
+      "learning_objective": "Nhận diện email thu thập credentials để dùng cho credential stuffing — giả thông báo vi phạm để dụ đổi mật khẩu vào trang giả",
+      "email": {
+        "sender_name": "HaveIBeenPwned Vietnam Alert",
+        "sender_email": "alert@hibp-vietnam-notify.com",
+        "recipient_email": "nguyen.thi.lan.nhi@gmail.com",
+        "subject": "Email của bạn xuất hiện trong 3 vụ data breach — Đổi mật khẩu ngay",
+        "body": "Xin chào Nguyễn Thị Lan Nhi,\n\nHệ thống HaveIBeenPwned phát hiện địa chỉ email của bạn xuất hiện trong 3 vụ rò rỉ dữ liệu gần đây:\n\n• Breach 1: VietnamData_2026 — 2.1M tài khoản\n• Breach 2: ShoppingVN_2025 — 450K tài khoản\n• Breach 3: ForumViet_2024 — 800K tài khoản\n\nMật khẩu của bạn có thể đã bị lộ. Đổi mật khẩu tất cả tài khoản dùng email này ngay.",
+        "cta_text": "Kiểm tra chi tiết và đổi mật khẩu",
+        "cta_link": "https://hibp-vietnam-notify.com/breach-details"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alert@hibp-vietnam-notify.com",
+          "explanation": "HaveIBeenPwned thật tại haveibeenpwned.com — 'hibp-vietnam-notify.com' là domain giả mạo. HIBP không có phiên bản Vietnam riêng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_breach_list",
+          "visible_text": "VietnamData_2026, ShoppingVN_2025, ForumViet_2024",
+          "explanation": "Tên các vụ breach được đặt tên chung chung, không thể xác minh — tạo cảm giác có thật nhưng thực ra là bịa đặt để tạo lo lắng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "credential_stuffing_setup",
+          "visible_text": "Đổi mật khẩu tất cả tài khoản dùng email này",
+          "explanation": "Trang 'đổi mật khẩu' giả sẽ yêu cầu nhập mật khẩu cũ và mới — thu thập được cả mật khẩu cũ (để dùng credential stuffing) lẫn mật khẩu mới.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "hibp-vietnam-notify.com",
+        "VietnamData_2026",
+        "đổi mật khẩu tất cả"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả HaveIBeenPwned để thu thập mật khẩu hàng loạt!",
+        "summary": "HIBP thật tại haveibeenpwned.com — không có phiên bản Vietnam. Trang giả thu thập mật khẩu cũ và mới cùng lúc.",
+        "learning_point": "Kiểm tra email bị breach thật tại haveibeenpwned.com — gõ tay URL. HIBP không gửi email yêu cầu đổi mật khẩu qua link.",
+        "psychology_display": "Fear + Technical Authority",
+        "attack_type_display": "Credential Stuffing Setup"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-029",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Authority + Compliance",
+      "attack_type": "SAML Phishing",
+      "learning_objective": "Nhận diện SAML phishing — tấn công vào quy trình SSO doanh nghiệp để chiếm session sau khi xác thực",
+      "email": {
+        "sender_name": "Salesforce Admin — Vietnam",
+        "sender_email": "admin@salesforce-vn-sso.com",
+        "recipient_email": "sales.director@phu-my-hung.com.vn",
+        "subject": "Salesforce CRM — Cập nhật SAML SSO Configuration — Đăng nhập lại bắt buộc",
+        "body": "Kính gửi Sales Director Phú Mỹ Hưng,\n\nSalesforce thông báo cập nhật cấu hình SAML SSO cho tenant của tổ chức bạn. Sau cập nhật, tất cả người dùng cần đăng nhập lại một lần để refresh SAML assertion.\n\nBước đăng nhập lại chỉ mất 30 giây và không ảnh hưởng đến dữ liệu CRM.\n\nĐăng nhập Salesforce để hoàn tất refresh SAML session.",
+        "cta_text": "Đăng nhập Salesforce (SAML refresh)",
+        "cta_link": "https://salesforce-vn-sso.com/saml-reauth"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "admin@salesforce-vn-sso.com",
+          "explanation": "Salesforce dùng @salesforce.com — 'salesforce-vn-sso.com' là domain giả mạo. Cấu hình SAML được IT admin thực hiện, không yêu cầu người dùng đăng nhập lại qua email.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "saml_phishing",
+          "visible_text": "refresh SAML assertion ... đăng nhập lại",
+          "explanation": "SAML refresh không yêu cầu người dùng thực hiện thủ công qua link email. Đây là trang giả thu thập Salesforce credentials hoặc SAML token.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "technical_jargon_trust",
+          "visible_text": "SAML assertion ... tenant",
+          "explanation": "Thuật ngữ kỹ thuật chính xác (SAML, assertion, tenant) làm người dùng tin đây là email từ IT/Salesforce Admin thật.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "salesforce-vn-sso.com",
+        "SAML refresh",
+        "đăng nhập lại"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "SAML Phishing nhắm Sales Director dùng Salesforce CRM!",
+        "summary": "SAML configuration là việc của IT admin — không cần người dùng đăng nhập lại qua email. Salesforce dùng @salesforce.com.",
+        "learning_point": "Mọi thay đổi SAML/SSO được IT thông báo qua kênh nội bộ và không yêu cầu người dùng click link email. Đăng nhập Salesforce thật tại login.salesforce.com.",
+        "psychology_display": "Authority + Technical Trust",
+        "attack_type_display": "SAML Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-FL-030",
+      "batch": "08",
+      "phase": 2,
+      "lesson": "2.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Fake Login Pages",
+      "psychology": "Fear + Urgency",
+      "attack_type": "Multi-Factor Authentication Fatigue + Fake Login",
+      "learning_objective": "Nhận diện MFA fatigue attack kết hợp fake login page — tấn công hai bước sau khi credentials bị lộ",
+      "email": {
+        "sender_name": "Microsoft Security Operations",
+        "sender_email": "security-ops@microsoft-secops.com",
+        "recipient_email": "nguyen.phuong.linh@pvcombank.com.vn",
+        "subject": "Cảnh báo: Tài khoản Microsoft 365 của bạn nhận 47 yêu cầu MFA từ IP lạ",
+        "body": "Kính gửi Nguyễn Phương Linh,\n\nMicrosoft Security Operations phát hiện 47 yêu cầu MFA push đến điện thoại của bạn trong 30 phút qua từ IP 185.xxx.xxx.xxx (Romania).\n\nĐây là dấu hiệu MFA Fatigue Attack — kẻ tấn công đã có mật khẩu của bạn và đang liên tục gửi MFA request để bạn vô tình chấp nhận.\n\nHành động khẩn cấp: Đăng nhập ngay để thu hồi session và đổi mật khẩu.",
+        "cta_text": "Khóa tài khoản và đổi mật khẩu ngay",
+        "cta_link": "https://microsoft-secops.com/emergency-account-lockdown"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security-ops@microsoft-secops.com",
+          "explanation": "Microsoft Security Operations dùng @microsoft.com — 'microsoft-secops.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "mfa_fatigue_false_alert",
+          "visible_text": "47 yêu cầu MFA push trong 30 phút",
+          "explanation": "Email mô tả chính xác cơ chế MFA Fatigue Attack thật — dùng kiến thức kỹ thuật đúng để tạo hoảng loạn. Nhưng cách phản ứng đúng là KHÔNG click link — mà đăng nhập trực tiếp vào Microsoft Portal.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "ironic_phishing",
+          "visible_text": "kẻ tấn công đã có mật khẩu — đang gửi MFA request",
+          "explanation": "Email cảnh báo MFA fatigue nhưng chính email này là phishing dụ bạn nhập mật khẩu vào trang giả — một cuộc tấn công hai tầng tinh vi.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "microsoft-secops.com",
+        "47 yêu cầu MFA",
+        "MFA Fatigue Attack"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Cảnh báo MFA Fatigue giả — chính email này là tấn công!",
+        "summary": "Email mô tả đúng cơ chế MFA fatigue nhưng chính nó là phishing. Mục đích: tạo hoảng loạn để bạn nhập mật khẩu vào trang giả (thực ra là bước 2 của cuộc tấn công).",
+        "learning_point": "Nhận nhiều MFA push không mong muốn: KHÔNG chấp nhận MFA và KHÔNG click link email. Đăng nhập trực tiếp tại portal.microsoft.com và đổi mật khẩu ở đó.",
+        "psychology_display": "Fear + Technical Panic",
+        "attack_type_display": "MFA Fatigue + Phishing Combo"
+      }
+    }
+  ]
+}

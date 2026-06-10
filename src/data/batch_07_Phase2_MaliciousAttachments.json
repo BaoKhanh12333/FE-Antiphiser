@@ -1,0 +1,1667 @@
+{
+  "batch_id": "07",
+  "batch_name": "Phase 2 — Malicious Attachments",
+  "phase": 2,
+  "lesson": "2.4",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P2-MA-001",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Curiosity",
+      "attack_type": "Malware Delivery",
+      "learning_objective": "Nhận diện file đính kèm .exe giả dạng tài liệu — dấu hiệu cơ bản nhất",
+      "email": {
+        "sender_name": "HR Phòng Nhân sự",
+        "sender_email": "hr@vietstar-hrm.com",
+        "recipient_email": "cao.van.minh@vietstar.com.vn",
+        "subject": "Bảng lương tháng 6/2026 — Tải về và kiểm tra",
+        "body": "Kính gửi anh Cao Văn Minh,\n\nPhòng Nhân sự gửi đính kèm bảng lương tháng 6/2026 của anh. Vui lòng mở file, kiểm tra và xác nhận lại với phòng HR nếu có sai sót trước ngày 10/06.\n\nFile đính kèm: BangLuong_T6_2026_CaoVanMinh.exe\n\nTrân trọng,\nPhòng Nhân sự",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "malicious_attachment_type",
+          "visible_text": "BangLuong_T6_2026_CaoVanMinh.exe",
+          "explanation": "File bảng lương hợp lệ là .pdf hoặc .xlsx — không bao giờ là .exe. File .exe là chương trình có thể chạy và cài malware.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hr@vietstar-hrm.com",
+          "explanation": "Email HR nội bộ phải đến từ @vietstar.com.vn — 'vietstar-hrm.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": [],
+      "highlight_keywords": [".exe", "vietstar-hrm.com", "BangLuong"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File đính kèm .exe cực kỳ nguy hiểm!",
+        "summary": "Bảng lương không bao giờ là file .exe. Mở file này sẽ chạy mã độc trên máy tính của bạn ngay lập tức.",
+        "learning_point": "Quy tắc vàng: tài liệu hợp lệ (lương, hợp đồng, hóa đơn) luôn là .pdf, .xlsx, hoặc .docx — KHÔNG BAO GIỜ là .exe, .bat, .cmd.",
+        "psychology_display": "Curiosity",
+        "attack_type_display": "Malware Delivery"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-002",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority",
+      "attack_type": "HTML Phishing",
+      "learning_objective": "Nhận diện file đính kèm .html giả dạng form đăng nhập — phishing không cần server riêng",
+      "email": {
+        "sender_name": "VPBank Security",
+        "sender_email": "security@vpbank-verify.net",
+        "recipient_email": "le.van.khanh@tanlong-construction.com",
+        "subject": "Xác minh tài khoản VPBank — Mở file đính kèm để tiếp tục",
+        "body": "Kính gửi Lê Văn Khánh,\n\nVPBank yêu cầu xác minh bổ sung cho tài khoản của bạn theo quy định bảo mật mới. Quá trình xác minh chỉ mất 2 phút.\n\nVui lòng mở file HTML đính kèm và điền thông tin để hoàn tất xác minh.\n\nFile: VPBank_Verify_Account.html",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "malicious_attachment_type",
+          "visible_text": "VPBank_Verify_Account.html",
+          "explanation": "File .html đính kèm trong email ngân hàng là dấu hiệu phishing. File này mở một trang web giả ngay trên máy bạn — không cần internet, không bị lọc bởi anti-phishing.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@vpbank-verify.net",
+          "explanation": "VPBank dùng @vpbank.com.vn — 'vpbank-verify.net' là domain giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "credential_request",
+          "visible_text": "điền thông tin để hoàn tất xác minh",
+          "explanation": "Yêu cầu nhập thông tin qua file đính kèm thay vì website chính thức — đây là cách bypass kiểm tra URL.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": [".html", "vpbank-verify.net", "điền thông tin"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .html đính kèm là bẫy phishing tinh vi!",
+        "summary": "File .html mở trang web giả ngay trên máy bạn — không cần kết nối đến server nào. Kẻ tấn công dùng kỹ thuật này để bypass bộ lọc phishing URL.",
+        "learning_point": "Ngân hàng không gửi form xác minh dạng file .html. Mọi xác minh hợp lệ đều diễn ra trên website hoặc app chính thức.",
+        "psychology_display": "Authority",
+        "attack_type_display": "HTML Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-003",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Urgency",
+      "attack_type": "Malware Delivery",
+      "learning_objective": "Nhận diện file .url giả dạng shortcut tài liệu — loại file ít được biết đến nhưng nguy hiểm",
+      "email": {
+        "sender_name": "DHL Express Vietnam",
+        "sender_email": "tracking@dhl-vietnam-delivery.com",
+        "recipient_email": "pham.thu.huong@saigon-import.com",
+        "subject": "Kiện hàng của bạn bị giữ tại hải quan — Xem chi tiết ngay",
+        "body": "Kính gửi Phạm Thu Hương,\n\nKiện hàng DHL Express mã #VNJN5782341 của bạn hiện đang bị tạm giữ tại Hải quan Tân Sơn Nhất do thiếu thông tin khai báo.\n\nBạn cần nộp bổ sung tài liệu trong 48 giờ để tránh kiện hàng bị trả về hoặc tiêu hủy.\n\nMở file đính kèm để xem yêu cầu chi tiết từ hải quan:\nFile: Customs_Declaration_VNJN5782341.url",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "malicious_attachment_type",
+          "visible_text": "Customs_Declaration_VNJN5782341.url",
+          "explanation": "File .url là shortcut Internet trỏ đến website — mở file này sẽ tải malware từ server kẻ tấn công. Tài liệu hải quan thật là .pdf.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "tracking@dhl-vietnam-delivery.com",
+          "explanation": "DHL Vietnam dùng @dhl.com — 'dhl-vietnam-delivery.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trong 48 giờ",
+          "explanation": "Deadline 48 giờ kết hợp nguy cơ 'tiêu hủy kiện hàng' tạo áp lực để người dùng không kịp kiểm tra kỹ.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": [".url", "dhl-vietnam-delivery.com", "tiêu hủy"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .url là bẫy malware ít được biết!",
+        "summary": "File .url trông như file thông thường nhưng thực chất là shortcut mở URL — thường dùng để tải malware. Tài liệu hải quan không bao giờ là .url.",
+        "learning_point": "Ngoài .exe, còn nhiều loại file nguy hiểm: .url, .lnk, .vbs, .js, .bat. Nếu không chắc về loại file — đừng mở và liên hệ IT.",
+        "psychology_display": "Urgency + Fear",
+        "attack_type_display": "Malware Delivery"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-004",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Malicious Attachments",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt file đính kèm .pdf hợp lệ từ đối tác thật",
+      "email": {
+        "sender_name": "Phòng Kế toán — Công ty TNHH Phú Mỹ",
+        "sender_email": "ketoan@phumy-trading.com.vn",
+        "recipient_email": "nguyen.van.thanh@dongnam-dist.com.vn",
+        "subject": "Hóa đơn VAT tháng 5/2026 — Hợp đồng DV0523",
+        "body": "Kính gửi anh Nguyễn Văn Thành,\n\nPhòng kế toán Phú Mỹ Trading gửi đính kèm hóa đơn VAT tháng 5/2026 theo hợp đồng DV0523.\n\nFile đính kèm: HoaDon_VAT_PhuMy_T5_2026_DV0523.pdf\nSố hóa đơn: 0001234\nGiá trị: 45.600.000đ (đã bao gồm VAT 10%)\n\nAnh vui lòng xác nhận đã nhận và phản hồi nếu có thắc mắc. Liên hệ kế toán trưởng: 0901 234 567.\n\nTrân trọng,\nNguyễn Thị Bích — Kế toán trưởng Phú Mỹ Trading",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email có file đính kèm từ công ty bên ngoài — người dùng có thể nghi ngờ mọi file đính kèm",
+        "why_legitimate": "Domain @phumy-trading.com.vn nhất quán với tên công ty. File là .pdf — định dạng hợp lệ cho hóa đơn. Có tên người nhận, số hợp đồng, số hóa đơn cụ thể. Có số điện thoại xác minh. Không có CTA đáng ngờ."
+      },
+      "feedback": {
+        "title": "Đây là email hợp lệ!",
+        "summary": "Hóa đơn PDF từ đối tác quen thuộc với đầy đủ thông tin xác minh và không có yêu cầu đáng ngờ.",
+        "learning_point": "File .pdf từ đối tác quen thuộc, domain nhất quán, có thông tin chi tiết cụ thể — đây là email hợp lệ. Nếu vẫn không chắc, gọi số điện thoại đã biết để xác nhận.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-005",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority",
+      "attack_type": "Macro Malware",
+      "learning_objective": "Nhận diện file .docx/.xlsx có macro độc hại — nguy hiểm khi Enable Macros",
+      "email": {
+        "sender_name": "Kiểm toán Nhà nước — Đoàn kiểm toán 5",
+        "sender_email": "kiemtoan@ktnn-doan5.org",
+        "recipient_email": "le.thi.bich.van@hcm-port.com.vn",
+        "subject": "Yêu cầu cung cấp số liệu tài chính Q1/2026 — Biểu mẫu đính kèm",
+        "body": "Kính gửi Bà Lê Thị Bích Vân,\n\nĐoàn kiểm toán số 5 — Kiểm toán Nhà nước đang thực hiện kiểm toán tại đơn vị. Vui lòng điền đầy đủ thông tin vào biểu mẫu đính kèm và gửi lại trước 15/06/2026.\n\nLưu ý: Khi mở file, vui lòng chọn 'Enable Content' để hiển thị đầy đủ biểu mẫu.\n\nFile: BieuMau_SoLieu_Q1_2026.xlsm",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "kiemtoan@ktnn-doan5.org",
+          "explanation": "Kiểm toán Nhà nước dùng domain @sav.gov.vn — 'ktnn-doan5.org' là domain giả mạo, dùng .org thay .gov.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "BieuMau_SoLieu_Q1_2026.xlsm",
+          "explanation": "File .xlsm là Excel có macro. Kết hợp với yêu cầu 'Enable Content', đây là dấu hiệu macro malware.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "enable_macros_request",
+          "visible_text": "chọn 'Enable Content' để hiển thị đầy đủ",
+          "explanation": "Yêu cầu bật macro là dấu hiệu số 1 của macro malware — tài liệu thật không cần bật macro để hiển thị.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf3"],
+      "missable_flags": ["rf2"],
+      "highlight_keywords": ["ktnn-doan5.org", ".xlsm", "Enable Content"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Macro malware — KHÔNG bao giờ Enable Content!",
+        "summary": "File .xlsm với yêu cầu Enable Content là kỹ thuật macro malware phổ biến nhất. Khi bật macro, mã độc chạy ngay lập tức trong nền.",
+        "learning_point": "Tài liệu chính thống KHÔNG CẦN bật macro để hiển thị. Nếu bất kỳ file Office nào yêu cầu Enable Content/Macros — đóng lại ngay và báo IT.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Macro Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-006",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Ransomware Delivery",
+      "learning_objective": "Nhận diện email phát tán ransomware qua file nén .zip chứa .exe",
+      "email": {
+        "sender_name": "Tòa án Nhân dân TP.HCM",
+        "sender_email": "thongbao@toaanhcm-notify.com",
+        "recipient_email": "vo.duy.khanh@kimlong-invest.com",
+        "subject": "KHẨN: Thông báo triệu tập — Vụ kiện dân sự số 2026/DS-0312",
+        "body": "Kính gửi Ông Võ Duy Khánh,\n\nTòa án Nhân dân TP.Hồ Chí Minh thông báo ông có liên quan đến vụ kiện dân sự số 2026/DS-0312. Ông được triệu tập tham dự phiên xét xử vào ngày 15/06/2026.\n\nVui lòng mở file đính kèm để xem đầy đủ nội dung thông báo triệu tập và các tài liệu liên quan.\n\nFile: ThongBao_TrieuTap_2026DS0312.zip",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@toaanhcm-notify.com",
+          "explanation": "Tòa án Nhân dân dùng domain .gov.vn — 'toaanhcm-notify.com' là domain tư nhân giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "ThongBao_TrieuTap_2026DS0312.zip",
+          "explanation": "File .zip từ cơ quan tòa án là bất thường — thông báo chính thức luôn là PDF. File .zip có thể chứa .exe hoặc file độc hại bên trong.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "authority_impersonation",
+          "visible_text": "Tòa án Nhân dân TP.HCM",
+          "explanation": "Giả danh Tòa án tạo nỗi sợ pháp lý tột độ — người dùng thường mở file ngay lập tức mà không kiểm tra.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["toaanhcm-notify.com", ".zip", "triệu tập"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .zip từ cơ quan nhà nước = dấu hiệu phishing!",
+        "summary": "Tòa án không gửi thông báo qua file .zip từ email. Đây là chiêu giả mạo cơ quan pháp lý để phát tán ransomware.",
+        "learning_point": "Cơ quan nhà nước gửi thông báo chính thức bằng PDF, không phải .zip. Nhận email dạng này: tra cứu số điện thoại tòa án chính thức và gọi xác minh.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Ransomware Delivery"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-007",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust",
+      "attack_type": "Double Extension Spoofing",
+      "learning_objective": "Nhận diện kỹ thuật double extension — file được đặt tên để ẩn extension thật (.pdf.exe)",
+      "email": {
+        "sender_name": "Nguyễn Hữu Nam",
+        "sender_email": "nguyen.huu.nam@supplier-viettech.com",
+        "recipient_email": "tran.thi.lan.anh@saigonport.com.vn",
+        "subject": "Báo giá thiết bị Q3/2026 theo yêu cầu",
+        "body": "Chào chị Lan Anh,\n\nTheo yêu cầu của chị tuần trước, bên anh gửi báo giá thiết bị mạng Q3/2026 kèm catalog sản phẩm mới nhất.\n\nFile đính kèm:\n- BaoGia_ThietBiMang_Q3_2026.pdf.exe\n- Catalog_VietTech_2026.pdf\n\nChị xem qua và phản hồi nếu cần điều chỉnh nhé.\n\nNguyễn Hữu Nam\nSales Manager — VietTech Solutions",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "double_extension",
+          "visible_text": "BaoGia_ThietBiMang_Q3_2026.pdf.exe",
+          "explanation": "File tên '.pdf.exe' dùng kỹ thuật double extension — Windows mặc định ẩn .exe, người dùng thấy tên file kết thúc bằng .pdf nhưng thực tế chạy .exe.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "nguyen.huu.nam@supplier-viettech.com",
+          "explanation": "Nếu quen biết đối tác từ trước, domain nên nhất quán với các email cũ. 'supplier-viettech.com' có thể là domain giả mạo nếu domain thật là viettech.com.vn.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1"],
+      "missable_flags": ["rf2"],
+      "highlight_keywords": [".pdf.exe", "double extension"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Double extension — kỹ thuật ngụy trang file độc hại!",
+        "summary": "'.pdf.exe' trông như file PDF nhưng thực chất là .exe. Kẻ tấn công lợi dụng Windows ẩn extension để đánh lừa.",
+        "learning_point": "Bật hiển thị extension trong Windows (View → File name extensions) để thấy tên file đầy đủ. File báo giá hợp lệ chỉ có một extension: .pdf hoặc .xlsx.",
+        "psychology_display": "Trust",
+        "attack_type_display": "Double Extension Spoofing"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-008",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Malicious Attachments",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email có file đính kèm .docx hợp lệ từ đối tác quen thuộc",
+      "email": {
+        "sender_name": "Lê Thanh Sơn — KPMG Vietnam",
+        "sender_email": "le.thanh.son@kpmg.com.vn",
+        "recipient_email": "bui.thi.mai.linh@phuong-dong-bank.com.vn",
+        "subject": "Draft Management Letter — Kiểm toán nội bộ Q1/2026",
+        "body": "Kính gửi chị Mai Linh,\n\nTheo lịch kiểm toán đã thỏa thuận, nhóm KPMG gửi bản draft Management Letter cho Q1/2026. Vui lòng xem xét và có ý kiến trước cuộc họp ngày 12/06.\n\nFile đính kèm: Draft_ManagementLetter_Q1_2026_PhuongDongBank.docx\n\nNếu có câu hỏi, anh sẵn sàng họp online bất kỳ lúc nào trong tuần này.\n\nTrân trọng,\nLê Thanh Sơn — Audit Manager\nKPMG Vietnam | le.thanh.son@kpmg.com.vn | 0912 345 678",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "File .docx từ đơn vị kiểm toán bên ngoài — người dùng có thể nghi ngờ file Word",
+        "why_legitimate": "Domain @kpmg.com.vn là domain chính thức của KPMG Việt Nam. File .docx là định dạng hợp lệ cho draft tài liệu. Có tên người nhận cụ thể. Có số điện thoại xác minh. Phù hợp ngữ cảnh kiểm toán."
+      },
+      "feedback": {
+        "title": "Đây là email hợp lệ!",
+        "summary": "Draft document từ đơn vị kiểm toán quen thuộc với domain chính thức, file .docx không có macro, và đầy đủ thông tin liên hệ.",
+        "learning_point": "File .docx từ đối tác quen thuộc với domain nhất quán là hợp lệ. Điểm kiểm tra: domain có đúng không? File có yêu cầu Enable Content không? Có ngữ cảnh hợp lý không?",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-009",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust + Authority",
+      "attack_type": "ISO/IMG Malware",
+      "learning_objective": "Nhận diện file .iso/.img ngụy trang tài liệu — kỹ thuật bypass antivirus mới",
+      "email": {
+        "sender_name": "Phòng IT — Tập đoàn Vingroup",
+        "sender_email": "it.support@vingroup-itsystem.com",
+        "recipient_email": "nguyen.hong.phuc@vinhomes.com.vn",
+        "subject": "Cập nhật bắt buộc: VPN Client v3.2 — Cài đặt trước 08/06",
+        "body": "Kính gửi anh Nguyễn Hồng Phúc,\n\nPhòng IT Tập đoàn triển khai cập nhật bắt buộc VPN Client v3.2 cho tất cả nhân viên làm việc từ xa. Phiên bản cũ sẽ hết hỗ trợ từ ngày 09/06/2026.\n\nVui lòng tải và cài đặt từ gói đính kèm trước thời hạn. Không cần quyền Admin — cài đặt tự động.\n\nFile: VinVPN_Client_v3.2_Setup.iso\n\nLiên hệ helpdesk nếu gặp sự cố: it.helpdesk@vingroup.net",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "it.support@vingroup-itsystem.com",
+          "explanation": "IT Vingroup dùng @vingroup.net — 'vingroup-itsystem.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "VinVPN_Client_v3.2_Setup.iso",
+          "explanation": "File .iso là ảnh đĩa — kẻ tấn công dùng để bypass antivirus vì nhiều AV không scan bên trong .iso. File .iso chứa .exe khi mount.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "social_engineering",
+          "visible_text": "Không cần quyền Admin — cài đặt tự động",
+          "explanation": "Nhấn mạnh 'không cần Admin' để giảm cảnh giác và khuyến khích cài đặt ngay. IT thật cài phần mềm qua hệ thống MDM/SCCM, không gửi qua email.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["vingroup-itsystem.com", ".iso", "Không cần Admin"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .iso — kỹ thuật bypass antivirus nguy hiểm!",
+        "summary": "File .iso là kỹ thuật tấn công mới (2023-2026) vì nhiều antivirus không scan bên trong ISO. IT không bao giờ phân phối phần mềm qua email.",
+        "learning_point": "Phần mềm nội bộ được cài qua hệ thống quản lý IT (MDM/SCCM), không qua email đính kèm. Nhận yêu cầu cài phần mềm qua email: báo IT ngay để xác minh.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "ISO Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-010",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority + Urgency",
+      "attack_type": "OneNote Phishing",
+      "learning_objective": "Nhận diện file .one (OneNote) chứa link độc hại nhúng bên trong — kỹ thuật tấn công 2024-2026",
+      "email": {
+        "sender_name": "Microsoft Teams Notification",
+        "sender_email": "teams-notify@ms-teams-vn.com",
+        "recipient_email": "do.thi.hoa@fpt-software.com.vn",
+        "subject": "Bạn đã bỏ lỡ cuộc họp Teams — Xem ghi chú đính kèm",
+        "body": "Xin chào Đỗ Thị Hoa,\n\nBạn đã bỏ lỡ cuộc họp Teams: 'Product Roadmap Q3/2026' lúc 14:00 hôm nay.\n\nGhi chú và quyết định từ cuộc họp đã được đồng nghiệp chia sẻ trong file đính kèm. Mở file để cập nhật thông tin trước phiên review ngày mai.\n\nFile: MeetingNotes_ProductRoadmap_Q3.one",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "teams-notify@ms-teams-vn.com",
+          "explanation": "Microsoft Teams thông báo từ @microsoft.com hoặc @teams.microsoft.com — 'ms-teams-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "MeetingNotes_ProductRoadmap_Q3.one",
+          "explanation": "File .one (OneNote) có thể nhúng script và hyperlink thực thi ngay khi click — kỹ thuật bypass bộ lọc Office 365 được dùng phổ biến từ 2024.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fomo",
+          "visible_text": "bỏ lỡ cuộc họp",
+          "explanation": "FOMO (sợ bỏ lỡ thông tin quan trọng) + deadline 'trước phiên review ngày mai' khiến người dùng mở file ngay mà không kiểm tra.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["ms-teams-vn.com", ".one", "bỏ lỡ cuộc họp"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .one (OneNote) — vũ khí phishing mới nhất!",
+        "summary": "Kẻ tấn công dùng file OneNote vì có thể nhúng script và bỏ qua nhiều bộ lọc email. Teams không gửi ghi chú họp qua email đính kèm.",
+        "learning_point": "Ghi chú Teams thật được chia sẻ trong nền tảng Teams, không qua email đính kèm. File .one lạ từ email = không mở.",
+        "psychology_display": "Authority + FOMO",
+        "attack_type_display": "OneNote Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-011",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust",
+      "attack_type": "QR Code Phishing (Quishing)",
+      "learning_objective": "Nhận diện QR code trong PDF đính kèm dẫn đến trang phishing — kỹ thuật bypass URL scanner",
+      "email": {
+        "sender_name": "Bảo hiểm Bảo Việt",
+        "sender_email": "dichvu@baoviet-insurance-portal.com",
+        "recipient_email": "phan.thi.my.duyen@binh-an-corp.com",
+        "subject": "Gia hạn hợp đồng bảo hiểm BHYT — Quét mã QR để thanh toán",
+        "body": "Kính gửi chị Phan Thị Mỹ Duyên,\n\nHợp đồng bảo hiểm y tế BaoViet của chị sẽ hết hạn vào ngày 30/06/2026. Vui lòng gia hạn trước thời hạn để đảm bảo quyền lợi liên tục.\n\nĐể thuận tiện, chúng tôi đính kèm file PDF thông tin hợp đồng và mã QR thanh toán trực tiếp.\n\nFile: BaoViet_GiaHan_BHYT_2026_PhanThiMyDuyen.pdf",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "dichvu@baoviet-insurance-portal.com",
+          "explanation": "Bảo Việt dùng @baoviet.com.vn — 'baoviet-insurance-portal.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "qr_code_phishing",
+          "visible_text": "mã QR thanh toán trực tiếp",
+          "explanation": "QR code trong file đính kèm không thể bị URL scanner kiểm tra — đây là kỹ thuật 'quishing' (QR phishing) bypass hoàn toàn bộ lọc email.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "hết hạn vào ngày 30/06/2026",
+          "explanation": "Deadline gia hạn bảo hiểm tạo áp lực tài chính — người dùng thường muốn xử lý nhanh để không mất quyền lợi.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["baoviet-insurance-portal.com", "mã QR", "gia hạn"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Quishing — QR code phishing trong file đính kèm!",
+        "summary": "QR code trong PDF là kỹ thuật mới nhất vì URL scanner không đọc được QR. Quét mã sẽ dẫn đến trang giả mạo trên điện thoại.",
+        "learning_point": "Không quét QR code từ file đính kèm email lạ. Gia hạn bảo hiểm hợp lệ qua app Bảo Việt hoặc gọi trực tiếp tổng đài 1800 599 944.",
+        "psychology_display": "Trust + Urgency",
+        "attack_type_display": "Quishing"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-012",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority",
+      "attack_type": "Malware Delivery",
+      "learning_objective": "Nhận diện file .bat đính kèm giả dạng script cài đặt công cụ nội bộ",
+      "email": {
+        "sender_name": "IT Helpdesk — Masan Group",
+        "sender_email": "helpdesk@masan-it-support.com",
+        "recipient_email": "pham.ngoc.son@masan.com.vn",
+        "subject": "Cài đặt công cụ VPN mới — Chạy file đính kèm",
+        "body": "Anh Sơn,\n\nIT Helpdesk gửi anh script cài đặt VPN Client mới (phiên bản bảo mật 4.1). Anh chỉ cần double-click file để cài đặt tự động — không cần quyền Admin.\n\nFile: MasanVPN_Install_v4.1.bat\n\nCài xong restart máy và kết nối lại VPN nhé.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "helpdesk@masan-it-support.com",
+          "explanation": "IT Masan dùng @masan.com.vn — 'masan-it-support.com' là domain ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "MasanVPN_Install_v4.1.bat",
+          "explanation": "File .bat là batch script có thể chạy bất kỳ lệnh nào trên máy tính — cực kỳ nguy hiểm, không bao giờ là định dạng cài đặt phần mềm hợp lệ.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        ".bat",
+        "masan-it-support.com",
+        "double-click"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .bat là script độc hại — không bao giờ chạy!",
+        "summary": "IT không phân phối phần mềm qua file .bat trong email. File này có thể xóa dữ liệu, mở backdoor hoặc tải thêm malware.",
+        "learning_point": "File .bat, .cmd, .vbs, .ps1 là script — KHÔNG mở từ email. Phần mềm IT được cài qua hệ thống MDM/SCCM nội bộ.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Malware Delivery"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-013",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Ransomware Delivery",
+      "learning_objective": "Nhận diện file .docm (Word có macro) nguy hiểm từ email giả cơ quan kiểm tra",
+      "email": {
+        "sender_name": "Thanh tra Bộ Tài chính",
+        "sender_email": "thanhtra@mof-inspection-vn.com",
+        "recipient_email": "ke.toan@hung-thinh-corp.com",
+        "subject": "Yêu cầu kiểm tra hồ sơ tài chính — Biểu mẫu đính kèm bắt buộc",
+        "body": "Kính gửi Phòng Kế toán Hưng Thịnh Corp,\n\nThanh tra Bộ Tài chính thực hiện kiểm tra định kỳ hồ sơ tài chính doanh nghiệp. Quý công ty cần hoàn thành biểu mẫu khai báo đính kèm và nộp lại trước 12/06/2026.\n\nFile: BM_KhaiBAo_TaiChinh_2025_HungThinh.docm\n\nLưu ý: Mở file và bật 'Enable Editing' + 'Enable Content' để hiển thị biểu mẫu.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thanhtra@mof-inspection-vn.com",
+          "explanation": "Bộ Tài chính dùng @mof.gov.vn — 'mof-inspection-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "BM_KhaiBAo_TaiChinh_2025_HungThinh.docm",
+          "explanation": "File .docm là Word có macro — cực nguy hiểm khi kết hợp yêu cầu bật 'Enable Content'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "enable_macros_request",
+          "visible_text": "bật 'Enable Editing' + 'Enable Content'",
+          "explanation": "Yêu cầu bật cả hai tùy chọn là quy trình chuẩn của macro malware — tài liệu thật không cần bật macro để hiện biểu mẫu.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf3"
+      ],
+      "missable_flags": [
+        "rf2"
+      ],
+      "highlight_keywords": [
+        ".docm",
+        "mof-inspection-vn.com",
+        "Enable Content"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": ".docm + Enable Content = macro malware chắc chắn!",
+        "summary": "Thanh tra Bộ Tài chính dùng @mof.gov.vn và không gửi biểu mẫu .docm cần bật macro.",
+        "learning_point": "Hai tín hiệu cùng xuất hiện: file .docm + yêu cầu Enable Content → đóng file ngay và báo IT.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Macro Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-014",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Curiosity",
+      "attack_type": "Malware Delivery",
+      "learning_objective": "Nhận diện file .lnk (shortcut) giả dạng tài liệu Word/PDF",
+      "email": {
+        "sender_name": "Phòng Kinh doanh — Đại Dương Corp",
+        "sender_email": "sales@daiduong-biz.com",
+        "recipient_email": "mua.hang@delta-retail.com.vn",
+        "subject": "Catalogue sản phẩm mới Q3/2026 — Xem trước khi đặt hàng",
+        "body": "Kính gửi Phòng Mua hàng Delta Retail,\n\nĐại Dương Corp gửi catalogue sản phẩm mới nhất Q3/2026. File có thể mở ngay, không cần cài thêm phần mềm.\n\nFile đính kèm: Catalogue_DaiDuong_Q3_2026.pdf.lnk\n\nMọi thắc mắc liên hệ sales team.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "double_extension",
+          "visible_text": "Catalogue_DaiDuong_Q3_2026.pdf.lnk",
+          "explanation": "File .lnk là shortcut Windows — kết hợp double extension .pdf.lnk để người dùng nghĩ là PDF. Mở file .lnk có thể chạy script độc hại.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "unsolicited_attachment",
+          "visible_text": "Đại Dương Corp",
+          "explanation": "Email từ nhà cung cấp lạ gửi file đính kèm không được yêu cầu — dấu hiệu cần cảnh giác cao.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        ".pdf.lnk",
+        "double extension",
+        "catalogue"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .lnk giả PDF — shortcut nguy hiểm!",
+        "summary": "File .lnk trông vô hại nhưng có thể chạy bất kỳ lệnh nào khi click. Catalogue thật là .pdf thuần.",
+        "learning_point": "Bật hiển thị extension đầy đủ trong Windows để thấy rõ .pdf.lnk. File .lnk không bao giờ là tài liệu thật.",
+        "psychology_display": "Curiosity",
+        "attack_type_display": "LNK Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-015",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Phishing via PDF with embedded link",
+      "learning_objective": "Nhận diện PDF đính kèm chứa link độc hại nhúng bên trong — an toàn khi mở nhưng nguy hiểm khi click link trong PDF",
+      "email": {
+        "sender_name": "Cục Đăng ký Kinh doanh — Sở KH&ĐT TP.HCM",
+        "sender_email": "thongbao@dkkd-hochiminhcity.com",
+        "recipient_email": "giam.doc@phuoc-loc-trading.com.vn",
+        "subject": "Thông báo gia hạn Giấy phép kinh doanh — Nộp hồ sơ trực tuyến",
+        "body": "Kính gửi Doanh nghiệp Phước Lộc Trading,\n\nGiấy chứng nhận đăng ký doanh nghiệp của quý công ty sẽ cần gia hạn theo quy định mới. Vui lòng xem hướng dẫn chi tiết trong file PDF đính kèm và nộp hồ sơ trực tuyến qua cổng trong file.\n\nFile: HuongDan_GiaHan_DKKD_2026.pdf",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@dkkd-hochiminhcity.com",
+          "explanation": "Sở KH&ĐT TP.HCM dùng @dpi.hochiminhcity.gov.vn — 'dkkd-hochiminhcity.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "pdf_embedded_link",
+          "visible_text": "nộp hồ sơ trực tuyến qua cổng trong file",
+          "explanation": "Link nộp hồ sơ nhúng trong PDF — không thể kiểm tra URL trước khi mở file. PDF từ cơ quan nhà nước giả thường chứa link dẫn đến trang phishing.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "dkkd-hochiminhcity.com",
+        "cổng trong file PDF",
+        "gia hạn DKKD"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "PDF chứa link độc hại bên trong!",
+        "summary": "PDF an toàn khi mở nhưng link nhúng trong PDF dẫn đến trang phishing. Sở KH&ĐT dùng .gov.vn.",
+        "learning_point": "Cơ quan nhà nước dùng .gov.vn. Gia hạn DKKD qua dangkykinhdoanh.gov.vn — không qua link trong PDF email.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "PDF Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-016",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust",
+      "attack_type": "Malware Delivery via RAR",
+      "learning_objective": "Nhận diện file .rar đính kèm chứa malware bên trong — loại file nén ẩn nội dung thật",
+      "email": {
+        "sender_name": "Nguyễn Thành Trung — Kinh doanh",
+        "sender_email": "nguyen.thanh.trung@vietsoftware-partner.com",
+        "recipient_email": "it.manager@phuc-hung-vina.com.vn",
+        "subject": "Bộ công cụ demo phần mềm quản lý kho — Theo yêu cầu của anh",
+        "body": "Anh ơi,\n\nTheo yêu cầu hôm qua, em gửi bộ demo phần mềm quản lý kho WMS Pro. File nén để gọn, anh giải nén và chạy file setup bên trong.\n\nFile: WMS_Pro_Demo_Full.rar\nPass giải nén: demo2026\n\nAnh dùng thử và feedback nhé!",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "password_protected_archive",
+          "visible_text": "Pass giải nén: demo2026",
+          "explanation": "File nén có password khiến antivirus không thể scan nội dung bên trong — kỹ thuật phổ biến để bypass kiểm tra bảo mật.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "nguyen.thanh.trung@vietsoftware-partner.com",
+          "explanation": "Nếu không có giao dịch trước với 'vietsoftware-partner.com', đây là email không được yêu cầu từ domain lạ.",
+          "severity": "medium"
+        },
+        {
+          "id": "rf3",
+          "type": "exe_inside_archive",
+          "visible_text": "chạy file setup bên trong",
+          "explanation": "File .rar chứa file setup (.exe) để chạy — kết hợp archive có password là cách phổ biến nhất để phát tán malware bypass AV.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf3"
+      ],
+      "missable_flags": [
+        "rf2"
+      ],
+      "highlight_keywords": [
+        ".rar",
+        "Pass giải nén",
+        "file setup bên trong"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .rar có password để bypass antivirus!",
+        "summary": "Password-protected archive là kỹ thuật phổ biến nhất để phát tán malware — AV không thể scan bên trong.",
+        "learning_point": "Không giải nén và chạy file setup từ archive có password gửi qua email. Phần mềm demo hợp lệ được tải từ website chính thức của nhà cung cấp.",
+        "psychology_display": "Trust",
+        "attack_type_display": "Password-Protected Archive Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-017",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Malicious Attachments",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt file đính kèm .xlsx hợp lệ từ bộ phận kế toán nội bộ",
+      "email": {
+        "sender_name": "Lê Thị Bích Ngọc — Kế toán trưởng",
+        "sender_email": "le.thi.bich.ngoc@viet-foods.com.vn",
+        "recipient_email": "nguyen.van.hung@viet-foods.com.vn",
+        "subject": "Báo cáo chi phí vận hành tháng 5/2026 — Kiểm tra trước họp",
+        "body": "Anh Hưng,\n\nEm gửi anh file báo cáo chi phí vận hành tháng 5 để anh kiểm tra trước buổi họp chiều thứ 4.\n\nFile: BaoCao_ChiPhi_VanHanh_T5_2026.xlsx\n\nAnh xem Sheet 2 — phần chi phí logistic có chênh lệch nhỏ so với kế hoạch, em đã ghi chú rõ.\n\nBích Ngọc",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "File .xlsx từ đồng nghiệp nội bộ — người dùng có thể lo ngại macro",
+        "why_legitimate": "Cả hai người dùng cùng domain @viet-foods.com.vn. File .xlsx (không phải .xlsm). Ngữ cảnh hợp lý (họp chiều thứ 4). Không yêu cầu Enable Content. Đồng nghiệp quen biết."
+      },
+      "feedback": {
+        "title": "Đây là file báo cáo nội bộ hợp lệ!",
+        "summary": "File .xlsx từ đồng nghiệp cùng domain, ngữ cảnh rõ ràng, không yêu cầu Enable Macros — hợp lệ.",
+        "learning_point": "File .xlsx từ đồng nghiệp nội bộ với ngữ cảnh rõ ràng là hợp lệ. Điểm kiểm tra: cùng domain? File .xlsx (không phải .xlsm)? Có ngữ cảnh cụ thể?",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-018",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority",
+      "attack_type": "Malware via SVG file",
+      "learning_objective": "Nhận diện file .svg độc hại — định dạng ảnh vector có thể chứa JavaScript",
+      "email": {
+        "sender_name": "Design Team — Sáng tạo Việt",
+        "sender_email": "design@sangtaoviet-studio.com",
+        "recipient_email": "marketing@hoang-long-travel.com.vn",
+        "subject": "Logo mới theo brief — File vector gốc đính kèm",
+        "body": "Kính gửi team Marketing Hoàng Long Travel,\n\nTheo brief thiết kế đã trao đổi, chúng tôi gửi file logo vector gốc (SVG) để team dùng cho các ấn phẩm in ấn và digital.\n\nFile: HoangLong_Logo_2026_Vector.svg\n\nFile SVG có thể mở trực tiếp trong trình duyệt để xem preview.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "malicious_attachment_type",
+          "visible_text": "HoangLong_Logo_2026_Vector.svg",
+          "explanation": "File .svg có thể chứa JavaScript độc hại — khi mở trong trình duyệt (như hướng dẫn), JavaScript có thể thực thi ngay lập tức.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "open_in_browser_instruction",
+          "visible_text": "mở trực tiếp trong trình duyệt để xem preview",
+          "explanation": "Hướng dẫn mở trong trình duyệt là cách kích hoạt JavaScript nhúng trong SVG — đây là kỹ thuật tấn công mới được dùng từ 2024.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        ".svg",
+        "mở trong trình duyệt",
+        "JavaScript"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File SVG có thể chứa JavaScript độc hại!",
+        "summary": "SVG là định dạng XML có thể nhúng JavaScript — mở trong trình duyệt sẽ thực thi code độc hại. File logo thật từ designer được gửi dưới dạng .ai, .eps hoặc .pdf.",
+        "learning_point": "File .svg từ nguồn không rõ cần cảnh giác — đặc biệt khi được hướng dẫn mở trong trình duyệt. Yêu cầu designer gửi file .pdf preview thay thế.",
+        "psychology_display": "Trust",
+        "attack_type_display": "SVG Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-019",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Fake Court Document",
+      "learning_objective": "Nhận diện file đính kèm giả văn bản tòa án để phát tán ransomware",
+      "email": {
+        "sender_name": "Văn phòng Thừa phát lại — TP.HCM",
+        "sender_email": "tphatl@vpthuaphatlai-hcm.com",
+        "recipient_email": "giam.doc@an-khang-invest.com",
+        "subject": "Tống đạt văn bản tư pháp — Vụ kiện 2026/DS-00812 — Mở ngay",
+        "body": "Kính gửi Ông/Bà Giám đốc An Khang Invest,\n\nVăn phòng Thừa phát lại thực hiện tống đạt theo yêu cầu của Tòa án Nhân dân TP.HCM trong vụ kiện dân sự 2026/DS-00812 liên quan đến công ty quý vị.\n\nVăn bản tư pháp đầy đủ được đính kèm. Quý vị có nghĩa vụ mở và xem nội dung trong 3 ngày làm việc.\n\nFile: VanBan_TuPhap_2026DS00812.docx",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "tphatl@vpthuaphatlai-hcm.com",
+          "explanation": "Văn phòng Thừa phát lại dùng domain .gov.vn hoặc domain được cấp phép bởi Bộ Tư pháp — 'vpthuaphatiai-hcm.com' là domain không xác minh được.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "legal_fear_attachment",
+          "visible_text": "có nghĩa vụ mở và xem nội dung",
+          "explanation": "Tạo cảm giác 'nghĩa vụ pháp lý' phải mở file — văn bản tư pháp thật được tống đạt trực tiếp hoặc qua bưu điện có đăng ký, không qua email đính kèm.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "vpthuaphatiai-hcm.com",
+        "nghĩa vụ mở",
+        "vụ kiện"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả văn phòng Thừa phát lại — đánh vào nỗi sợ pháp lý!",
+        "summary": "Tống đạt văn bản tư pháp thật được thực hiện trực tiếp hoặc bưu điện có ký nhận — không qua email đính kèm.",
+        "learning_point": "Văn bản tư pháp thật không đến qua email. Nhận tình huống này: gọi cho luật sư hoặc tra cứu số vụ kiện tại tòa án có liên quan.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Legal Document Scam"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-020",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Curiosity",
+      "attack_type": "Excel XLL Add-in Malware",
+      "learning_objective": "Nhận diện file .xll (Excel add-in) nguy hiểm — kỹ thuật bypass khi mở file Excel",
+      "email": {
+        "sender_name": "Data Analytics Team — McKinsey Vietnam",
+        "sender_email": "analytics@mckinsey-vietnam-hub.com",
+        "recipient_email": "strategy@phan-vu-holdings.com.vn",
+        "subject": "Dashboard phân tích ngành FMCG Q2/2026 — File Excel tương tác",
+        "body": "Kính gửi team Strategy Phan Vũ Holdings,\n\nMcKinsey Vietnam Analytics chia sẻ dashboard phân tích ngành FMCG Q2/2026 — file Excel tương tác với dữ liệu real-time.\n\nFile: FMCG_Analytics_Dashboard_Q2_2026.xll\n\nKhi mở file, Excel sẽ yêu cầu cài Add-in — chọn 'Install' để kích hoạt dashboard tương tác.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "analytics@mckinsey-vietnam-hub.com",
+          "explanation": "McKinsey dùng @mckinsey.com — 'mckinsey-vietnam-hub.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "FMCG_Analytics_Dashboard_Q2_2026.xll",
+          "explanation": "File .xll là Excel Add-in có thể chứa DLL độc hại — khi cài 'Add-in', malware thực thi ngay. Microsoft đã chặn nhiều loại XLL nhưng kỹ thuật vẫn được dùng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "install_prompt_request",
+          "visible_text": "chọn 'Install' để kích hoạt",
+          "explanation": "Yêu cầu cài Add-in khi mở file là cơ chế thực thi malware — tương tự Enable Macros nhưng ít người biết hơn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        ".xll",
+        "mckinsey-vietnam-hub.com",
+        "Install Add-in"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .xll Excel Add-in — cơ chế malware ít được biết!",
+        "summary": "XLL là kỹ thuật mới bypass nhiều bộ lọc. McKinsey không gửi dashboard qua email đính kèm .xll.",
+        "learning_point": "File .xll cần được IT whitelist trước khi dùng — không cài Add-in từ email. Báo cáo McKinsey thật được gửi dưới dạng .pdf hoặc link PowerBI.",
+        "psychology_display": "Curiosity + Authority",
+        "attack_type_display": "XLL Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-021",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority + Fear",
+      "attack_type": "Fake Employment Contract",
+      "learning_objective": "Nhận diện email giả hợp đồng lao động có file độc hại nhắm ứng viên mới nhận việc",
+      "email": {
+        "sender_name": "HR Onboarding — Unilever Vietnam",
+        "sender_email": "onboarding@unilever-vn-hr.com",
+        "recipient_email": "tran.thi.kim.chi.1999@gmail.com",
+        "subject": "Hợp đồng lao động chính thức — Ký và gửi lại trước ngày nhận việc",
+        "body": "Kính gửi Trần Thị Kim Chi,\n\nChúc mừng bạn đã vượt qua vòng phỏng vấn tại Unilever Vietnam! HR gửi hợp đồng lao động chính thức để bạn xem xét và ký.\n\nFile: HDLD_UnileverVN_TranThiKimChi_2026.exe\n\nMở file, đọc nội dung và ký tên điện tử. Gửi lại file đã ký trước ngày nhận việc 15/06/2026.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "onboarding@unilever-vn-hr.com",
+          "explanation": "Unilever Vietnam dùng @unilever.com — 'unilever-vn-hr.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "HDLD_UnileverVN_TranThiKimChi_2026.exe",
+          "explanation": "Hợp đồng lao động là file .exe — bất kỳ hợp đồng hợp lệ nào đều là .pdf hoặc .docx. File .exe này sẽ cài malware khi chạy.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "excitement_exploitation",
+          "visible_text": "Chúc mừng bạn đã vượt qua vòng phỏng vấn",
+          "explanation": "Khai thác cảm xúc hưng phấn của người mới nhận việc — trong trạng thái vui mừng, người dùng ít cảnh giác hơn.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "unilever-vn-hr.com",
+        "HDLD...exe",
+        "hợp đồng lao động .exe"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Hợp đồng lao động .exe — nhắm người mới nhận việc!",
+        "summary": "Kẻ tấn công khai thác tâm lý hưng phấn của người mới được tuyển — không ai ngờ hợp đồng lao động lại là malware.",
+        "learning_point": "Hợp đồng lao động hợp lệ là .pdf hoặc .docx — KHÔNG BAO GIỜ là .exe. Nhận offer từ công ty lớn: xác minh qua website chính thức hoặc LinkedIn của người HR.",
+        "psychology_display": "Excitement + Trust",
+        "attack_type_display": "Fake Employment Contract Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-022",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust",
+      "attack_type": "Malware via PPAM (PowerPoint Add-in)",
+      "learning_objective": "Nhận diện file .ppam (PowerPoint Add-in) độc hại giả dạng template trình bày",
+      "email": {
+        "sender_name": "Creative Director — Saatchi & Saatchi Vietnam",
+        "sender_email": "creative@saatchi-vn-studio.com",
+        "recipient_email": "marketing.director@masan-consumer.com",
+        "subject": "Brand template mới — Cài Add-in để dùng với PowerPoint",
+        "body": "Kính gửi team Marketing Masan Consumer,\n\nSaatchi & Saatchi Vietnam gửi bộ brand template mới theo brand guideline 2026. Để dùng template, cài Add-in vào PowerPoint.\n\nFile: Masan_BrandKit_2026.ppam\n\nSau khi cài, template sẽ xuất hiện trong tab 'Add-ins' của PowerPoint.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "creative@saatchi-vn-studio.com",
+          "explanation": "Saatchi & Saatchi Vietnam dùng @saatchi.com — 'saatchi-vn-studio.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malicious_attachment_type",
+          "visible_text": "Masan_BrandKit_2026.ppam",
+          "explanation": "File .ppam là PowerPoint Add-in có thể chứa macro độc hại — cài Add-in từ nguồn không tin cậy là rủi ro cao.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        ".ppam",
+        "saatchi-vn-studio.com",
+        "cài Add-in"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .ppam PowerPoint Add-in — ít người biết nhưng nguy hiểm!",
+        "summary": "PPAM là Add-in PowerPoint có thể chứa macro độc hại tương tự XLSM. Brand template thật được gửi dưới dạng .pptx hoặc link SharePoint.",
+        "learning_point": "Không cài Add-in Office từ email. Brand template thật được chia sẻ qua SharePoint/Teams nội bộ hoặc link đến dịch vụ thiết kế đã xác minh.",
+        "psychology_display": "Trust",
+        "attack_type_display": "PowerPoint Add-in Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-023",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Malicious Attachments",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt file .pptx hợp lệ từ đơn vị tư vấn chiến lược",
+      "email": {
+        "sender_name": "Phạm Thị Hồng Vân — Senior Consultant",
+        "sender_email": "pham.thi.hong.van@roland-berger.com",
+        "recipient_email": "ceo@dai-phat-invest.com.vn",
+        "subject": "Draft báo cáo chiến lược Q3/2026 — Review trước cuộc họp thứ 3",
+        "body": "Kính gửi anh CEO,\n\nRoland Berger gửi anh draft báo cáo chiến lược Q3/2026 để anh review trước buổi họp thứ 4 tuần tới.\n\nFile: DaiPhat_Strategy_Q3_2026_v3_draft.pptx\n\nSlide 18-22 có phần anh cần confirm số liệu với CFO. Chúng tôi sẽ finalize sau khi nhận feedback.\n\nTrân trọng,\nPhạm Thị Hồng Vân\nSenior Consultant — Roland Berger Vietnam\npham.thi.hong.van@roland-berger.com | 0912 xxx xxx",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "File .pptx từ công ty tư vấn bên ngoài — có thể nghi ngờ",
+        "why_legitimate": "Domain @roland-berger.com là domain chính thức của Roland Berger toàn cầu. File .pptx — định dạng hợp lệ, không phải .ppam hay .pptm. Có ngữ cảnh cụ thể (slide 18-22). Có số điện thoại xác minh."
+      },
+      "feedback": {
+        "title": "Đây là file báo cáo tư vấn hợp lệ!",
+        "summary": "File .pptx từ @roland-berger.com với ngữ cảnh rõ ràng và không yêu cầu cài gì thêm — hợp lệ.",
+        "learning_point": "File .pptx từ đối tác quen thuộc với domain chính thức là hợp lệ. Khác với .ppam (add-in) hay .pptm (có macro).",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-024",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust",
+      "attack_type": "Polyglot File Attack",
+      "learning_objective": "Nhận diện polyglot file — file vừa là PDF hợp lệ vừa chứa mã độc chạy trong môi trường khác",
+      "email": {
+        "sender_name": "Trần Huy Hoàng — Research Analyst",
+        "sender_email": "tran.huy.hoang@vcbs-research.com",
+        "recipient_email": "investment@huong-viet-fund.com.vn",
+        "subject": "Báo cáo phân tích cổ phiếu VIC, VHM, MSN — Q2/2026",
+        "body": "Kính gửi team Investment Hương Việt Fund,\n\nVCBS Research gửi báo cáo phân tích chuyên sâu ba mã VIC, VHM và MSN cho Q2/2026. Báo cáo kèm mô hình định giá tương tác.\n\nFile: VCBS_Research_VIC_VHM_MSN_Q2_2026.pdf\n\nMô hình định giá tương tác yêu cầu Adobe Acrobat Pro để hiển thị đầy đủ — Microsoft Edge PDF viewer sẽ không hiện đủ dữ liệu.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "tran.huy.hoang@vcbs-research.com",
+          "explanation": "VCBS dùng @vcbs.com.vn — 'vcbs-research.com' là domain giả mạo thêm '-research'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "specific_software_requirement",
+          "visible_text": "yêu cầu Adobe Acrobat Pro — Microsoft Edge sẽ không hiện đủ",
+          "explanation": "Yêu cầu dùng phần mềm cụ thể để mở file là kỹ thuật đảm bảo nạn nhân dùng môi trường có thể khai thác JavaScript/Action trong Acrobat.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "polyglot_indicator",
+          "visible_text": "mô hình định giá tương tác",
+          "explanation": "PDF 'tương tác' với nhiều tính năng phức tạp là dấu hiệu có thể chứa JavaScript độc hại hoặc là polyglot file — vừa là PDF hợp lệ vừa chứa payload.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vcbs-research.com",
+        "Adobe Acrobat Pro bắt buộc",
+        "mô hình tương tác"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Polyglot file — PDF hợp lệ chứa payload độc hại!",
+        "summary": "Polyglot file là kỹ thuật cao cấp: file vừa là PDF đọc được, vừa là file có thể thực thi trong môi trường khác. Yêu cầu dùng phần mềm cụ thể là để trigger đúng môi trường khai thác.",
+        "learning_point": "Báo cáo chứng khoán thật không yêu cầu phần mềm đặc biệt để mở. VCBS Research gửi báo cáo qua domain @vcbs.com.vn.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "Polyglot File Attack"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-025",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority + Compliance",
+      "attack_type": "Signed Malware Certificate Abuse",
+      "learning_objective": "Nhận diện malware được ký số hợp lệ — file .exe có chữ ký số không đồng nghĩa an toàn",
+      "email": {
+        "sender_name": "Microsoft Partner Network",
+        "sender_email": "partner-update@ms-partner-network.com",
+        "recipient_email": "it.director@techvina-solutions.com.vn",
+        "subject": "Bắt buộc: Cập nhật Microsoft Partner Compliance Tool v2.1",
+        "body": "Kính gửi IT Director TechVina Solutions,\n\nMicrosoft Partner Network yêu cầu tất cả đối tác cài đặt công cụ Partner Compliance Tool v2.1 trước 30/06/2026 để duy trì trạng thái đối tác.\n\nFile cài đặt đã được ký số bởi Microsoft — Windows SmartScreen sẽ xác nhận chữ ký hợp lệ khi cài đặt.\n\nFile: MSPartner_ComplianceTool_v2.1_Setup.exe",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "partner-update@ms-partner-network.com",
+          "explanation": "Microsoft Partner Network dùng @microsoft.com — 'ms-partner-network.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "signed_malware_false_trust",
+          "visible_text": "đã được ký số bởi Microsoft — Windows SmartScreen sẽ xác nhận",
+          "explanation": "Chữ ký số không đồng nghĩa file an toàn — kẻ tấn công có thể dùng chứng chỉ ký số bị đánh cắp hoặc chứng chỉ hợp lệ từ shell company. SmartScreen check chứng chỉ, không check hành vi.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "distribution_via_email",
+          "visible_text": "File cài đặt ... .exe",
+          "explanation": "Microsoft phân phối tool cho partner qua Partner Center (partner.microsoft.com) — không qua email đính kèm .exe.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "ms-partner-network.com",
+        "ký số bởi Microsoft",
+        "SmartScreen xác nhận"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Chữ ký số không đảm bảo file an toàn!",
+        "summary": "Malware ngày càng được ký số hợp lệ để bypass SmartScreen. Microsoft không phân phối compliance tool qua email đính kèm.",
+        "learning_point": "Microsoft Partner tools chỉ tải từ partner.microsoft.com. Chữ ký số là điều kiện cần nhưng không đủ — domain email người gửi vẫn là kiểm tra quan trọng nhất.",
+        "psychology_display": "Authority + Compliance",
+        "attack_type_display": "Signed Malware"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-026",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust",
+      "attack_type": "ZIP Bomb / Archive Exploit",
+      "learning_objective": "Nhận diện file nén độc hại được thiết kế để crash hệ thống hoặc bypass AV bằng kỹ thuật nén đặc biệt",
+      "email": {
+        "sender_name": "Data Team — Nielsen Vietnam",
+        "sender_email": "data@nielsen-vn-research.com",
+        "recipient_email": "research@thanh-phat-consumer.com.vn",
+        "subject": "Raw Data FMCG Retail Q2/2026 — File nén đầy đủ",
+        "body": "Kính gửi Research Team Thanh Phát Consumer,\n\nNielsen Vietnam gửi raw data FMCG retail Q2/2026 theo hợp đồng nghiên cứu. Do dung lượng lớn (18GB raw data), chúng tôi đã nén thành file zip nhỏ hơn.\n\nFile: Nielsen_FMCG_RawData_Q2_2026.zip (45MB)\n\nGiải nén vào ổ D: — hệ thống sẽ tự extract khoảng 18GB dữ liệu.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "data@nielsen-vn-research.com",
+          "explanation": "Nielsen dùng @nielsen.com — 'nielsen-vn-research.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "zip_bomb_indicator",
+          "visible_text": "45MB ... giải nén thành 18GB",
+          "explanation": "Tỷ lệ nén 400:1 (45MB → 18GB) là dấu hiệu ZIP bomb — file nén được thiết kế để giải nén vô hạn, làm crash hệ thống hoặc lấp đầy ổ đĩa.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "nielsen-vn-research.com",
+        "45MB → 18GB",
+        "ZIP bomb"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "ZIP Bomb — file nhỏ giải nén vô hạn làm crash hệ thống!",
+        "summary": "Tỷ lệ nén 400:1 là bất thường và là dấu hiệu ZIP bomb. Nielsen chia sẻ raw data qua SFTP hoặc data platform được bảo mật — không qua email đính kèm.",
+        "learning_point": "Tỷ lệ nén bình thường: 2:1 đến 10:1. File zip nén được 18GB từ 45MB là bất thường cực đoan — không giải nén và báo IT ngay.",
+        "psychology_display": "Trust",
+        "attack_type_display": "ZIP Bomb"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-027",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority + Urgency",
+      "attack_type": "MOTW Bypass via Container File",
+      "learning_objective": "Nhận diện kỹ thuật bypass Mark of the Web (MOTW) bằng file .img hoặc .vhd giả dạng phần mềm",
+      "email": {
+        "sender_name": "Software Licensing — Adobe Systems",
+        "sender_email": "licensing@adobe-software-vn.com",
+        "recipient_email": "it.admin@vinaprint-corp.com.vn",
+        "subject": "Adobe Creative Cloud Enterprise — License Key & Installer",
+        "body": "Kính gửi IT Admin Vinaprint Corp,\n\nTheo đơn mua bản quyền Adobe Creative Cloud Enterprise, chúng tôi gửi bộ cài đặt và license key.\n\nDo kích thước lớn và yêu cầu bảo toàn toàn vẹn file, installer được đóng gói dạng disk image.\n\nFile: AdobeCC_Enterprise_Vinaprint_2026.img\n\nMount file (double-click) và chạy Setup.exe bên trong để cài đặt.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "licensing@adobe-software-vn.com",
+          "explanation": "Adobe gửi license từ @adobe.com — 'adobe-software-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "motw_bypass",
+          "visible_text": "AdobeCC_Enterprise_Vinaprint_2026.img",
+          "explanation": "File .img (disk image) bypass MOTW — Windows không đánh dấu file tải từ internet khi extract từ disk image, khiến SmartScreen và một số AV không cảnh báo khi chạy file bên trong.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "mount_and_run",
+          "visible_text": "Mount file và chạy Setup.exe bên trong",
+          "explanation": "Hướng dẫn mount + chạy setup là chuỗi thực thi malware qua disk image — Adobe phân phối qua Creative Cloud Desktop App, không qua .img email.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "adobe-software-vn.com",
+        ".img disk image",
+        "Mount + chạy Setup.exe"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "File .img bypass SmartScreen và MOTW!",
+        "summary": "Disk image (.img/.vhd/.iso) là kỹ thuật bypass bảo mật Windows hiệu quả nhất hiện tại. Adobe CC Enterprise cài qua admin.adobe.com — không qua .img email.",
+        "learning_point": "File .img, .vhd, .iso từ email là Red Flag cao. Phần mềm doanh nghiệp Adobe được quản lý qua Adobe Admin Console và Creative Cloud Desktop App.",
+        "psychology_display": "Authority + Trust",
+        "attack_type_display": "MOTW Bypass"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-028",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust + Authority",
+      "attack_type": "Malware via HTML Smuggling",
+      "learning_objective": "Nhận diện HTML smuggling — file .html đính kèm tự động tải malware về máy khi mở trong trình duyệt",
+      "email": {
+        "sender_name": "Procurement — Samsung C&T Vietnam",
+        "sender_email": "procurement@samsung-ct-vn.com",
+        "recipient_email": "sales@viet-steel-supply.com.vn",
+        "subject": "RFQ — Yêu cầu báo giá thép xây dựng Q3/2026 — Form điền trực tiếp",
+        "body": "Kính gửi Viet Steel Supply,\n\nSamsung C&T Vietnam gửi yêu cầu báo giá vật liệu xây dựng Q3/2026. Để tiện lợi, chúng tôi thiết kế form báo giá tương tác — mở file HTML và điền trực tiếp.\n\nFile: RFQ_Samsung_CT_SteelMaterials_Q3_2026.html\n\nMở trong trình duyệt, điền thông tin và export PDF gửi lại cho chúng tôi.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "procurement@samsung-ct-vn.com",
+          "explanation": "Samsung C&T dùng @samsungcnt.com — 'samsung-ct-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "html_smuggling",
+          "visible_text": "RFQ_Samsung_CT_SteelMaterials_Q3_2026.html",
+          "explanation": "HTML smuggling: file .html khi mở trong trình duyệt có thể tự động tải xuống file malware về máy thông qua JavaScript — bypass nhiều bộ lọc email vì file HTML bản thân không chứa malware.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "rfq_via_html",
+          "visible_text": "form báo giá tương tác — mở file HTML",
+          "explanation": "RFQ (Request for Quotation) hợp lệ được gửi dưới dạng .xlsx hoặc .pdf — không phải file .html tương tác.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "samsung-ct-vn.com",
+        "RFQ...html",
+        "mở trong trình duyệt"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "HTML Smuggling — file HTML tự tải malware khi mở!",
+        "summary": "HTML Smuggling là kỹ thuật tinh vi: file .html bản thân không chứa malware nên qua được bộ lọc email, nhưng khi mở trong trình duyệt sẽ tự tải file độc hại về.",
+        "learning_point": "File .html từ email lạ — không mở trong trình duyệt. RFQ hợp lệ là file .xlsx hoặc .pdf. Samsung C&T dùng @samsungcnt.com.",
+        "psychology_display": "Trust + Business Opportunity",
+        "attack_type_display": "HTML Smuggling"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-029",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Authority",
+      "attack_type": "Malware via MSI Package",
+      "learning_objective": "Nhận diện file .msi (Windows Installer) độc hại giả dạng cập nhật phần mềm chính hãng",
+      "email": {
+        "sender_name": "Zoom IT — Enterprise Deployment",
+        "sender_email": "enterprise@zoom-enterprise-update.com",
+        "recipient_email": "it.helpdesk@phu-nhuan-jewelry.com.vn",
+        "subject": "Zoom Enterprise 6.2.0 — Cập nhật bắt buộc — Triển khai trước 08/06",
+        "body": "Kính gửi IT Helpdesk PNJ,\n\nZoom thông báo bản cập nhật bắt buộc Enterprise 6.2.0 vá lỗ hổng bảo mật CVE-2026-28134 (nghiêm trọng). Tất cả người dùng trong tổ chức cần cập nhật trước 08/06/2026.\n\nGói MSI Enterprise cho triển khai hàng loạt:\nFile: Zoom_Enterprise_6.2.0_PNJ_Deployment.msi\n\nTriển khai qua Group Policy hoặc SCCM.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "enterprise@zoom-enterprise-update.com",
+          "explanation": "Zoom gửi thông báo cập nhật từ @zoom.us — 'zoom-enterprise-update.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_cve",
+          "visible_text": "CVE-2026-28134",
+          "explanation": "CVE cụ thể tạo cảm giác cập nhật khẩn cấp thật — kẻ tấn công biết IT admin phản ứng nhanh với CVE nghiêm trọng. Cần xác minh CVE này có thật không trên nvd.nist.gov.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "msi_from_email",
+          "visible_text": "Zoom_Enterprise_6.2.0_PNJ_Deployment.msi",
+          "explanation": "Zoom Enterprise deployment package được tải từ zoom.us/download/enterprise — không qua email đính kèm .msi.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "zoom-enterprise-update.com",
+        "CVE-2026-28134",
+        ".msi từ email"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả cập nhật Zoom khẩn cấp với CVE giả!",
+        "summary": "CVE số cụ thể tạo áp lực bảo mật mạnh với IT admin. Nhưng Zoom không phân phối MSI qua email — và CVE cần được xác minh độc lập.",
+        "learning_point": "Khi nhận thông báo CVE khẩn: xác minh CVE tại nvd.nist.gov. Zoom Enterprise update tải từ zoom.us hoặc qua MDM nội bộ — không từ email đính kèm.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "MSI Malware via Fake Patch"
+      }
+    },
+    {
+      "simulation_id": "P2-MA-030",
+      "batch": "07",
+      "phase": 2,
+      "lesson": "2.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Malicious Attachments",
+      "psychology": "Trust",
+      "attack_type": "Malware via Compromised Supply Chain",
+      "learning_objective": "Nhận diện khi phần mềm hợp lệ bị nhúng malware từ chuỗi cung ứng phần mềm bị xâm phạm",
+      "email": {
+        "sender_name": "Kế toán Việt — Hỗ trợ kỹ thuật",
+        "sender_email": "support@ketoanviet-update.vn",
+        "recipient_email": "ke.toan.truong@hai-phong-port.com.vn",
+        "subject": "Kế toán Việt 2026 — Bản vá lỗi thuế TNCN mới — Cập nhật ngay",
+        "body": "Kính gửi Kế toán trưởng Hải Phòng Port,\n\nKế toán Việt phát hành bản vá 2026.06 cập nhật biểu thuế TNCN mới theo Thông tư 40/2026. Phần mềm sẽ tính sai nếu chưa cập nhật.\n\nBản vá: KetoanViet_Patch_2026.06_TNCN.exe\n\nCài đặt bình thường như các bản vá trước. File được ký số bởi Kế toán Việt Software.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "support@ketoanviet-update.vn",
+          "explanation": "Cần xác minh domain thật của Kế toán Việt — nếu domain thật khác 'ketoanviet-update.vn', đây là giả mạo. Bản vá thật được phân phối qua auto-update trong phần mềm.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "patch_via_email",
+          "visible_text": "KetoanViet_Patch_2026.06_TNCN.exe",
+          "explanation": "Phần mềm kế toán cập nhật qua tính năng auto-update tích hợp — không qua file .exe gửi email. Nhận bản vá qua email là bất thường.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "tax_urgency_pretext",
+          "visible_text": "tính sai nếu chưa cập nhật",
+          "explanation": "Đe dọa tính thuế sai tạo áp lực nghiệp vụ với kế toán — sợ sai thuế là lo lắng nghề nghiệp lớn nhất của kế toán.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "ketoanviet-update.vn",
+        "Patch...exe qua email",
+        "tính sai thuế"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Bản vá phần mềm kế toán giả — nhắm kế toán trưởng!",
+        "summary": "Phần mềm kế toán là mục tiêu cao giá vì có quyền truy cập dữ liệu tài chính toàn công ty. Bản vá thật được phân phối qua auto-update trong phần mềm.",
+        "learning_point": "Không cài bản vá phần mềm từ email — dù file được ký số. Cập nhật phần mềm kế toán qua tính năng 'Kiểm tra cập nhật' trong chính phần mềm hoặc trang chủ nhà phát triển.",
+        "psychology_display": "Trust + Professional Fear",
+        "attack_type_display": "Supply Chain Software Attack"
+      }
+    }
+  ]
+}
