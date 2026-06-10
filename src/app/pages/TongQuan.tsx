@@ -65,17 +65,15 @@ const PHASE_CONFIG: Record<number, {
   4: { name: "Ứng phó & Báo cáo",           Icon: ShieldAlert, color: "#059669", bgColor: "#ECFDF5" },
 };
 
-function getPhaseNum(id: number) {
-  if (id <= 6)  return 1;
-  if (id <= 11) return 2;
-  if (id <= 16) return 3;
-  return 4;
+function getPhaseNum(lesson: any) {
+  return lesson.phaseNumber ?? 1;
 }
 
 export function TongQuan() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
+  const [allCampaigns, setAllCampaigns] = useState<any[]>([]);
   const [activeCampaign, setActiveCampaign] = useState<any>(null);
   const [campaignDetails, setCampaignDetails] = useState<any>(null);
   const [activeCampaignAttempts, setActiveCampaignAttempts] = useState<any[]>([]);
@@ -107,6 +105,8 @@ export function TongQuan() {
           !c.campaignName.toLowerCase().includes("test") && 
           !c.campaignName.toLowerCase().includes("verify")
         ) || [];
+
+        setAllCampaigns(filteredCampaigns);
 
         // Find active campaign
         const active = filteredCampaigns.find((c: any) => c.isActive) || null;
@@ -195,7 +195,7 @@ export function TongQuan() {
 
   // Phase grouping calculations
   const phaseStats = [1, 2, 3, 4].map(ph => {
-    const phaseLessons = allLessons.filter((l: any) => getPhaseNum(l.lessonId) === ph);
+    const phaseLessons = allLessons.filter((l: any) => getPhaseNum(l) === ph);
     const total = phaseLessons.length;
     const completed = phaseLessons.filter((l: any) => 
       progressList.some((p: any) => p.lessonId === l.lessonId && p.isCompleted)
@@ -243,34 +243,41 @@ export function TongQuan() {
           <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-indigo-50/50 blur-xl pointer-events-none" />
 
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-indigo-100 text-indigo-700">
-                {activeCampaign ? "● Chiến dịch đang chạy" : "Sẵn sàng học tập"}
+                {allCampaigns.length > 0 ? `● ${allCampaigns.length} chiến dịch đang chạy` : "Sẵn sàng học tập"}
               </span>
             </div>
 
-            {activeCampaign ? (
+            {allCampaigns.length > 0 ? (
               <>
                 <h2 className="font-black text-slate-800 text-lg leading-snug">
-                  {campaignDetails?.campaignName || activeCampaign.campaignName}
+                  Bạn đang tham gia {allCampaigns.length} chiến dịch
                 </h2>
-                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed max-w-lg">
-                  {campaignDetails?.description || "Tham gia thực hành và nâng cao khả năng phản xạ trước các email lừa đảo nguy hại."}
-                </p>
+                <div className="mt-2 space-y-1">
+                  {allCampaigns.slice(0, 3).map((c: any) => (
+                    <p key={c.campaignId} className="text-xs text-slate-500 leading-relaxed truncate">
+                      • {c.campaignName}
+                    </p>
+                  ))}
+                  {allCampaigns.length > 3 && (
+                    <p className="text-xs text-indigo-400 font-semibold">+{allCampaigns.length - 3} chiến dịch khác</p>
+                  )}
+                </div>
 
-                {/* Progress bar */}
-                <div className="mt-6">
+                {/* Aggregate progress */}
+                <div className="mt-5">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-slate-500 font-bold">Tiến độ thực tế</span>
+                    <span className="text-xs text-slate-500 font-bold">Tổng email đã xử lý</span>
                     <span className="text-xs font-black text-indigo-600">
-                      {doneEmails} / {totalEmails} Email ({activePercent}%)
+                      {stats.processedEmails} email — {stats.accuracyRate}% chính xác
                     </span>
                   </div>
                   <div className="h-3 rounded-full w-full bg-indigo-100/50">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
-                        width: `${activePercent}%`,
+                        width: `${Math.min(100, stats.processedEmails > 0 ? Math.min(stats.processedEmails * 5, 100) : 0)}%`,
                         background: "linear-gradient(90deg, #4F46E5, #6366F1)",
                         boxShadow: "0 0 10px rgba(79, 70, 229, 0.25)"
                       }}
@@ -292,16 +299,16 @@ export function TongQuan() {
 
           <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between">
             <span className="text-[11px] text-indigo-500 font-bold">
-              {activeCampaign ? `Yêu cầu làm tối thiểu ${totalEmails} kịch bản` : "Hoàn thành 4 Phase bài học lý thuyết"}
+              {allCampaigns.length > 0 ? `${allCampaigns.length} chiến dịch — ${stats.processedEmails} email đã làm` : "Hoàn thành 4 Phase bài học lý thuyết"}
             </span>
-            {activeCampaign ? (
+            {allCampaigns.length > 0 ? (
               <button
                 onClick={() => navigate("/nguoi-dung/mo-phong")}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 style={{ boxShadow: "0 4px 14px rgba(79, 70, 229, 0.3)" }}
               >
                 <PlayCircle size={15} />
-                Thực hành ngay
+                Xem tất cả chiến dịch
               </button>
             ) : (
               <button

@@ -115,11 +115,34 @@ export const lessonService = {
   },
 
   /**
+   * Cập nhật nội dung bài học (Admin) — title, content (HTML), simulationGuide
+   * @param {number} lessonId
+   * @param {{ title?: string, content?: string, simulationGuide?: string }} data
+   */
+  updateLesson: async (lessonId, data) => {
+    const response = await axiosInstance.put(`/Lesson/${lessonId}`, data);
+    if (response && response.isSuccess) return response.result;
+    throw new Error(response?.errorMessage || "Không thể cập nhật bài học");
+  },
+
+  /**
    * Cấu hình danh sách bài học lý thuyết tiên quyết cho chiến dịch (Admin)
    * @param {number} campaignId - ID chiến dịch
    * @param {number[]} lessonIds - Danh sách ID bài học bắt buộc
    * @returns {Promise<object>} Kết quả cấu hình
    */
+  getQuiz: async (lessonId) => {
+    const response = await axiosInstance.get(`/Lesson/${lessonId}/quiz`);
+    if (response && response.isSuccess) return response.result;
+    throw new Error(response?.errorMessage || "Không thể tải quiz");
+  },
+
+  saveQuiz: async (lessonId, data) => {
+    const response = await axiosInstance.put(`/Lesson/${lessonId}/quiz`, data);
+    if (response && response.isSuccess) return response.result;
+    throw new Error(response?.errorMessage || "Không thể lưu quiz");
+  },
+
   setPrerequisites: async (campaignId, lessonIds) => {
     try {
       const response = await axiosInstance.post("/Lesson/set-prerequisites", {

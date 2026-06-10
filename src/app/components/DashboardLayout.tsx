@@ -5,7 +5,7 @@ import { userService } from "../services/userService";
 import {
   LayoutDashboard, BookOpen, ShieldAlert, BarChart3,
   X, Shield, LogOut, Settings, Menu, Bell, Search,
-  Users, FileCheck, LayoutGrid, Sliders, Library, ChevronDown, PlusCircle,
+  Users, FileCheck, LayoutGrid, Sliders, Library, ChevronDown, PlusCircle, Package,
 } from "lucide-react";
 
 type Role = "user" | "manager" | "admin";
@@ -14,20 +14,25 @@ interface DashboardLayoutProps {
   role: Role;
 }
 
-const navByRole: Record<Role, { to: string; label: string; icon: React.ElementType; badge?: string; end?: boolean }[]> = {
+const navByRole: Record<Role, { to: string; label: string; icon: React.ElementType; badge?: string; end?: boolean; comingSoon?: boolean }[]> = {
   user: [
+    { to: "/nguoi-dung", label: "Tổng quan", icon: LayoutDashboard, end: true },
     { to: "/nguoi-dung/lo-trinh", label: "Bài học", icon: BookOpen },
     { to: "/nguoi-dung/mo-phong", label: "Mô phỏng", icon: ShieldAlert },
+    { to: "#", label: "Báo cáo AI", icon: BarChart3, comingSoon: true },
   ],
   manager: [
     { to: "/quan-ly", label: "Tổng quan", icon: LayoutDashboard, end: true },
     { to: "/quan-ly/tao-chien-dich", label: "Tạo chiến dịch", icon: PlusCircle },
-    { to: "/quan-ly/doi-ngu", label: "Đội ngũ", icon: Users },
+    { to: "/quan-ly/nhan-vien", label: "Nhân viên", icon: Users },
     { to: "/quan-ly/bao-cao", label: "Báo cáo & AI", icon: BarChart3 },
   ],
   admin: [
     { to: "/quan-tri", label: "Tổng quan hệ thống", icon: LayoutDashboard, end: true },
+    { to: "/quan-tri/tao-chien-dich", label: "Tạo chiến dịch", icon: PlusCircle },
+    { to: "/quan-tri/bai-hoc", label: "Quản lý bài học", icon: BookOpen },
     { to: "/quan-tri/kich-ban", label: "Thư viện kịch bản", icon: Library },
+    { to: "/quan-tri/goi-dich-vu", label: "Quản lý gói dịch vụ", icon: Package },
     { to: "/quan-tri/ai-controller", label: "Bộ điều khiển AI", icon: Sliders },
     { to: "/quan-tri/quan-ly", label: "Quản lý người dùng", icon: LayoutGrid },
   ],
@@ -136,24 +141,38 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           <p className="px-3 mb-2 text-indigo-400 uppercase" style={{ fontSize: "0.65rem", letterSpacing: "0.1em", fontWeight: 600 }}>Menu chính</p>
-          {navItems.map(({ to, label, icon: Icon, badge, end }) => (
-            <NavLink
-              key={to} to={to} end={end}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${isActive ? "text-white shadow-lg" : "text-indigo-200 hover:text-white hover:bg-white/10"}`
-              }
-              style={({ isActive }) => isActive ? { background: "linear-gradient(135deg, #6366F1, #818CF8)" } : {}}
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon size={18} className={isActive ? "text-white" : "text-indigo-300 group-hover:text-white"} />
-                  <span style={{ fontWeight: isActive ? 600 : 400, fontSize: "0.9rem" }}>{label}</span>
-                  {badge && <span className="ml-auto text-white px-1.5 py-0.5 rounded-md" style={{ fontSize: "0.65rem", background: "#F59E0B", fontWeight: 700 }}>{badge}</span>}
-                </>
-              )}
-            </NavLink>
-          ))}
+          {navItems.map(({ to, label, icon: Icon, badge, end, comingSoon }) =>
+            comingSoon ? (
+              <div
+                key={label}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-not-allowed opacity-50"
+              >
+                <Icon size={18} className="text-indigo-300" />
+                <span style={{ fontSize: "0.9rem" }} className="text-indigo-200">{label}</span>
+                <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md text-indigo-300"
+                  style={{ background: "rgba(255,255,255,0.1)", letterSpacing: "0.03em" }}>
+                  Soon
+                </span>
+              </div>
+            ) : (
+              <NavLink
+                key={to} to={to} end={end}
+                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${isActive ? "text-white shadow-lg" : "text-indigo-200 hover:text-white hover:bg-white/10"}`
+                }
+                style={({ isActive }) => isActive ? { background: "linear-gradient(135deg, #6366F1, #818CF8)" } : {}}
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon size={18} className={isActive ? "text-white" : "text-indigo-300 group-hover:text-white"} />
+                    <span style={{ fontWeight: isActive ? 600 : 400, fontSize: "0.9rem" }}>{label}</span>
+                    {badge && <span className="ml-auto text-white px-1.5 py-0.5 rounded-md" style={{ fontSize: "0.65rem", background: "#F59E0B", fontWeight: 700 }}>{badge}</span>}
+                  </>
+                )}
+              </NavLink>
+            )
+          )}
         </nav>
 
         {/* Bottom */}

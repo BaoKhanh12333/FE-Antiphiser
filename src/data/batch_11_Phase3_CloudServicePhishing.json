@@ -1,0 +1,1681 @@
+{
+  "batch_id": "11",
+  "batch_name": "Phase 3 — Cloud Service Phishing",
+  "phase": 3,
+  "lesson": "3.3",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P3-CS-001",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Fear",
+      "attack_type": "Microsoft 365 Credential Harvesting",
+      "learning_objective": "Nhận diện email giả Microsoft 365 cảnh báo hộp thư sắp đầy để dụ đăng nhập",
+      "email": {
+        "sender_name": "Microsoft 365 Storage",
+        "sender_email": "storage-alert@microsoft365-storage-vn.com",
+        "recipient_email": "nguyen.thi.kim.anh@vinhomes.com.vn",
+        "subject": "Hộp thư Outlook của bạn đã dùng 97% dung lượng — Nâng cấp ngay",
+        "body": "Kính gửi Nguyễn Thị Kim Anh,\n\nHộp thư Microsoft 365 của bạn đang ở mức 97% dung lượng. Nếu không nâng cấp, bạn sẽ không thể nhận email mới từ 24:00 đêm nay.\n\nEmail bị trả về sẽ ảnh hưởng đến công việc và liên lạc với đồng nghiệp.\n\nĐăng nhập để xác nhận nâng cấp miễn phí (theo gói Enterprise của tổ chức bạn).",
+        "cta_text": "Nâng cấp dung lượng ngay",
+        "cta_link": "http://microsoft365-storage-vn.com/upgrade-storage"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "storage-alert@microsoft365-storage-vn.com",
+          "explanation": "Microsoft gửi thông báo từ @microsoft.com — 'microsoft365-storage-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "urgency_language",
+          "visible_text": "từ 24:00 đêm nay",
+          "explanation": "Deadline cùng ngày tạo áp lực hành động ngay — Microsoft thật thông báo dung lượng sớm và không có deadline chặt như vậy.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fake_free_upgrade",
+          "visible_text": "nâng cấp miễn phí",
+          "explanation": "Lời hứa nâng cấp miễn phí chỉ cần đăng nhập — bẫy để lấy thông tin đăng nhập Microsoft 365.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["microsoft365-storage-vn.com", "97% dung lượng", "24:00 đêm nay"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả cảnh báo dung lượng Microsoft 365!",
+        "summary": "Cảnh báo hộp thư đầy là mồi nhử phổ biến — tạo lo lắng về gián đoạn công việc để dụ đăng nhập vào trang giả.",
+        "learning_point": "Kiểm tra dung lượng Outlook thật: đăng nhập trực tiếp tại outlook.office365.com — không click link email. IT admin sẽ thông báo qua kênh nội bộ nếu tổ chức cần nâng cấp.",
+        "psychology_display": "Fear + Urgency",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-002",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority",
+      "attack_type": "Google Workspace Phishing",
+      "learning_objective": "Nhận diện email giả Google Workspace yêu cầu xác minh tài khoản tổ chức",
+      "email": {
+        "sender_name": "Google Workspace Admin",
+        "sender_email": "workspace-verify@google-workspace-admin.net",
+        "recipient_email": "tran.duc.minh@fpt-telecom.com.vn",
+        "subject": "Tài khoản Google Workspace cần xác minh — Bắt buộc trong 72 giờ",
+        "body": "Kính gửi Trần Đức Minh,\n\nGoogle Workspace phát hiện hoạt động bất thường trong tài khoản tổ chức của bạn. Theo chính sách bảo mật mới của Google, tất cả tài khoản có hoạt động bất thường cần xác minh trong vòng 72 giờ.\n\nTài khoản chưa xác minh sẽ bị tạm khóa quyền truy cập Gmail, Drive và Meet.\n\nXác minh ngay để tránh gián đoạn công việc.",
+        "cta_text": "Xác minh tài khoản",
+        "cta_link": "https://google-workspace-admin.net/verify-account"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "workspace-verify@google-workspace-admin.net",
+          "explanation": "Google Workspace gửi thông báo từ @google.com — 'google-workspace-admin.net' là domain giả mạo dùng .net.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "tạm khóa Gmail, Drive và Meet",
+          "explanation": "Liệt kê cụ thể các dịch vụ bị khóa tạo lo lắng về gián đoạn toàn bộ công việc — hiệu quả với người dùng phụ thuộc vào Google Workspace.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "72 giờ",
+          "explanation": "Deadline 72 giờ đủ ngắn để tạo áp lực nhưng đủ dài để trông hợp lý hơn deadline vài giờ.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["google-workspace-admin.net", "khóa Gmail Drive Meet", "72 giờ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Google Workspace Admin để chiếm tài khoản tổ chức!",
+        "summary": "Tài khoản Google Workspace của tổ chức chứa toàn bộ email, file và lịch — mục tiêu giá trị cao cho kẻ tấn công.",
+        "learning_point": "Thông báo bảo mật Google Workspace thật đến từ @google.com và hiển thị trong admin console tại admin.google.com — không chỉ qua email.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-003",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Curiosity",
+      "attack_type": "OneDrive Phishing",
+      "learning_objective": "Nhận diện email giả thông báo file được chia sẻ qua OneDrive",
+      "email": {
+        "sender_name": "OneDrive Notification",
+        "sender_email": "share-notify@onedrive-share-portal.com",
+        "recipient_email": "vo.thi.thanh.thuy@hdbank.com.vn",
+        "subject": "Võ Thị Thanh Thủy — Tài liệu quan trọng được chia sẻ với bạn",
+        "body": "Xin chào Võ Thị Thanh Thủy,\n\nNguyễn Văn Hải đã chia sẻ tài liệu OneDrive với bạn:\n\n📄 Hop_Dong_Vay_Von_HDBank_Q3_2026_draft.docx\n\nTài liệu này chứa thông tin bảo mật — chỉ bạn được xem. Tài liệu sẽ tự xóa sau 48 giờ nếu không được mở.\n\nMở tài liệu để xem nội dung.",
+        "cta_text": "Mở tài liệu",
+        "cta_link": "https://onedrive-share-portal.com/view-document"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "share-notify@onedrive-share-portal.com",
+          "explanation": "OneDrive gửi thông báo từ @microsoft.com hoặc @sharepointonline.com — 'onedrive-share-portal.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_scarcity",
+          "visible_text": "tự xóa sau 48 giờ",
+          "explanation": "OneDrive không tự xóa file chia sẻ sau 48 giờ — đây là urgency giả tạo để dụ người dùng click nhanh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "curiosity_bait",
+          "visible_text": "Hợp đồng vay vốn ... chỉ bạn được xem",
+          "explanation": "Tên file nhạy cảm liên quan đến công việc + 'chỉ bạn được xem' kích thích tò mò và cảm giác được tin tưởng.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["onedrive-share-portal.com", "tự xóa sau 48 giờ", "chỉ bạn được xem"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả thông báo chia sẻ OneDrive!",
+        "summary": "Phishing giả OneDrive rất phổ biến vì người dùng quen nhận thông báo file chia sẻ từ đồng nghiệp — ít cảnh giác hơn.",
+        "learning_point": "Thông báo chia sẻ OneDrive thật đến từ @microsoft.com và link trỏ về sharepoint.com hoặc onedrive.live.com. Nếu không chắc, vào thẳng OneDrive để kiểm tra.",
+        "psychology_display": "Curiosity + Urgency",
+        "attack_type_display": "OneDrive Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-004",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Cloud Service Phishing",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt thông báo chia sẻ Google Drive hợp lệ",
+      "email": {
+        "sender_name": "Phạm Anh Tuấn (via Google Drive)",
+        "sender_email": "drive-shares-noreply@google.com",
+        "recipient_email": "le.thi.hong.hanh@vin-edu.vn",
+        "subject": "Phạm Anh Tuấn đã chia sẻ tài liệu với bạn",
+        "body": "Phạm Anh Tuấn (pham.anh.tuan@vin-edu.vn) đã chia sẻ tài liệu sau với bạn:\n\nKế hoạch giảng dạy HK1_2026-2027.xlsx\n\nMở trong Google Sheets\n\n---\nGoogle Drive: Lưu trữ, chia sẻ và cộng tác. Miễn phí cho Google Workspace.\nBạn nhận được email này vì Phạm Anh Tuấn đã chia sẻ tài liệu với le.thi.hong.hanh@vin-edu.vn.",
+        "cta_text": "Mở trong Google Sheets",
+        "cta_link": "https://docs.google.com/spreadsheets/d/1abc123..."
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email thông báo chia sẻ file có link — dễ nhầm với phishing OneDrive/Drive",
+        "why_legitimate": "Domain @google.com chính thức. Link trỏ về docs.google.com. Người chia sẻ dùng cùng domain tổ chức @vin-edu.vn. Footer giải thích lý do nhận email. Không tạo áp lực."
+      },
+      "feedback": {
+        "title": "Đây là thông báo chia sẻ Google Drive hợp lệ!",
+        "summary": "Email từ @google.com với link docs.google.com và người chia sẻ từ cùng tổ chức — hoàn toàn hợp lệ.",
+        "learning_point": "Thông báo Drive hợp lệ: từ @google.com, link về docs.google.com/drive.google.com, có tên và email người chia sẻ rõ ràng, footer giải thích lý do nhận.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-005",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Microsoft Teams Phishing",
+      "learning_objective": "Nhận diện email giả Teams thông báo tin nhắn bị bỏ lỡ để dụ đăng nhập",
+      "email": {
+        "sender_name": "Microsoft Teams",
+        "sender_email": "teams-missed@ms-teams-notify.com",
+        "recipient_email": "hoang.thi.lan.anh@pvn.vn",
+        "subject": "Bạn đã bỏ lỡ 5 tin nhắn trong Teams — Giám đốc đang chờ phản hồi",
+        "body": "Xin chào Hoàng Thị Lan Anh,\n\nBạn có 5 tin nhắn chưa đọc trong Microsoft Teams, bao gồm tin nhắn từ Giám đốc Nguyễn Hữu Thành trong kênh Project VN-Gas Q3.\n\n🔴 Tin nhắn quan trọng từ: Nguyễn Hữu Thành (Giám đốc)\n\"Lan Anh — cần xem lại số liệu báo cáo trước 14:00...\"\n\nĐăng nhập để xem và trả lời ngay.",
+        "cta_text": "Mở Microsoft Teams",
+        "cta_link": "https://ms-teams-notify.com/open-teams"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "teams-missed@ms-teams-notify.com",
+          "explanation": "Microsoft Teams gửi thông báo từ @microsoft.com hoặc @teams.microsoft.com — 'ms-teams-notify.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_pressure",
+          "visible_text": "Giám đốc đang chờ phản hồi",
+          "explanation": "Đề cập Giám đốc đang chờ tạo áp lực phải phản hồi ngay — người dùng sợ bị đánh giá là không chú ý công việc.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "preview_bait",
+          "visible_text": "\"Lan Anh — cần xem lại số liệu báo cáo trước 14:00...\"",
+          "explanation": "Preview tin nhắn bị cắt giữa chừng kích thích tò mò muốn xem nội dung đầy đủ — dụ người dùng click để đọc tiếp.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["ms-teams-notify.com", "Giám đốc đang chờ", "trước 14:00"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả thông báo Teams từ Giám đốc!",
+        "summary": "Kết hợp 'tin nhắn bị bỏ lỡ' + 'Giám đốc đang chờ' + preview bị cắt — ba yếu tố tâm lý cùng lúc khiến người dùng click ngay.",
+        "learning_point": "Thông báo Teams thật đến từ @microsoft.com và app Teams trên máy tính/điện thoại. Nếu có tin nhắn quan trọng, nó sẽ hiện trong app — không cần click link email.",
+        "psychology_display": "Authority + Curiosity + FOMO",
+        "attack_type_display": "Teams Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-006",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Fear + Authority",
+      "attack_type": "Azure AD / Entra ID Phishing",
+      "learning_objective": "Nhận diện phishing nhắm vào tài khoản Azure AD — mục tiêu cao giá vì có quyền admin hệ thống",
+      "email": {
+        "sender_name": "Microsoft Azure Security",
+        "sender_email": "azure-security@microsoftazure-alert.com",
+        "recipient_email": "it.admin@ocean-group.com.vn",
+        "subject": "CẢNH BÁO: Tài khoản Azure AD phát hiện đăng nhập từ IP độc hại",
+        "body": "Kính gửi IT Administrator,\n\nMicrosoft Azure Defender phát hiện đăng nhập vào tài khoản Azure AD của tổ chức từ IP được gắn cờ là độc hại:\n\nIP: 185.220.xxx.xxx (Tor Exit Node — Nga)\nThời gian: 02:17 sáng nay\nTài khoản: it.admin@ocean-group.com.vn\n\nQuyền admin của tài khoản này nếu bị xâm phạm có thể ảnh hưởng toàn bộ hệ thống tổ chức. Xác minh và thu hồi quyền truy cập ngay.",
+        "cta_text": "Xem lại và thu hồi quyền truy cập",
+        "cta_link": "https://microsoftazure-alert.com/security-review"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "azure-security@microsoftazure-alert.com",
+          "explanation": "Microsoft Azure gửi cảnh báo từ @microsoft.com hoặc @azure.com — 'microsoftazure-alert.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "high_value_target",
+          "visible_text": "Tor Exit Node — Nga",
+          "explanation": "Chi tiết kỹ thuật nghe đáng sợ (Tor, IP Nga) được thiết kế để gây hoảng loạn với IT admin — người thường phản ứng nhanh với mối đe dọa kỹ thuật.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "systemic_threat",
+          "visible_text": "có thể ảnh hưởng toàn bộ hệ thống tổ chức",
+          "explanation": "Nhấn mạnh tầm ảnh hưởng toàn tổ chức tạo áp lực trách nhiệm — IT admin sợ bị quy trách nhiệm nếu không xử lý ngay.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["microsoftazure-alert.com", "Tor Exit Node Nga", "02:17 sáng nay"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Phishing nhắm IT Admin — mục tiêu đặc biệt nguy hiểm!",
+        "summary": "IT admin là mục tiêu giá trị nhất vì có quyền admin toàn hệ thống. Kẻ tấn công dùng chi tiết kỹ thuật đáng sợ để khai thác phản xạ xử lý sự cố của IT.",
+        "learning_point": "Cảnh báo Azure Security thật hiển thị trong Azure Portal (portal.azure.com) và Microsoft Defender. IT admin nên truy cập portal trực tiếp — không click link email khi xử lý incident.",
+        "psychology_display": "Fear + Authority",
+        "attack_type_display": "Azure AD Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-007",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Curiosity + Trust",
+      "attack_type": "Dropbox / Cloud Storage Phishing",
+      "learning_objective": "Nhận diện email giả dịch vụ lưu trữ đám mây (Dropbox) chia sẻ file nhạy cảm",
+      "email": {
+        "sender_name": "Dropbox Business",
+        "sender_email": "no-reply@dropbox-business-share.com",
+        "recipient_email": "dao.van.quang@baria-petro.com.vn",
+        "subject": "Báo cáo tài chính nội bộ Q1/2026 được chia sẻ bảo mật với bạn",
+        "body": "Xin chào Đào Văn Quang,\n\nMột tài liệu bảo mật đã được chia sẻ với bạn qua Dropbox Business:\n\n🔒 Financial_Report_Internal_Q1_2026_Confidential.pdf\nChia sẻ bởi: finance@baria-petro.com.vn\nHết hạn: 07/06/2026\n\nTài liệu được mã hóa và chỉ có thể xem bằng tài khoản Dropbox Business của tổ chức.",
+        "cta_text": "Xem tài liệu bảo mật",
+        "cta_link": "https://dropbox-business-share.com/secure-view"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "no-reply@dropbox-business-share.com",
+          "explanation": "Dropbox gửi thông báo từ @dropbox.com — 'dropbox-business-share.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "curiosity_bait",
+          "visible_text": "Financial_Report_Internal_Q1_2026_Confidential.pdf",
+          "explanation": "Tên file 'Confidential' kết hợp với nội dung tài chính nội bộ kích thích tò mò mạnh — đặc biệt với người có liên quan đến tài chính.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fake_expiry",
+          "visible_text": "Hết hạn: 07/06/2026",
+          "explanation": "Ngày hết hạn gần (ngày mai hoặc vài ngày nữa) tạo FOMO — người dùng muốn xem trước khi 'hết hạn'.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["dropbox-business-share.com", "Confidential", "Hết hạn: 07/06/2026"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Dropbox chia sẻ tài liệu 'Confidential'!",
+        "summary": "Tên file có chữ 'Confidential' + ngày hết hạn sắp tới + yêu cầu đăng nhập = công thức phishing Cloud Storage hiệu quả.",
+        "learning_point": "Dropbox thật chia sẻ file qua link dropbox.com. Nếu đồng nghiệp chia sẻ file qua Dropbox, họ sẽ thông báo qua chat/email nội bộ trước.",
+        "psychology_display": "Curiosity + FOMO",
+        "attack_type_display": "Cloud Storage Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-008",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Cloud Service Phishing",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt thông báo bảo mật Microsoft 365 hợp lệ — có link nhưng là link thật",
+      "email": {
+        "sender_name": "Microsoft account team",
+        "sender_email": "account-security-noreply@accountprotection.microsoft.com",
+        "recipient_email": "bui.van.duc@mekong-bank.com.vn",
+        "subject": "Đánh giá hoạt động bảo mật gần đây cho Bùi Văn Đức",
+        "body": "Bùi Văn Đức,\n\nĐây là tóm tắt hoạt động bảo mật tài khoản Microsoft của bạn trong tháng qua:\n\n✓ Đăng nhập thành công: 47 lần\n✓ Thiết bị đã dùng: Windows 11 (Laptop công ty), iPhone 15\n✓ Địa điểm: TP.HCM, Việt Nam\n\nKhông phát hiện hoạt động bất thường.\n\nNếu bạn nhận thấy hoạt động không nhận ra, xem lại tại mysignins.microsoft.com.\n\nMicrosoft sẽ không bao giờ yêu cầu mật khẩu qua email.",
+        "cta_text": "Xem lại hoạt động",
+        "cta_link": "https://mysignins.microsoft.com"
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email bảo mật từ Microsoft có link — dễ nhầm với phishing",
+        "why_legitimate": "Domain @accountprotection.microsoft.com là domain chính thức Microsoft. Link trỏ về mysignins.microsoft.com — domain thật. Không có áp lực hay deadline. Nội dung thông tin (không yêu cầu hành động). Email có câu 'Microsoft không yêu cầu mật khẩu qua email'."
+      },
+      "feedback": {
+        "title": "Đây là email bảo mật Microsoft hợp lệ!",
+        "summary": "Email từ @accountprotection.microsoft.com (domain chính thức) với link mysignins.microsoft.com thật, không áp lực, và có cảnh báo bảo mật chủ động.",
+        "learning_point": "Microsoft gửi tóm tắt bảo mật định kỳ từ @accountprotection.microsoft.com — đây là hợp lệ. Phân biệt với phishing: không có áp lực, link về domain microsoft.com thật.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-009",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust + Authority",
+      "attack_type": "SharePoint Impersonation",
+      "learning_objective": "Nhận diện phishing giả SharePoint nội bộ — link có tên công ty trong URL nhưng domain là giả",
+      "email": {
+        "sender_name": "SharePoint — Masan Group",
+        "sender_email": "sharepoint@masan-sharepoint-internal.com",
+        "recipient_email": "le.thi.quynh.nhu@masan.com.vn",
+        "subject": "Bạn được yêu cầu ký duyệt tài liệu trên SharePoint",
+        "body": "Xin chào Lê Thị Quỳnh Như,\n\nNguyễn Văn Thắng — Giám đốc Chiến lược đã gửi tài liệu cần chữ ký phê duyệt của bạn trên SharePoint nội bộ Masan:\n\n📋 Ke_Hoach_Mo_Rong_2026_2028_Final.docx\nYêu cầu phê duyệt trước: 06/06/2026 17:00\n\nĐăng nhập SharePoint nội bộ Masan để xem và ký duyệt.",
+        "cta_text": "Đăng nhập SharePoint Masan",
+        "cta_link": "https://masan-sharepoint-internal.com/masan/approve-document"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "sharepoint@masan-sharepoint-internal.com",
+          "explanation": "SharePoint nội bộ Masan chạy trên domain masan.sharepoint.com hoặc masan.com.vn — 'masan-sharepoint-internal.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_internal_url",
+          "visible_text": "https://masan-sharepoint-internal.com/masan/",
+          "explanation": "URL có chữ 'masan' trong path nhưng domain chính là 'masan-sharepoint-internal.com' — domain bên ngoài. Kẻ tấn công dùng tên tổ chức trong path để đánh lừa khi đọc nhanh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "approval_pressure",
+          "visible_text": "Yêu cầu phê duyệt trước: 06/06/2026 17:00",
+          "explanation": "Deadline phê duyệt cụ thể tạo áp lực công việc — người có quyền ký duyệt không muốn làm delay quy trình.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["masan-sharepoint-internal.com", "/masan/ trong path", "phê duyệt trước 17:00"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "SharePoint giả với tên công ty trong URL — rất khó nhận ra!",
+        "summary": "URL 'masan-sharepoint-internal.com/masan/' có tên tổ chức ở cả domain lẫn path — người đọc nhanh dễ tưởng đây là SharePoint thật.",
+        "learning_point": "SharePoint nội bộ thật có URL dạng: [company].sharepoint.com hoặc intranet.[company].com.vn. Luôn kiểm tra phần domain chính — không phải path.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "SharePoint Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-010",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority + Compliance",
+      "attack_type": "Conditional Access Phishing",
+      "learning_objective": "Nhận diện phishing giả yêu cầu Conditional Access — kỹ thuật mới nhắm IT và người dùng doanh nghiệp",
+      "email": {
+        "sender_name": "Azure Active Directory",
+        "sender_email": "aad-notify@azure-aad-conditional.com",
+        "recipient_email": "pham.hoang.nam@pvcombank.com.vn",
+        "subject": "Thiết bị của bạn không đáp ứng Conditional Access Policy — Cần hành động",
+        "body": "Kính gửi Phạm Hoàng Nam,\n\nThiết bị bạn đang dùng không đáp ứng chính sách Conditional Access mới của tổ chức (Compliant Device Required — Policy ID: CA-2026-089).\n\nKể từ 08:00 ngày 07/06/2026, thiết bị không tuân thủ sẽ bị chặn truy cập Microsoft 365, Teams và tài nguyên nội bộ.\n\nĐể đưa thiết bị vào trạng thái Compliant, tải và cài đặt agent Intune mới nhất.",
+        "cta_text": "Tải Intune Compliance Agent",
+        "cta_link": "https://azure-aad-conditional.com/intune-agent-download"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "aad-notify@azure-aad-conditional.com",
+          "explanation": "Azure AD thông báo từ @microsoft.com — 'azure-aad-conditional.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "malware_delivery_via_download",
+          "visible_text": "tải và cài đặt agent Intune mới nhất",
+          "explanation": "Yêu cầu tải phần mềm 'agent' từ link email — đây thực ra là malware. Intune thật được quản lý hoàn toàn bởi IT, không cần người dùng tự tải.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "technical_jargon_intimidation",
+          "visible_text": "Conditional Access — Policy ID: CA-2026-089",
+          "explanation": "Dùng thuật ngữ kỹ thuật cụ thể (Policy ID) tạo cảm giác email đến từ hệ thống thật — người dùng không chuyên IT ít khi kiểm tra lại.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["azure-aad-conditional.com", "tải Intune agent", "Policy ID: CA-2026-089"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Conditional Access để phát tán malware!",
+        "summary": "Kẻ tấn công dùng thuật ngữ IT chính xác (Conditional Access, Intune, Compliant Device) để đánh lừa cả người dùng lẫn IT không cảnh giác.",
+        "learning_point": "Intune và Conditional Access được quản lý hoàn toàn bởi IT — người dùng KHÔNG BAO GIỜ tự tải agent từ link email. Nhận thông báo dạng này: báo IT ngay.",
+        "psychology_display": "Authority + Compliance",
+        "attack_type_display": "Malware via Fake IT Tool"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-011",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust",
+      "attack_type": "OAuth App Consent Phishing",
+      "learning_objective": "Nhận diện phishing ứng dụng OAuth độc hại yêu cầu quyền truy cập toàn bộ Microsoft 365",
+      "email": {
+        "sender_name": "Microsoft AppSource",
+        "sender_email": "appsource@microsoft-appsource-vn.com",
+        "recipient_email": "nguyen.thi.minh.chau@ssi.com.vn",
+        "subject": "Lời mời dùng thử: SSI Analytics Pro — Ứng dụng phân tích chứng khoán Microsoft 365",
+        "body": "Kính gửi Nguyễn Thị Minh Châu,\n\nBạn được mời dùng thử miễn phí SSI Analytics Pro — ứng dụng phân tích chứng khoán tích hợp Microsoft 365 dành riêng cho khách hàng SSI.\n\nỨng dụng tự động tổng hợp dữ liệu từ email, lịch và OneDrive để tạo báo cáo đầu tư cá nhân hóa.\n\nKết nối tài khoản Microsoft 365 để bắt đầu dùng thử 30 ngày miễn phí.",
+        "cta_text": "Kết nối Microsoft 365",
+        "cta_link": "https://microsoft-appsource-vn.com/ssi-analytics-consent"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "appsource@microsoft-appsource-vn.com",
+          "explanation": "Microsoft AppSource dùng @microsoft.com — 'microsoft-appsource-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "oauth_consent_phishing",
+          "visible_text": "tổng hợp dữ liệu từ email, lịch và OneDrive",
+          "explanation": "Ứng dụng yêu cầu quyền đọc email, lịch và OneDrive — nếu đồng ý OAuth consent, kẻ tấn công có toàn quyền truy cập mà không cần mật khẩu, kể cả sau khi đổi mật khẩu.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "brand_impersonation",
+          "visible_text": "dành riêng cho khách hàng SSI",
+          "explanation": "Giả vờ là ứng dụng dành riêng cho SSI tạo cảm giác được IT SSI đã vetting — người dùng tin tưởng hơn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["microsoft-appsource-vn.com", "email, lịch và OneDrive", "dành riêng cho SSI"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "OAuth Consent Phishing — quyền truy cập mãi mãi dù đổi mật khẩu!",
+        "summary": "Nếu đồng ý OAuth, ứng dụng độc hại có thể đọc toàn bộ email và OneDrive vô thời hạn — kể cả sau khi đổi mật khẩu, vì dùng access token riêng.",
+        "learning_point": "Chỉ cài ứng dụng Microsoft 365 được IT phê duyệt và có trong danh sách whitelist. Kiểm tra ứng dụng đã được cấp quyền tại: myapps.microsoft.com.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "OAuth Consent Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-012",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Fear",
+      "attack_type": "Zoom Credential Harvesting",
+      "learning_objective": "Nhận diện phishing giả Zoom thông báo tài khoản bị đình chỉ do vi phạm Terms of Service",
+      "email": {
+        "sender_name": "Zoom Account Support",
+        "sender_email": "support@zoom-account-vn.com",
+        "recipient_email": "nguyen.thi.hoa.lan@gemadept.com.vn",
+        "subject": "Tài khoản Zoom của bạn bị đình chỉ — Kháng cáo trong 48 giờ",
+        "body": "Kính gửi Nguyễn Thị Hoa Lan,\n\nZoom đã phát hiện vi phạm Điều khoản Dịch vụ từ tài khoản của bạn (ID: zoom_hoa.lan@gemadept.com.vn). Tài khoản đã bị đình chỉ tạm thời.\n\nHành vi vi phạm: Sử dụng Zoom để phát sóng nội dung vi phạm bản quyền.\n\nNếu đây là nhầm lẫn, đăng nhập để kháng cáo trong 48 giờ. Sau thời hạn, tài khoản sẽ bị xóa vĩnh viễn.",
+        "cta_text": "Đăng nhập kháng cáo",
+        "cta_link": "http://zoom-account-vn.com/appeal-suspension"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "support@zoom-account-vn.com",
+          "explanation": "Zoom dùng @zoom.us — 'zoom-account-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "false_violation_claim",
+          "visible_text": "phát sóng nội dung vi phạm bản quyền",
+          "explanation": "Cáo buộc vi phạm cụ thể tạo hoảng loạn và cảm giác cần phải kháng cáo ngay — người dùng phản xạ muốn tự bảo vệ.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "account_deletion_threat",
+          "visible_text": "tài khoản sẽ bị xóa vĩnh viễn",
+          "explanation": "Đe dọa mất tài khoản Zoom vĩnh viễn — đặc biệt nguy hiểm với người dùng doanh nghiệp phụ thuộc vào Zoom cho công việc.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "zoom-account-vn.com",
+        "vi phạm bản quyền",
+        "xóa vĩnh viễn"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Zoom đình chỉ tài khoản để lấy thông tin đăng nhập!",
+        "summary": "Zoom dùng @zoom.us. Thông báo đình chỉ thật hiển thị khi đăng nhập vào zoom.us — không qua email từ domain khác.",
+        "learning_point": "Kiểm tra trạng thái tài khoản Zoom tại zoom.us/account — gõ tay URL. Zoom không gửi cảnh báo vi phạm từ domain ngoài zoom.us.",
+        "psychology_display": "Fear + Legal Threat",
+        "attack_type_display": "Zoom Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-013",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Urgency",
+      "attack_type": "Google Drive Storage Full Scam",
+      "learning_objective": "Nhận diện phishing giả Google Drive cảnh báo lưu trữ đầy để dụ đăng nhập",
+      "email": {
+        "sender_name": "Google Drive Storage",
+        "sender_email": "storage@google-drive-storage-vn.com",
+        "recipient_email": "bui.thi.xuan@hoanganhgroup.com.vn",
+        "subject": "Google Drive của bạn đầy 99% — File bị xóa trong 24 giờ",
+        "body": "Xin chào Bùi Thị Xuân,\n\nGoogle Drive của bạn đã dùng 14.8 GB / 15 GB (99%). Nếu không giải phóng dung lượng hoặc nâng cấp, Google sẽ tự động xóa các file cũ nhất để giải phóng không gian sau 24 giờ.\n\nNâng cấp lên Google One 100 GB với giá đặc biệt 19.000đ/tháng (thay vì 49.000đ) — chỉ trong hôm nay.",
+        "cta_text": "Nâng cấp và bảo vệ file ngay",
+        "cta_link": "https://google-drive-storage-vn.com/upgrade-storage"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "storage@google-drive-storage-vn.com",
+          "explanation": "Google Drive dùng @google.com — 'google-drive-storage-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "false_deletion_threat",
+          "visible_text": "Google sẽ tự động xóa các file cũ nhất",
+          "explanation": "Google không tự động xóa file khi Drive đầy — chỉ ngừng đồng bộ. Đây là đe dọa sai sự thật để tạo hoảng loạn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fake_discount",
+          "visible_text": "19.000đ/tháng thay vì 49.000đ — chỉ hôm nay",
+          "explanation": "Giá ưu đãi chỉ trong ngày hôm nay tạo FOMO — dụ nhập thông tin thẻ tín dụng vào trang thanh toán giả.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "google-drive-storage-vn.com",
+        "tự động xóa file",
+        "19.000đ chỉ hôm nay"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Google Drive cảnh báo xóa file để lấy thẻ tín dụng!",
+        "summary": "Google không tự động xóa file và dùng @google.com. Nâng cấp Google One thật tại one.google.com.",
+        "learning_point": "Kiểm tra dung lượng Drive thật tại drive.google.com/settings. Google One nâng cấp tại one.google.com — không qua link email từ domain lạ.",
+        "psychology_display": "Fear + FOMO",
+        "attack_type_display": "Cloud Storage Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-014",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority",
+      "attack_type": "Slack Credential Harvesting",
+      "learning_objective": "Nhận diện phishing giả Slack thông báo workspace bị deactivate",
+      "email": {
+        "sender_name": "Slack Workspace Admin",
+        "sender_email": "admin@slack-workspace-vn.com",
+        "recipient_email": "tran.van.phong@pvn.vn",
+        "subject": "Slack Workspace pvn.slack.com sắp bị deactivate — Hành động ngay",
+        "body": "Kính gửi Trần Văn Phong,\n\nSlack thông báo workspace pvn.slack.com sẽ bị deactivate vào 01/07/2026 do không đủ điều kiện gói Enterprise Grid.\n\nToàn bộ lịch sử tin nhắn, file chia sẻ và kênh thảo luận sẽ bị xóa vĩnh viễn.\n\nĐăng nhập ngay để chuyển đổi gói hoặc xuất dữ liệu trước khi mất.",
+        "cta_text": "Lưu dữ liệu Slack ngay",
+        "cta_link": "https://slack-workspace-vn.com/save-data"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "admin@slack-workspace-vn.com",
+          "explanation": "Slack dùng @slack.com — 'slack-workspace-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "data_loss_threat",
+          "visible_text": "lịch sử tin nhắn, file chia sẻ và kênh sẽ bị xóa vĩnh viễn",
+          "explanation": "Đe dọa mất toàn bộ dữ liệu Slack tạo panic — đặc biệt với team phụ thuộc Slack cho giao tiếp và lưu trữ file.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "slack-workspace-vn.com",
+        "xóa vĩnh viễn",
+        "deactivate"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Slack thông báo xóa workspace để lấy thông tin đăng nhập!",
+        "summary": "Slack dùng @slack.com. Thông báo workspace thật hiển thị trong app Slack và email từ @slack.com.",
+        "learning_point": "Kiểm tra trạng thái workspace Slack tại slack.com/admin — không click link từ email domain ngoài.",
+        "psychology_display": "Fear + Data Loss",
+        "attack_type_display": "Slack Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-015",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Curiosity",
+      "attack_type": "Trello / Project Management Phishing",
+      "learning_objective": "Nhận diện phishing giả thông báo được thêm vào board Trello quan trọng",
+      "email": {
+        "sender_name": "Trello Notification",
+        "sender_email": "notify@trello-vn-board.com",
+        "recipient_email": "le.minh.duc@kinhdo.com.vn",
+        "subject": "Bạn được thêm vào board: Kế hoạch M&A bí mật 2026 — Xem ngay",
+        "body": "Xin chào Lê Minh Đức,\n\nNguyễn Thanh Hải (CEO) đã thêm bạn vào board Trello:\n\n🔒 Kế hoạch M&A bí mật 2026\n\nBoard này chứa thông tin chiến lược quan trọng. Đăng nhập Trello để xem nội dung được chia sẻ.",
+        "cta_text": "Xem board Trello",
+        "cta_link": "https://trello-vn-board.com/board/ma-plan-2026"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "notify@trello-vn-board.com",
+          "explanation": "Trello dùng @trello.com — 'trello-vn-board.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "high_value_curiosity_bait",
+          "visible_text": "Kế hoạch M&A bí mật 2026",
+          "explanation": "Tên board 'M&A bí mật' kết hợp với tên CEO tạo curiosity cực mạnh — người dùng rất muốn xem thông tin chiến lược.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "trello-vn-board.com",
+        "M&A bí mật",
+        "CEO thêm vào"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả thông báo Trello 'M&A bí mật' để lấy thông tin đăng nhập!",
+        "summary": "Trello dùng @trello.com. Thông báo thật hiện trong app Trello — không từ 'trello-vn-board.com'.",
+        "learning_point": "Mở app Trello trực tiếp để kiểm tra board mới được chia sẻ. Không đăng nhập Trello qua link email từ domain ngoài trello.com.",
+        "psychology_display": "Curiosity + Authority",
+        "attack_type_display": "Project Tool Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-016",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Fear + Urgency",
+      "attack_type": "GitHub / GitLab Credential Harvesting",
+      "learning_objective": "Nhận diện phishing giả GitHub cảnh báo repository bị expose public",
+      "email": {
+        "sender_name": "GitHub Security",
+        "sender_email": "security@github-security-vn.com",
+        "recipient_email": "dev.lead@fsoft.com.vn",
+        "subject": "CRITICAL: Repository fsoft/internal-api bị đổi thành Public — Hành động ngay",
+        "body": "Xin chào Dev Lead,\n\nGitHub Security phát hiện repository 'fsoft/internal-api' của tổ chức bạn vừa bị thay đổi từ Private sang Public lúc 02:14 sáng nay.\n\nSource code, API keys và secrets có thể đã bị lộ ra internet. Khóa repository và rotate credentials ngay.",
+        "cta_text": "Khóa repository ngay",
+        "cta_link": "https://github-security-vn.com/emergency-lock"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@github-security-vn.com",
+          "explanation": "GitHub gửi cảnh báo từ @github.com — 'github-security-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "developer_panic_trigger",
+          "visible_text": "API keys và secrets có thể đã bị lộ",
+          "explanation": "Cảnh báo lộ API keys và secrets tạo nỗi sợ cực lớn với developer — họ phản ứng ngay lập tức không kiểm tra domain.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "github-security-vn.com",
+        "API keys lộ",
+        "02:14 sáng"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả GitHub cảnh báo repo lộ để lấy thông tin đăng nhập developer!",
+        "summary": "GitHub dùng @github.com. Kiểm tra repository visibility tại github.com/org/repo — gõ tay URL.",
+        "learning_point": "GitHub Security alerts từ @github.com và hiển thị trong Security tab của repository. Không đăng nhập GitHub qua link email từ domain ngoài.",
+        "psychology_display": "Technical Fear + Urgency",
+        "attack_type_display": "GitHub Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-017",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Cloud Service Phishing",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt thông báo bảo mật Atlassian/Jira hợp lệ",
+      "email": {
+        "sender_name": "Atlassian",
+        "sender_email": "no-reply@atlassian.com",
+        "recipient_email": "nguyen.van.cuong@vng.com.vn",
+        "subject": "Tóm tắt bảo mật tài khoản Atlassian — Tháng 5/2026",
+        "body": "Xin chào Nguyễn Văn Cường,\n\nĐây là tóm tắt hoạt động bảo mật tài khoản Atlassian của bạn trong tháng 5/2026:\n\n• Đăng nhập: 47 phiên từ TP.HCM, Việt Nam\n• Ứng dụng được truy cập: Jira, Confluence, Bitbucket\n• Không có hoạt động đáng ngờ nào được phát hiện\n\nNếu bạn nhận thấy hoạt động không quen thuộc, hãy truy cập id.atlassian.com/manage-profile/security\n\nAtlassian sẽ không bao giờ yêu cầu mật khẩu qua email.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email bảo mật từ Atlassian — có thể nhầm với phishing Jira/Confluence",
+        "why_legitimate": "Domain @atlassian.com chính thức. Không có link đáng ngờ. Hướng dẫn vào id.atlassian.com để xử lý. Câu 'không yêu cầu mật khẩu qua email'. Không có CTA áp lực."
+      },
+      "feedback": {
+        "title": "Đây là tóm tắt bảo mật Atlassian hợp lệ!",
+        "summary": "Email từ @atlassian.com, không có link đáng ngờ, hướng dẫn đến id.atlassian.com, và chủ động cảnh báo không hỏi mật khẩu — hợp lệ.",
+        "learning_point": "Tóm tắt bảo mật cloud service hợp lệ: từ domain chính thức, không CTA áp lực, hướng dẫn vào portal chính thức để xử lý, có cảnh báo bảo mật chủ động.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-018",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Microsoft License Expiry Scam",
+      "learning_objective": "Nhận diện phishing giả Microsoft thông báo license Microsoft 365 hết hạn để dụ đăng nhập và cập nhật thẻ",
+      "email": {
+        "sender_name": "Microsoft 365 Billing",
+        "sender_email": "billing@microsoft365-vn-billing.com",
+        "recipient_email": "it.admin@phuoclong.com.vn",
+        "subject": "License Microsoft 365 Business Premium hết hạn sau 3 ngày — Gia hạn ngay",
+        "body": "Kính gửi IT Admin Phước Long,\n\nGói Microsoft 365 Business Premium (25 licenses) của tổ chức bạn sẽ hết hạn vào ngày 10/06/2026.\n\nNếu không gia hạn:\n• Email và Teams ngừng hoạt động\n• OneDrive chỉ đọc\n• SharePoint bị khóa sau 30 ngày\n\nGia hạn ngay để tránh gián đoạn. Cập nhật phương thức thanh toán qua cổng quản lý license.",
+        "cta_text": "Gia hạn Microsoft 365",
+        "cta_link": "https://microsoft365-vn-billing.com/renew-license"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "billing@microsoft365-vn-billing.com",
+          "explanation": "Microsoft gửi thông báo billing từ @microsoft.com — 'microsoft365-vn-billing.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "service_disruption_threat",
+          "visible_text": "Email và Teams ngừng hoạt động",
+          "explanation": "Liệt kê cụ thể các dịch vụ bị ngừng tạo lo lắng về gián đoạn toàn công ty — đặc biệt với IT admin chịu trách nhiệm uptime.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "payment_update_via_link",
+          "visible_text": "Cập nhật phương thức thanh toán qua cổng",
+          "explanation": "Yêu cầu cập nhật thẻ tín dụng qua link email từ domain ngoài — trang giả sẽ lấy thông tin thẻ doanh nghiệp.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "microsoft365-vn-billing.com",
+        "Email và Teams ngừng",
+        "cập nhật thanh toán"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả thông báo hết hạn Microsoft 365 để lấy thẻ doanh nghiệp!",
+        "summary": "Microsoft billing dùng @microsoft.com. Quản lý license tại admin.microsoft.com — không qua link email từ domain ngoài.",
+        "learning_point": "Kiểm tra license Microsoft 365 tại admin.microsoft.com/Adminportal/Home#/subscriptions — gõ tay URL. Microsoft không gửi thông báo gia hạn từ domain ngoài microsoft.com.",
+        "psychology_display": "Authority + Fear of Downtime",
+        "attack_type_display": "License Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-019",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust",
+      "attack_type": "Google Workspace Admin Console Phishing",
+      "learning_objective": "Nhận diện phishing nhắm Google Workspace admin — giả thông báo security incident từ admin console",
+      "email": {
+        "sender_name": "Google Workspace Security Center",
+        "sender_email": "security-center@google-workspace-security.com",
+        "recipient_email": "admin@techviet.com.vn",
+        "subject": "Security Center Alert: 3 tài khoản bị xâm phạm trong domain techviet.com.vn",
+        "body": "Kính gửi Admin,\n\nGoogle Workspace Security Center phát hiện 3 tài khoản trong domain techviet.com.vn có dấu hiệu bị xâm phạm:\n\n• nguyen.van.a@techviet.com.vn — đăng nhập từ Belarus\n• tran.thi.b@techviet.com.vn — forward email đến địa chỉ lạ\n• le.van.c@techviet.com.vn — download bất thường Google Drive\n\nĐăng nhập Admin Console để xem report đầy đủ và thực hiện remediation.",
+        "cta_text": "Xem Security Report",
+        "cta_link": "https://google-workspace-security.com/admin-security-report"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security-center@google-workspace-security.com",
+          "explanation": "Google Workspace Security Center dùng @google.com — 'google-workspace-security.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "specific_account_threat",
+          "visible_text": "3 tài khoản bị xâm phạm trong domain",
+          "explanation": "Liệt kê tên tài khoản cụ thể (dù là giả) tạo cảm giác thật — admin hoảng loạn vì nghĩ hệ thống đang bị tấn công thật.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "google-workspace-security.com",
+        "3 tài khoản bị xâm phạm",
+        "Belarus"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Google Security Center nhắm Workspace admin!",
+        "summary": "Google Workspace Security Center dùng @google.com. Security alerts thật hiển thị trong admin.google.com/ac/security.",
+        "learning_point": "Kiểm tra security alerts Google Workspace tại admin.google.com — gõ tay URL. Google không gửi security report từ domain ngoài google.com.",
+        "psychology_display": "Authority + Technical Fear",
+        "attack_type_display": "Admin Console Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-020",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Fear",
+      "attack_type": "iCloud Phishing",
+      "learning_objective": "Nhận diện phishing giả iCloud thông báo thiết bị bị khóa qua Find My iPhone",
+      "email": {
+        "sender_name": "Apple iCloud",
+        "sender_email": "find-my@icloud-device-vn.com",
+        "recipient_email": "tran.thi.bao.ngoc@gmail.com",
+        "subject": "iPhone 15 của bạn bị đánh dấu mất — Mở khóa ngay",
+        "body": "Xin chào Trần Thị Bảo Ngọc,\n\niCloud đã nhận được yêu cầu đánh dấu iPhone 15 (SN: F4GT7H8K9M) của bạn là 'Đã mất' qua Find My iPhone.\n\nNếu đây là nhầm lẫn, đăng nhập iCloud ngay để hủy lệnh và mở khóa thiết bị. Sau 24 giờ, thiết bị sẽ bị khóa vĩnh viễn và dữ liệu có thể bị xóa từ xa.",
+        "cta_text": "Mở khóa iPhone ngay",
+        "cta_link": "https://icloud-device-vn.com/unlock-device"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "find-my@icloud-device-vn.com",
+          "explanation": "Apple iCloud dùng @apple.com — 'icloud-device-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "device_lock_panic",
+          "visible_text": "bị khóa vĩnh viễn và dữ liệu bị xóa từ xa",
+          "explanation": "Đe dọa mất thiết bị iPhone và toàn bộ dữ liệu tạo nỗi sợ mạnh — đặc biệt với người có nhiều dữ liệu cá nhân trên iPhone.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "icloud-device-vn.com",
+        "khóa vĩnh viễn",
+        "xóa từ xa"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả iCloud khóa iPhone để chiếm tài khoản Apple ID!",
+        "summary": "Apple dùng @apple.com. Quản lý Find My iPhone tại icloud.com/find — gõ tay URL.",
+        "learning_point": "Kiểm tra Find My tại icloud.com — gõ tay URL, không click link email. Apple không gửi thông báo Find My từ domain ngoài apple.com/icloud.com.",
+        "psychology_display": "Fear + Device Loss",
+        "attack_type_display": "iCloud Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-021",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority",
+      "attack_type": "AWS Cost Alert Phishing",
+      "learning_objective": "Nhận diện phishing giả cảnh báo chi phí AWS bất thường để lấy thông tin đăng nhập",
+      "email": {
+        "sender_name": "AWS Billing Alert",
+        "sender_email": "billing@aws-cost-alert-vn.com",
+        "recipient_email": "devops@topdev.vn",
+        "subject": "AWS Cost Alert: Chi phí tháng này tăng 2.400% — Kiểm tra ngay",
+        "body": "Kính gửi TopDev DevOps Team,\n\nAWS Cost Explorer phát hiện chi phí tháng 6/2026 của tài khoản AWS tăng bất thường:\n\nDự kiến chi phí tháng 6: $47,832 USD\nCùng kỳ tháng 5: $1,923 USD\nMức tăng: +2,387%\n\nNguyên nhân có thể: EC2 instance bị spawn không kiểm soát hoặc crypto mining attack.\n\nĐăng nhập AWS Console ngay để kiểm tra và dừng các resources bất thường.",
+        "cta_text": "Kiểm tra AWS Cost Explorer",
+        "cta_link": "https://aws-cost-alert-vn.com/cost-explorer"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "billing@aws-cost-alert-vn.com",
+          "explanation": "AWS gửi billing alerts từ @amazon.com hoặc @aws.amazon.com — 'aws-cost-alert-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "financial_shock_tactic",
+          "visible_text": "$47,832 USD tăng 2,387%",
+          "explanation": "Con số tăng đột biến cực lớn tạo cú sốc tài chính — DevOps panic và click link ngay để 'dừng thiệt hại'.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "aws-cost-alert-vn.com",
+        "$47,832 tăng 2387%",
+        "crypto mining attack"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả AWS cost alert để chiếm tài khoản AWS!",
+        "summary": "AWS billing alerts từ @amazon.com. Cost Explorer thật tại console.aws.amazon.com/cost-management.",
+        "learning_point": "Kiểm tra AWS costs tại console.aws.amazon.com — gõ tay URL. AWS Budgets alerts thật từ @amazon.com và hiển thị trong AWS Console.",
+        "psychology_display": "Financial Fear + Technical Urgency",
+        "attack_type_display": "AWS Cost Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-022",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust",
+      "attack_type": "Figma / Design Tool Phishing",
+      "learning_objective": "Nhận diện phishing giả thông báo chia sẻ file thiết kế Figma quan trọng",
+      "email": {
+        "sender_name": "Figma Notifications",
+        "sender_email": "notifications@figma-share-vn.com",
+        "recipient_email": "ux.lead@sendo.vn",
+        "subject": "CEO chia sẻ: Rebrand concept 2026 — Được đặt làm Editor",
+        "body": "Xin chào UX Lead,\n\nNguyen Van Hai (CEO) vừa chia sẻ và đặt bạn làm Editor cho file Figma:\n\n🎨 Sendo_Rebrand_Concept_2026_CONFIDENTIAL\n\nCEO muốn nhận feedback thiết kế trước cuộc họp Board ngày mai.\n\nĐăng nhập để xem và chỉnh sửa file.",
+        "cta_text": "Mở Figma File",
+        "cta_link": "https://figma-share-vn.com/file/rebrand-2026"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "notifications@figma-share-vn.com",
+          "explanation": "Figma gửi thông báo từ @figma.com — 'figma-share-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "ceo_file_share_bait",
+          "visible_text": "CEO chia sẻ ... CONFIDENTIAL ... feedback trước Board ngày mai",
+          "explanation": "CEO chia sẻ file bí mật + deadline Board meeting ngày mai tạo áp lực kép — UX lead muốn xem ngay và chuẩn bị.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "figma-share-vn.com",
+        "CEO chia sẻ CONFIDENTIAL",
+        "Board ngày mai"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả thông báo Figma CEO chia sẻ để lấy thông tin đăng nhập!",
+        "summary": "Figma dùng @figma.com. Thông báo chia sẻ thật hiển thị trong app Figma và từ @figma.com.",
+        "learning_point": "Mở app Figma trực tiếp để kiểm tra file được chia sẻ. Thông báo Figma thật từ @figma.com với link figma.com — không từ domain ngoài.",
+        "psychology_display": "Authority + FOMO",
+        "attack_type_display": "Design Tool Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-023",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Cloud Service Phishing",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email chia sẻ Microsoft SharePoint hợp lệ từ đồng nghiệp nội bộ",
+      "email": {
+        "sender_name": "Nguyễn Thanh Tùng (via Microsoft SharePoint)",
+        "sender_email": "no-reply@sharepointonline.com",
+        "recipient_email": "le.thi.mai.anh@vingroup.net",
+        "subject": "Nguyễn Thanh Tùng đã chia sẻ 'Báo cáo thị trường BĐS Q2' với bạn",
+        "body": "Nguyễn Thanh Tùng (nguyen.thanh.tung@vingroup.net) đã chia sẻ tài liệu sau với bạn từ Microsoft SharePoint:\n\n📄 Báo cáo thị trường BĐS Q2/2026.xlsx\n\nMở trong Microsoft Excel\n\nĐây là thông báo tự động từ Microsoft SharePoint. Bạn nhận email này vì Nguyễn Thanh Tùng đã chia sẻ tài liệu với le.thi.mai.anh@vingroup.net.",
+        "cta_text": "Mở trong Excel",
+        "cta_link": "https://vingroup-my.sharepoint.com/:x:/g/personal/..."
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email SharePoint từ @sharepointonline.com — có thể nhầm với phishing",
+        "why_legitimate": "Domain @sharepointonline.com là domain chính thức Microsoft. Link trỏ về vingroup-my.sharepoint.com — subdomain SharePoint của tổ chức. Người chia sẻ dùng cùng domain @vingroup.net. Footer giải thích rõ lý do nhận email."
+      },
+      "feedback": {
+        "title": "Đây là thông báo chia sẻ SharePoint hợp lệ!",
+        "summary": "Email từ @sharepointonline.com (domain chính thức Microsoft) với link về SharePoint của tổ chức — hoàn toàn hợp lệ.",
+        "learning_point": "SharePoint notifications hợp lệ từ @sharepointonline.com với link về [org]-my.sharepoint.com. Người chia sẻ dùng cùng domain tổ chức là dấu hiệu tin cậy.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-024",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust + Authority",
+      "attack_type": "Microsoft Power Automate Abuse",
+      "learning_objective": "Nhận diện phishing dùng Microsoft Power Automate hợp lệ để lừa người dùng cấp quyền rộng",
+      "email": {
+        "sender_name": "Microsoft Power Automate",
+        "sender_email": "powerautomate@microsoft.com",
+        "recipient_email": "nguyen.thi.tuong.vi@vinhomes.com.vn",
+        "subject": "Yêu cầu phê duyệt từ quy trình tự động — Lê Văn Hùng (Giám đốc)",
+        "body": "Nguyễn Thị Tường Vi,\n\nGiám đốc Lê Văn Hùng đã tạo quy trình Power Automate và cần bạn phê duyệt để tiếp tục:\n\nQuy trình: Tự động hóa báo cáo tài chính hàng tháng\nQuyền yêu cầu: Đọc và ghi email, calendar, OneDrive, SharePoint\n\nPhê duyệt để quy trình hoạt động.",
+        "cta_text": "Phê duyệt quy trình",
+        "cta_link": "https://flow.microsoft.com/manage/environments/..."
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "legitimate_domain_abuse",
+          "visible_text": "powerautomate@microsoft.com",
+          "explanation": "Email từ @microsoft.com là thật — đây là tấn công lạm dụng Power Automate hợp lệ. Kẻ tấn công tạo flow thật trên tài khoản Microsoft giả hoặc bị xâm phạm và gửi yêu cầu phê duyệt.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "excessive_permissions",
+          "visible_text": "Đọc và ghi email, calendar, OneDrive, SharePoint",
+          "explanation": "Quyền đọc+ghi toàn bộ (email, lịch, OneDrive, SharePoint) là quá rộng cho một quy trình báo cáo — quy trình hợp lệ chỉ cần quyền tối thiểu.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unverified_director_request",
+          "visible_text": "Giám đốc Lê Văn Hùng đã tạo quy trình",
+          "explanation": "Phê duyệt quy trình có quyền rộng cần xác nhận trực tiếp với Giám đốc — không chỉ dựa trên email tự động.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "@microsoft.com thật nhưng bị lạm dụng",
+        "đọc+ghi tất cả",
+        "Power Automate"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Power Automate bị lạm dụng — email từ microsoft.com THẬT nhưng nguy hiểm!",
+        "summary": "Đây là tấn công tinh vi: email từ @microsoft.com thật nhưng kẻ tấn công dùng Power Automate hợp lệ để xin quyền truy cập rộng. Quyền đọc+ghi toàn bộ là bất thường.",
+        "learning_point": "Trước khi phê duyệt Power Automate flow có quyền rộng: xác nhận trực tiếp với người tạo flow. Nguyên tắc Least Privilege: quyền tối thiểu cần thiết cho công việc.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "Power Automate Abuse"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-025",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority + Compliance",
+      "attack_type": "Cloud DLP Policy Phishing",
+      "learning_objective": "Nhận diện phishing giả cảnh báo Data Loss Prevention (DLP) để dụ xác minh file bị chặn",
+      "email": {
+        "sender_name": "Microsoft Purview DLP",
+        "sender_email": "dlp-alert@microsoft-purview-vn.com",
+        "recipient_email": "nguyen.van.duc@bidv.com.vn",
+        "subject": "DLP Policy Alert: Email của bạn chứa dữ liệu nhạy cảm — Xác minh ngay",
+        "body": "Kính gửi Nguyễn Văn Đức,\n\nMicrosoft Purview DLP đã chặn email bạn vừa gửi vì phát hiện dữ liệu nhạy cảm:\n\nEmail bị chặn: To: partner@extern.com\nNội dung vi phạm: Số CCCD, thông tin tài khoản ngân hàng\nPolicy: Financial Data Protection — Sensitivity Label: Confidential\n\nNếu email hợp lệ và cần gửi, đăng nhập để xác minh và giải phóng email khỏi quarantine.",
+        "cta_text": "Xác minh và giải phóng email",
+        "cta_link": "https://microsoft-purview-vn.com/dlp-release"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "dlp-alert@microsoft-purview-vn.com",
+          "explanation": "Microsoft Purview dùng @microsoft.com — 'microsoft-purview-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "dlp_phishing",
+          "visible_text": "đăng nhập để xác minh và giải phóng email",
+          "explanation": "DLP quarantine thật được quản lý qua Microsoft 365 Defender portal — không qua link email từ domain ngoài. Đăng nhập vào trang giả sẽ mất thông tin đăng nhập.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "sensitive_content_listed",
+          "visible_text": "Số CCCD, thông tin tài khoản ngân hàng",
+          "explanation": "Liệt kê nội dung nhạy cảm cụ thể tạo lo ngại về vi phạm compliance — nhân viên BIDV đặc biệt lo ngại về DLP do môi trường tài chính ngân hàng nghiêm ngặt.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "microsoft-purview-vn.com",
+        "DLP quarantine",
+        "giải phóng email"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả DLP alert để chiếm tài khoản Microsoft 365 của nhân viên ngân hàng!",
+        "summary": "Microsoft Purview DLP dùng @microsoft.com. DLP quarantine được quản lý tại security.microsoft.com/quarantine — không qua email từ domain ngoài.",
+        "learning_point": "DLP quarantine thật quản lý tại Microsoft 365 Defender: security.microsoft.com. Email bị chặn bởi DLP được thông báo qua email từ @microsoft.com với link về security.microsoft.com.",
+        "psychology_display": "Authority + Compliance Fear",
+        "attack_type_display": "DLP Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-026",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust",
+      "attack_type": "SaaS Supply Chain Attack",
+      "learning_objective": "Nhận diện email từ SaaS vendor bị xâm phạm gửi thông báo 'cập nhật bắt buộc' để phát tán malware",
+      "email": {
+        "sender_name": "Basecamp Support",
+        "sender_email": "support@basecamp.com",
+        "recipient_email": "project.manager@phat-dat.com.vn",
+        "subject": "Basecamp 4.0 — Cập nhật bắt buộc trước 01/07/2026 — Desktop App",
+        "body": "Kính gửi Project Manager Phát Đạt,\n\nBasecamp 4.0 ra mắt với nhiều tính năng mới. Desktop app cũ (v3.x) sẽ ngừng hoạt động sau 01/07/2026.\n\nTải Basecamp 4.0 Desktop App ngay để tiếp tục sử dụng:\n\nWindows: Basecamp_4.0_Setup_Win.exe (tải từ liên kết đặc biệt dành cho users Việt Nam)\n\nLưu ý: Do sự cố CDN khu vực, file tải qua link thông thường tại basecamp.com có thể chậm — dùng link đặc biệt này.",
+        "cta_text": "Tải Basecamp 4.0 (link đặc biệt VN)",
+        "cta_link": "https://basecamp-update-vn.com/download/v4"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "domain_mismatch_in_body",
+          "visible_text": "basecamp-update-vn.com",
+          "explanation": "Dù email từ @basecamp.com (có thể thật hoặc bị spoofed), link download trỏ về 'basecamp-update-vn.com' — domain này không phải Basecamp. Mâu thuẫn giữa domain email và link download.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "special_link_excuse",
+          "visible_text": "link đặc biệt dành cho users Việt Nam do sự cố CDN",
+          "explanation": "Lý do 'link đặc biệt do CDN' là cách giải thích tại sao download không trỏ về basecamp.com thật — đây là social engineering để người dùng không thắc mắc về URL bất thường.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "exe_download_from_non_official",
+          "visible_text": "Basecamp_4.0_Setup_Win.exe",
+          "explanation": "Tải file .exe từ domain không phải của Basecamp thật — ngay cả khi email có vẻ từ @basecamp.com.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "basecamp-update-vn.com",
+        "link đặc biệt VN",
+        "sự cố CDN"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "SaaS Supply Chain Attack — link download khác domain email!",
+        "summary": "Dù email từ @basecamp.com, link download về 'basecamp-update-vn.com' là bất thường. Mọi download phần mềm phải từ domain chính thức của nhà cung cấp.",
+        "learning_point": "Luôn kiểm tra URL download — phải là basecamp.com, không phải domain khác dù email trông hợp lệ. Tải phần mềm từ website chính thức, gõ tay URL.",
+        "psychology_display": "Trust + Techical Excuse",
+        "attack_type_display": "SaaS Supply Chain"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-027",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority + Fear",
+      "attack_type": "Multi-Cloud Account Takeover",
+      "learning_objective": "Nhận diện phishing nhắm multi-cloud admin — giả cảnh báo cross-cloud misconfiguration nguy hiểm",
+      "email": {
+        "sender_name": "Wiz Security — Cloud Security Posture",
+        "sender_email": "alerts@wiz-security-vn.com",
+        "recipient_email": "cloud.security@tma-solutions.com.vn",
+        "subject": "CRITICAL: S3 bucket public exposure + Azure blob leak phát hiện",
+        "body": "Kính gửi Cloud Security Team TMA Solutions,\n\nWiz Security phát hiện 2 lỗ hổng nghiêm trọng trong môi trường cloud của tổ chức:\n\n🔴 AWS S3: 3 bucket cấu hình public — có thể chứa dữ liệu khách hàng\n🔴 Azure Blob: 2 container leak qua SAS token hết hạn\n\nDữ liệu có thể đã bị crawler index. Đăng nhập Wiz dashboard để xem chi tiết và remediation steps ngay.",
+        "cta_text": "Xem Wiz Security Report",
+        "cta_link": "https://wiz-security-vn.com/cloud-report"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alerts@wiz-security-vn.com",
+          "explanation": "Wiz Security dùng @wiz.io — 'wiz-security-vn.com' là domain giả mạo. Wiz không có domain riêng cho Vietnam.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "unsolicited_security_vendor",
+          "visible_text": "Wiz Security phát hiện",
+          "explanation": "Nếu tổ chức chưa sử dụng Wiz, email này là không được yêu cầu — Wiz không scan môi trường cloud mà không được mời. Nếu đang dùng Wiz, alerts đến từ @wiz.io.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "credential_harvesting_via_dashboard",
+          "visible_text": "đăng nhập Wiz dashboard để xem",
+          "explanation": "Trang 'Wiz dashboard' giả sẽ yêu cầu đăng nhập — có thể lấy cloud credentials (AWS, Azure) nếu dùng SSO.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "wiz-security-vn.com",
+        "S3 public + Azure leak",
+        "Wiz dashboard"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Wiz Security để chiếm cloud credentials của Cloud Security team!",
+        "summary": "Wiz dùng @wiz.io. Nếu chưa dùng Wiz, không có lý do nhận alerts từ Wiz. Nếu đang dùng, alerts đến từ @wiz.io với link về app.wiz.io.",
+        "learning_point": "Cloud security alerts thật từ tool bạn đang dùng và từ domain chính thức của tool đó. Alerts từ tool chưa onboard = phishing.",
+        "psychology_display": "Technical Fear + Authority",
+        "attack_type_display": "Cloud Security Tool Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-028",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust",
+      "attack_type": "CI/CD Pipeline Phishing",
+      "learning_objective": "Nhận diện phishing nhắm developer qua giả thông báo CI/CD pipeline failure yêu cầu đăng nhập",
+      "email": {
+        "sender_name": "GitHub Actions",
+        "sender_email": "noreply@github-actions-vn.com",
+        "recipient_email": "backend.lead@tiki.vn",
+        "subject": "[FAILED] tiki/backend-core — Deploy to Production — Action required",
+        "body": "GitHub Actions workflow failed:\n\nRepository: tiki/backend-core\nWorkflow: Deploy to Production\nTrigger: push to main (commit abc123f)\nStatus: ❌ FAILED\nError: Secrets rotation required — production credentials expired\n\nBuild blocked until credentials rotated. Login to GitHub to rotate secrets and re-trigger deployment.",
+        "cta_text": "Rotate Secrets & Re-deploy",
+        "cta_link": "https://github-actions-vn.com/secrets-rotation"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "noreply@github-actions-vn.com",
+          "explanation": "GitHub Actions dùng @github.com — 'github-actions-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "production_deploy_urgency",
+          "visible_text": "Deploy to Production — FAILED — Build blocked",
+          "explanation": "Production deployment bị block là áp lực cực lớn với developer — họ cần fix ngay để không delay release và ảnh hưởng đến user.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "secrets_rotation_via_link",
+          "visible_text": "Login to GitHub to rotate secrets",
+          "explanation": "Secrets rotation thật thực hiện trong GitHub repository Settings → Secrets — không qua link email từ domain ngoài github.com.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "github-actions-vn.com",
+        "Deploy Production FAILED",
+        "rotate secrets"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả GitHub Actions failure để chiếm tài khoản developer!",
+        "summary": "GitHub Actions dùng @github.com. Failure notifications thật hiển thị trong GitHub repository và từ @github.com với link về github.com.",
+        "learning_point": "GitHub Actions notifications thật từ @github.com với link về github.com/[org]/[repo]. Secrets rotation trong repository Settings — không qua link email từ domain ngoài.",
+        "psychology_display": "Technical Urgency + Deployment Fear",
+        "attack_type_display": "CI/CD Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-029",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Authority",
+      "attack_type": "Cloud Backup Ransom Threat",
+      "learning_objective": "Nhận diện phishing kết hợp đe dọa xóa cloud backup nếu không đăng nhập xác minh",
+      "email": {
+        "sender_name": "Veeam Cloud Backup — Vietnam",
+        "sender_email": "backup-alert@veeam-cloud-vn.com",
+        "recipient_email": "it.infra@phumy-hung.com.vn",
+        "subject": "CRITICAL: Backup job thất bại 5 ngày liên tiếp — Dữ liệu không được bảo vệ",
+        "body": "Kính gửi IT Infrastructure Team Phú Mỹ Hưng,\n\nVeeam Cloud Backup phát hiện backup job cho production servers đã thất bại liên tiếp 5 ngày:\n\n• VM-PROD-DB01: ❌ Failed\n• VM-PROD-APP01: ❌ Failed\n• VM-PROD-FILE01: ❌ Failed\n\nNguy cơ: Nếu xảy ra sự cố trong 48 giờ tới, không có backup để khôi phục.\n\nĐăng nhập Veeam Cloud Manager để kiểm tra và khắc phục ngay.",
+        "cta_text": "Đăng nhập Veeam Cloud Manager",
+        "cta_link": "https://veeam-cloud-vn.com/cloud-manager"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "backup-alert@veeam-cloud-vn.com",
+          "explanation": "Veeam dùng @veeam.com — 'veeam-cloud-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "backup_failure_panic",
+          "visible_text": "5 ngày backup thất bại — không có backup để khôi phục",
+          "explanation": "Backup failure với nguy cơ mất dữ liệu production là nỗi sợ lớn nhất của IT Infrastructure team — họ phản ứng ngay lập tức.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "specific_vm_names",
+          "visible_text": "VM-PROD-DB01, VM-PROD-APP01, VM-PROD-FILE01",
+          "explanation": "Tên VM cụ thể tạo cảm giác thật — nhưng đây là tên VM phổ biến mà kẻ tấn công đoán hoặc đã research về hệ thống.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "veeam-cloud-vn.com",
+        "5 ngày backup failed",
+        "VM-PROD tên cụ thể"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Veeam backup alert để chiếm quyền truy cập IT infrastructure!",
+        "summary": "Veeam dùng @veeam.com. Backup alerts thật hiển thị trong Veeam console và từ @veeam.com.",
+        "learning_point": "Kiểm tra backup status trong Veeam Backup & Replication console trực tiếp — không qua link email từ domain ngoài. Veeam cloud dùng @veeam.com.",
+        "psychology_display": "Technical Fear + Data Loss",
+        "attack_type_display": "Backup System Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-CS-030",
+      "batch": "11",
+      "phase": 3,
+      "lesson": "3.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Cloud Service Phishing",
+      "psychology": "Trust + Compliance",
+      "attack_type": "Cloud Compliance Report Phishing",
+      "learning_objective": "Nhận diện phishing giả báo cáo compliance cloud (SOC2, ISO 27001) để lấy thông tin đăng nhập quản trị",
+      "email": {
+        "sender_name": "Drata — Compliance Automation",
+        "sender_email": "reports@drata-compliance-vn.com",
+        "recipient_email": "compliance@mbf-systems.com.vn",
+        "subject": "Drata: 47 controls FAILED trong SOC 2 audit — Hành động trước 15/06",
+        "body": "Kính gửi Compliance Team MBF Systems,\n\nDrata Compliance Automation phát hiện 47 control trong SOC 2 audit của tổ chức bạn đang ở trạng thái FAILED hoặc AT RISK:\n\n• Access Control: 12 issues\n• Encryption: 8 issues\n• Vulnerability Management: 15 issues\n• Incident Response: 12 issues\n\nAudit deadline: 30/06/2026. Đăng nhập Drata để xem chi tiết và remediation plan.",
+        "cta_text": "Xem Compliance Report",
+        "cta_link": "https://drata-compliance-vn.com/soc2-report"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "reports@drata-compliance-vn.com",
+          "explanation": "Drata dùng @drata.com — 'drata-compliance-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "compliance_deadline_panic",
+          "visible_text": "47 controls FAILED — audit deadline 30/06",
+          "explanation": "SOC 2 audit failure là rủi ro nghiêm trọng với doanh nghiệp SaaS/tech — compliance team phản ứng ngay với bất kỳ cảnh báo audit failure nào.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unsolicited_compliance_tool",
+          "visible_text": "Drata Compliance Automation",
+          "explanation": "Nếu tổ chức chưa dùng Drata, không có lý do nhận alerts từ Drata. Nếu đang dùng, alerts từ @drata.com với link về app.drata.com.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "drata-compliance-vn.com",
+        "47 controls FAILED SOC2",
+        "audit 30/06"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Drata SOC2 alerts để chiếm tài khoản compliance admin!",
+        "summary": "Drata dùng @drata.com. SOC2 compliance alerts thật từ @drata.com với link về app.drata.com — không từ domain ngoài.",
+        "learning_point": "Compliance tool alerts (Drata, Vanta, Secureframe) từ domain chính thức của tool và link về app của tool đó. Nếu chưa onboard tool: không có lý do nhận alerts.",
+        "psychology_display": "Compliance Fear + Urgency",
+        "attack_type_display": "Compliance Tool Phishing"
+      }
+    }
+  ]
+}

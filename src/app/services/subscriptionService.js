@@ -9,6 +9,16 @@ export const subscriptionService = {
    * Lấy danh sách tất cả các gói dịch vụ (Public)
    * @returns {Promise<Array>} Danh sách gói dịch vụ
    */
+  getMyPlanStatus: async () => {
+    try {
+      const response = await axiosInstance.get("/Subscription/my-plan");
+      if (response && response.isSuccess) return response.result;
+      return null;
+    } catch {
+      return null;
+    }
+  },
+
   getAllPlans: async () => {
     try {
       const response = await axiosInstance.get("/SubscriptionPlan");

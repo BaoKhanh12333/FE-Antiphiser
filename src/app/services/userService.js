@@ -45,11 +45,23 @@ export const userService = {
 
   updateUserStatusOrRole: async (data) => {
     try {
-      // data: { userId, roleId, status, systemScore, riskLevel }
       const response = await axiosInstance.put("/UserAccount/UpdateUserStatusOrRole", data);
-      return response;
+      if (response && response.isSuccess) {
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể cập nhật tài khoản");
     } catch (error) {
       throw error;
+    }
+  },
+
+  getMyManager: async () => {
+    try {
+      const response = await axiosInstance.get("/UserAccount/my-manager");
+      if (response && response.isSuccess) return response.result;
+      return null;
+    } catch {
+      return null;
     }
   },
 
@@ -81,15 +93,26 @@ export const userService = {
    * Manager: lấy nhân viên cùng công ty (RoleId=3, cùng CompanyId).
    * Trả về CompanyEmployeePagedResponse { items, totalCount, pageIndex, pageSize }.
    */
-  getCompanyEmployees: async (pageIndex = 1, pageSize = 100) => {
+  getCompanyEmployees: async (pageIndex = 1, pageSize = 100, searchTerm = "") => {
     try {
       const response = await axiosInstance.get(
-        `/UserAccount/company-employees?pageIndex=${pageIndex}&pageSize=${pageSize}`
+        `/UserAccount/company-employees?pageIndex=${pageIndex}&pageSize=${pageSize}&searchTerm=${encodeURIComponent(searchTerm)}`
       );
       if (response && response.isSuccess) {
         return response.result;
       }
       throw new Error(response?.errorMessage || "Không thể tải danh sách nhân viên");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /** Manager xem học trình + kết quả chiến dịch của 1 nhân viên */
+  getEmployeeProgress: async (employeeId) => {
+    try {
+      const response = await axiosInstance.get(`/UserAccount/employee-progress/${employeeId}`);
+      if (response && response.isSuccess) return response.result;
+      throw new Error(response?.errorMessage || "Không thể tải học trình nhân viên");
     } catch (error) {
       throw error;
     }
