@@ -140,19 +140,19 @@ const PLANS: Plan[] = [
     label: "Cá nhân",
     price: "39.000",
     unit: "VND",
-    cycle: "/người/tháng",
-    target: "Cá nhân & hộ kinh doanh nhỏ",
+    cycle: "/tháng",
+    target: "Dành riêng cho 1 cá nhân sử dụng",
     badge: null,
     glow: false,
     accent: "indigo",
     cta: "Chọn gói này",
     ctaStyle: "outline-indigo",
     features: [
+      { text: "Chỉ dành cho 1 người dùng" },
       { text: "1–2 chiến dịch phishing/tháng" },
       { text: "Cảnh báo rủi ro email thời gian thực" },
       { text: "Báo cáo điểm AI cá nhân hóa" },
       { text: "Dashboard theo dõi tiến độ" },
-      { text: "Tối đa 10 người dùng" },
     ],
   },
   {
@@ -161,19 +161,19 @@ const PLANS: Plan[] = [
     label: "Doanh nghiệp nhỏ",
     price: "79.000",
     unit: "VND",
-    cycle: "/người/tháng",
-    target: "SME nhạy cảm về chi phí",
+    cycle: "/tháng",
+    target: "SME nhạy cảm về chi phí — tối đa 50 nhân viên",
     badge: null,
     glow: false,
     accent: "indigo",
     cta: "Chọn gói này",
     ctaStyle: "outline-indigo",
     features: [
+      { text: "1 tài khoản Manager riêng" },
+      { text: "Tối đa 50 nhân viên" },
       { text: "2–3 chiến dịch phishing/tháng" },
       { text: "Dashboard doanh nghiệp tùy chỉnh" },
-      { text: "Báo cáo điểm AI chi tiết" },
       { text: "Cảnh báo rủi ro theo nhóm" },
-      { text: "Tối đa 50 người dùng" },
       { text: "Xuất báo cáo PDF hàng tháng" },
     ],
   },
@@ -183,7 +183,7 @@ const PLANS: Plan[] = [
     label: "Enterprise",
     price: "99.000",
     unit: "VND",
-    cycle: "/người/tháng",
+    cycle: "/tháng",
     target: "SME từ 20–150 nhân viên",
     badge: "PHỔ BIẾN NHẤT",
     glow: true,
@@ -191,11 +191,12 @@ const PLANS: Plan[] = [
     cta: "Liên hệ tư vấn ngay",
     ctaStyle: "solid-amber",
     features: [
+      { text: "1 tài khoản Manager riêng" },
+      { text: "Không giới hạn nhân viên" },
       { text: "Chiến dịch phishing không giới hạn" },
       { text: "AI scoring & phản hồi cá nhân hóa" },
       { text: "Báo cáo rủi ro nâng cao theo bộ phận" },
       { text: "Xuất báo cáo tuân thủ (Compliance)" },
-      { text: "Không giới hạn người dùng" },
       { text: "Tích hợp SSO & Active Directory" },
       { text: "Hỗ trợ ưu tiên 24/7" },
     ],
@@ -650,7 +651,7 @@ function BenefitsSection({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-function PricingSection({ onLogin }: { onLogin: () => void }) {
+function PricingSection({ onPlanClick }: { onPlanClick: (planId: string) => void }) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
@@ -788,7 +789,7 @@ function PricingSection({ onLogin }: { onLogin: () => void }) {
                   </ul>
 
                   <button
-                    onClick={onLogin}
+                    onClick={() => onPlanClick(plan.id)}
                     className="w-full py-3 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 active:scale-95"
                     style={
                       plan.ctaStyle === "solid-amber"
@@ -941,8 +942,17 @@ export function LandingPage() {
     return "/nguoi-dung";
   })();
 
-  // Nếu đã đăng nhập → vào app; chưa → vào trang đăng nhập
+  // Nút nav / hero / benefits / footer: vào app nếu đã login, else đăng nhập
   const handleCTA = () => navigate(isAuth ? appPath : "/dang-nhap");
+
+  // Card giá: FREE → vào app/login; trả phí → mua-goi nếu đã login, else login
+  const handlePlanClick = (planId: string) => {
+    if (planId === "free") {
+      navigate(isAuth ? appPath : "/dang-nhap");
+    } else {
+      navigate(isAuth ? "/nguoi-dung/mua-goi" : "/dang-nhap");
+    }
+  };
 
   return (
     <div style={{ fontFamily: "'Be Vietnam Pro', Inter, sans-serif", background: "#F8FAFF" }}>
@@ -957,7 +967,7 @@ export function LandingPage() {
       <HeroSection onLogin={handleCTA} />
       <FeaturesSection />
       <BenefitsSection onLogin={handleCTA} />
-      <PricingSection onLogin={handleCTA} />
+      <PricingSection onPlanClick={handlePlanClick} />
       <FAQSection />
       <Footer onLogin={handleCTA} />
     </div>
