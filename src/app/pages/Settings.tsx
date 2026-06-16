@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import {
   User, Mail, Save, CheckCircle2, Lock, Building2, Crown,
   AlertCircle, Clock, Users, ChevronRight, Star, Shield,
@@ -19,6 +20,13 @@ const TABS: { id: TabId; label: string; desc: string; Icon: React.ElementType }[
   { id: "security", label: "Bảo mật",         desc: "Mật khẩu & xác thực",    Icon: Lock      },
   { id: "plan",     label: "Công ty & Gói",   desc: "Tổ chức & dịch vụ",      Icon: Building2 },
 ];
+
+// Guard: DateTime.MinValue ("0001-01-01T...") serializes as truthy string but is Invalid Date in JS
+function safeDate(s: string | null | undefined): Date | null {
+  if (!s) return null;
+  const d = new Date(s);
+  return isNaN(d.getTime()) || d.getFullYear() <= 1 ? null : d;
+}
 
 // ─── Input component ──────────────────────────────────────────────────────────
 function Field({
@@ -68,6 +76,8 @@ function Divider({ label }: { label?: string }) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export function Settings() {
+  const navigate = useNavigate();
+  const role = authService.getCurrentRole()?.toLowerCase();
   const [tab, setTab]         = useState<TabId>("profile");
   const [loading, setLoading] = useState(true);
 
@@ -446,9 +456,7 @@ export function Settings() {
                         <div className="flex items-center justify-between py-2 border-b border-slate-50 text-sm">
                           <span className="text-slate-500 flex items-center gap-2"><Clock size={13} />Ngày hết hạn</span>
                           <span className="font-semibold text-slate-700">
-                            {planStatus.endDate
-                              ? new Date(planStatus.endDate).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })
-                              : "—"}
+                            {safeDate(planStatus.endDate)?.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" }) ?? "—"}
                           </span>
                         </div>
                         <div className="flex items-center justify-between py-2 border-b border-slate-50 text-sm">
@@ -495,10 +503,21 @@ export function Settings() {
                           </div>
                         ))}
                       </div>
-                      <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-indigo-50 border border-indigo-100">
-                        <span className="text-xs text-indigo-700 font-semibold">Liên hệ quản lý để đăng ký gói</span>
+                      <button
+                        onClick={() =>
+                          navigate(
+                            role === "manager"
+                              ? "/quan-ly/mua-goi"
+                              : "/nguoi-dung/mua-goi"
+                          )
+                        }
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 transition-colors"
+                      >
+                        <span className="text-xs text-indigo-700 font-semibold">
+                          {role === "manager" ? "Mua gói cho công ty" : "Xem các gói dịch vụ"}
+                        </span>
                         <ChevronRight size={14} className="text-indigo-400" />
-                      </div>
+                      </button>
                     </div>
                   )}
                 </div>

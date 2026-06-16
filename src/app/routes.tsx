@@ -14,6 +14,7 @@ import { ManagerDashboard } from "./pages/ManagerDashboard";
 import { ManagerNhanVien } from "./pages/manager/ManagerNhanVien";
 import { ManagerBaoCao } from "./pages/manager/ManagerBaoCao";
 import { ManagerTaoCampaign } from "./pages/manager/ManagerTaoCampaign";
+import { ManagerMuaGoi } from "./pages/manager/ManagerMuaGoi";
 import { AdminTongQuan } from "./pages/admin/AdminTongQuan";
 import { AdminThuVien } from "./pages/admin/AdminThuVien";
 import { AdminTaoCampaign } from "./pages/admin/AdminTaoCampaign";
@@ -22,6 +23,7 @@ import { AdminQuanLyNguoiDung } from "./pages/admin/AdminQuanLyNguoiDung";
 import { AdminQuanLyGoi } from "./pages/admin/AdminQuanLyGoi";
 import { AdminQuanLyLesson } from "./pages/admin/AdminQuanLyLesson";
 import { Settings } from "./pages/Settings";
+import { MuaGoi } from "./pages/MuaGoi";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
@@ -87,6 +89,7 @@ export const router = createBrowserRouter([
               { path: "bai-hoc/:lessonId", Component: BaiHoc },
               { path: "mo-phong", Component: MoPhong },
               { path: "bao-cao", Component: BaoCao },
+              { path: "mua-goi", Component: MuaGoi },
               { path: "cai-dat", Component: Settings },
             ],
           },
@@ -105,6 +108,7 @@ export const router = createBrowserRouter([
               { path: "nhan-vien", Component: ManagerNhanVien },
               { path: "bao-cao", Component: ManagerBaoCao },
               { path: "tao-chien-dich", Component: ManagerTaoCampaign },
+              { path: "mua-goi", Component: ManagerMuaGoi },
               { path: "cai-dat", Component: Settings },
             ],
           },

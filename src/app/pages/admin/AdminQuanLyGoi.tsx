@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Edit2, X, Check, Loader2, AlertTriangle } from "lucide-react";
+import { Edit2, X, Check, Loader2, AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { subscriptionService } from "../../services/subscriptionService";
 
 interface Plan {
@@ -17,24 +17,48 @@ interface Plan {
 interface EditForm {
   name: string;
   description: string;
-  featureText: string;
+  selectedFeatures: string[];
+  customFeatures: string[];
   price: string;
   durationMonth: string;
   isActive: boolean;
   maxSlots: string;
 }
 
-function featureToText(feature: string | null): string {
-  if (!feature) return "";
-  return feature.split(", ").join("\n");
+const PREDEFINED_FEATURES = [
+  "Chỉ dành cho 1 người dùng",
+  "1-2 chiến dịch phishing/tháng",
+  "2-3 chiến dịch phishing/tháng",
+  "Chiến dịch phishing không giới hạn",
+  "Cảnh báo rủi ro email thời gian thực",
+  "Báo cáo điểm AI cá nhân hóa",
+  "Báo cáo điểm AI chi tiết",
+  "Dashboard theo dõi tiến độ",
+  "Dashboard doanh nghiệp tùy chỉnh",
+  "1 tài khoản Manager riêng",
+  "Tối đa 10 nhân viên",
+  "Tối đa 50 nhân viên",
+  "Tối đa 100 nhân viên",
+  "Không giới hạn nhân viên",
+  "Cảnh báo rủi ro theo nhóm",
+  "Xuất báo cáo PDF hàng tháng",
+  "AI scoring & phản hồi cá nhân hóa",
+  "Báo cáo rủi ro nâng cao theo bộ phận",
+  "Xuất báo cáo tuân thủ (Compliance)",
+  "Tích hợp SSO & Active Directory",
+  "Hỗ trợ ưu tiên 24/7",
+];
+
+function parseFeatureString(feature: string | null): { selected: string[]; custom: string[] } {
+  if (!feature) return { selected: [], custom: [] };
+  const items = feature.split(",").map((s) => s.trim()).filter(Boolean);
+  const selected = items.filter((f) => PREDEFINED_FEATURES.includes(f));
+  const custom = items.filter((f) => !PREDEFINED_FEATURES.includes(f));
+  return { selected, custom };
 }
 
-function textToFeature(text: string): string {
-  return text
-    .split("\n")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0)
-    .join(", ");
+function buildFeatureString(selected: string[], custom: string[]): string {
+  return [...selected, ...custom.map((s) => s.trim()).filter(Boolean)].join(", ");
 }
 
 /* ── Edit Modal ─────────────────────────────────────────────────────── */
@@ -47,15 +71,18 @@ function EditModal({
   onClose: () => void;
   onRefresh: () => void;
 }) {
+  const { selected: initSelected, custom: initCustom } = parseFeatureString(plan.feature);
   const [form, setForm] = useState<EditForm>({
     name: plan.name,
     description: plan.description ?? "",
-    featureText: featureToText(plan.feature),
+    selectedFeatures: initSelected,
+    customFeatures: initCustom,
     price: plan.price?.toString() ?? "",
     durationMonth: plan.durationInMonths.toString(),
     isActive: plan.isActive,
     maxSlots: plan.maxSlots.toString(),
   });
+  const [newCustom, setNewCustom] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,7 +128,7 @@ function EditModal({
         maxSlots,
       };
       if (form.description.trim()) body.description = form.description.trim();
-      const featureStr = textToFeature(form.featureText);
+      const featureStr = buildFeatureString(form.selectedFeatures, form.customFeatures);
       if (featureStr) body.feature = featureStr;
 
       await subscriptionService.updatePlan(plan.id, body);
@@ -218,7 +245,7 @@ function EditModal({
             />
           </div>
 
-          {/* Lợi ích */}
+          {/* Lợi ích — checkbox list */}
           <div>
             <label
               style={{
@@ -226,31 +253,113 @@ function EditModal({
                 fontSize: "0.8rem",
                 fontWeight: 600,
                 color: "#475569",
-                marginBottom: 4,
+                marginBottom: 6,
               }}
             >
               Lợi ích{" "}
               <span style={{ fontWeight: 400, color: "#94A3B8" }}>
-                (mỗi mục 1 dòng)
+                (tích để chọn)
               </span>
             </label>
-            <textarea
-              value={form.featureText}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, featureText: e.target.value }))
-              }
-              rows={4}
-              className="w-full px-3 py-2 rounded-xl outline-none text-slate-800 resize-none"
+            <div
+              className="rounded-xl overflow-y-auto"
               style={{
-                fontSize: "0.875rem",
                 border: "1px solid #E2E8F0",
-                fontFamily: "inherit",
+                maxHeight: 220,
+                padding: "8px 4px",
               }}
-              placeholder={"10 nhân viên\n50 kịch bản\nBáo cáo cơ bản"}
-            />
-            <p style={{ fontSize: "0.75rem", color: "#94A3B8", marginTop: 3 }}>
-              Lưu tự động ghép lại bằng dấu phẩy. Dòng trống sẽ được bỏ qua.
-            </p>
+            >
+              {PREDEFINED_FEATURES.map((feat) => {
+                const checked = form.selectedFeatures.includes(feat);
+                return (
+                  <label
+                    key={feat}
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors"
+                  >
+                    <div
+                      onClick={() =>
+                        setForm((f) => ({
+                          ...f,
+                          selectedFeatures: checked
+                            ? f.selectedFeatures.filter((x) => x !== feat)
+                            : [...f.selectedFeatures, feat],
+                        }))
+                      }
+                      className="shrink-0 w-4 h-4 rounded flex items-center justify-center cursor-pointer transition-colors"
+                      style={{
+                        background: checked ? "#6366F1" : "#fff",
+                        border: checked ? "none" : "1.5px solid #CBD5E1",
+                      }}
+                    >
+                      {checked && <Check size={11} color="#fff" strokeWidth={3} />}
+                    </div>
+                    <span style={{ fontSize: "0.83rem", color: checked ? "#3730A3" : "#475569" }}>
+                      {feat}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+
+            {/* Custom features */}
+            {form.customFeatures.length > 0 && (
+              <div className="mt-2 flex flex-col gap-1">
+                {form.customFeatures.map((cf, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div
+                      className="flex-1 px-3 py-1.5 rounded-lg text-sm text-slate-700"
+                      style={{ background: "#F1F5F9", border: "1px solid #E2E8F0" }}
+                    >
+                      {cf}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((f) => ({
+                          ...f,
+                          customFeatures: f.customFeatures.filter((_, idx) => idx !== i),
+                        }))
+                      }
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add custom feature */}
+            <div className="flex gap-2 mt-2">
+              <input
+                type="text"
+                value={newCustom}
+                onChange={(e) => setNewCustom(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && newCustom.trim()) {
+                    e.preventDefault();
+                    setForm((f) => ({ ...f, customFeatures: [...f.customFeatures, newCustom.trim()] }));
+                    setNewCustom("");
+                  }
+                }}
+                placeholder="Thêm lợi ích tuỳ chỉnh..."
+                className="flex-1 px-3 py-1.5 rounded-lg outline-none text-slate-800"
+                style={{ fontSize: "0.83rem", border: "1px solid #E2E8F0" }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (!newCustom.trim()) return;
+                  setForm((f) => ({ ...f, customFeatures: [...f.customFeatures, newCustom.trim()] }));
+                  setNewCustom("");
+                }}
+                className="px-3 py-1.5 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors"
+                style={{ background: "#EEF2FF", color: "#6366F1", border: "1px solid #C7D2FE" }}
+              >
+                <Plus size={13} />
+                Thêm
+              </button>
+            </div>
           </div>
 
           {/* Giá + Thời hạn */}

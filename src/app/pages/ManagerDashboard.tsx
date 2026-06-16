@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import {
   TrendingUp, Users, AlertTriangle, Award, ChevronRight, Star,
-  Loader2, PlusCircle,
+  Loader2, PlusCircle, ShoppingCart,
 } from "lucide-react";
 import { analyticsService } from "../services/analyticsService";
 
@@ -119,6 +119,17 @@ export function ManagerDashboard() {
             Tổng quan hiệu suất bảo mật — {overview?.totalEmployees ?? 0} nhân viên
           </p>
         </div>
+        <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate("/quan-ly/mua-goi")}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: "linear-gradient(135deg, #10B981, #059669)",
+            boxShadow: "0 8px 24px rgba(16,185,129,0.3)",
+          }}
+        >
+          <ShoppingCart size={15} /> Mua gói
+        </button>
         <button
           onClick={() => navigate("/quan-ly/tao-chien-dich")}
           className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -132,6 +143,7 @@ export function ManagerDashboard() {
         >
           <PlusCircle size={15} /> Tạo chiến dịch
         </button>
+        </div>
       </div>
 
       {/* Stat cards — deltas ẩn (không có time-series) */}

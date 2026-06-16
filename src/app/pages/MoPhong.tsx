@@ -527,6 +527,23 @@ function ResultsScreen({
   );
 }
 
+// ─── Campaign card CSS ────────────────────────────────────────────────────────
+const campaignCSS = `
+  @keyframes cpFadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes cpProgressFill { from { width:0%; } }
+  .cp-enter { animation: cpFadeUp 0.4s ease-out both; }
+  .cp-bar   { animation: cpProgressFill 0.9s 0.4s ease-out both; }
+  .cp-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(99,102,241,0.14) !important; }
+  .cp-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    .cp-enter, .cp-bar { animation: none !important; }
+    .cp-card:hover { transform: none !important; }
+  }
+`;
+
 // ─── Campaign Picker ──────────────────────────────────────────────────────────
 function CampaignPicker({
   campaigns, loading, error, onPick, onGoLessons
@@ -535,32 +552,42 @@ function CampaignPicker({
   onPick: (id: number) => void; onGoLessons: () => void;
 }) {
   if (loading) return (
-    <div className="flex flex-col items-center justify-center min-h-[300px] gap-3">
-      <Loader2 className="animate-spin text-indigo-600" size={28} />
-      <p className="text-slate-400 text-sm">Đang tải danh sách chiến dịch...</p>
+    <div className="flex flex-col items-center justify-center min-h-[340px] gap-4">
+      <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+        style={{ background: "linear-gradient(135deg,#EEF2FF,#E0E7FF)", boxShadow: "0 4px 16px rgba(99,102,241,0.15)" }}>
+        <Loader2 className="animate-spin text-indigo-500" size={22} />
+      </div>
+      <p className="text-slate-400 text-sm font-medium">Đang tải chiến dịch...</p>
     </div>
   );
 
   if (error) return (
-    <div className="max-w-lg mx-auto text-center py-16 space-y-3">
-      <AlertTriangle size={36} className="mx-auto text-amber-400" />
+    <div className="max-w-lg mx-auto text-center py-16 space-y-4">
+      <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
+        style={{ background: "#FFFBEB" }}>
+        <AlertTriangle size={28} className="text-amber-400" />
+      </div>
       <p className="text-slate-600 font-semibold">{error}</p>
-      <button onClick={onGoLessons} className="text-indigo-600 text-sm font-semibold hover:underline">
-        ← Về trang bài học
+      <button onClick={onGoLessons}
+        className="inline-flex items-center gap-1.5 text-indigo-600 text-sm font-semibold hover:underline">
+        <ArrowLeft size={14} /> Về trang bài học
       </button>
     </div>
   );
 
   if (campaigns.length === 0) return (
-    <div className="max-w-lg mx-auto text-center py-16 space-y-4">
-      <Shield size={40} className="mx-auto text-slate-300" />
+    <div className="max-w-lg mx-auto text-center py-16 space-y-5">
+      <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto"
+        style={{ background: "linear-gradient(135deg,#EEF2FF,#E0E7FF)", boxShadow: "0 8px 24px rgba(99,102,241,0.12)" }}>
+        <Shield size={28} className="text-indigo-300" />
+      </div>
       <div>
-        <p className="text-slate-700 font-bold text-base">Bạn chưa được giao chiến dịch nào</p>
+        <p className="text-slate-700 font-bold text-base">Chưa được giao chiến dịch</p>
         <p className="text-slate-400 text-sm mt-1">Hoàn thành bài học lý thuyết để được giao chiến dịch mô phỏng.</p>
       </div>
       <button onClick={onGoLessons}
         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold transition-all hover:scale-[1.02]"
-        style={{ background: "linear-gradient(135deg, #6366F1, #4F46E5)" }}>
+        style={{ background: "linear-gradient(135deg,#6366F1,#4F46E5)", boxShadow: "0 4px 16px rgba(99,102,241,0.3)" }}>
         <BookOpen size={15} /> Về trang bài học
       </button>
     </div>
@@ -568,169 +595,173 @@ function CampaignPicker({
 
   return (
     <div className="max-w-5xl mx-auto space-y-6" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-      
-      {/* Header section with context */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      <style>{campaignCSS}</style>
+
+      {/* Header */}
+      <div className="cp-enter flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="font-extrabold text-slate-900" style={{ fontSize: "1.45rem", letterSpacing: "-0.02em" }}>
-            Chiến dịch Mô phỏng Phishing
+          <h1 style={{ fontWeight: 800, fontSize: "1.4rem", color: "#0F172A", letterSpacing: "-0.02em" }}>
+            Chiến dịch mô phỏng
           </h1>
-          <p className="text-slate-400 text-xs mt-1 font-medium">
-            Chọn một chiến dịch được giao để rèn luyện phản xạ phát hiện email giả mạo.
+          <p className="text-slate-400 text-sm mt-1">
+            Rèn luyện phản xạ phát hiện email phishing trong môi trường thực tế
           </p>
         </div>
-        <div className="px-4 py-2 rounded-2xl bg-indigo-50 border border-indigo-100/30 flex items-center gap-2 shrink-0 self-start md:self-auto">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl shrink-0 self-start sm:self-auto"
+          style={{ background: "#EEF2FF", border: "1px solid rgba(99,102,241,0.15)" }}>
           <Sparkles size={14} className="text-indigo-500" />
-          <span className="text-indigo-700 text-xs font-bold">
-            Bạn được giao {campaigns.length} chiến dịch
-          </span>
+          <span className="text-indigo-700 text-sm font-bold">{campaigns.length} chiến dịch</span>
         </div>
       </div>
 
-      {/* Grid of Campaign Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {campaigns.map((c: any) => {
+      {/* Cards grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {campaigns.map((c: any, idx: number) => {
           const total = c._totalEmails ?? 0;
           const completed = c._completedEmails ?? 0;
-          const progressPercent = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
-          
-          // Trạng thái chiến dịch
-          let statusText = "Chưa bắt đầu";
-          let statusBg = "#F1F5F9";
-          let statusColor = "#475569";
-          if (completed > 0 && completed < total) {
-            statusText = "Đang làm";
-            statusBg = "#EFF6FF";
-            statusColor = "#2563EB";
-          } else if (completed === total && total > 0) {
-            statusText = "Đã xong";
-            statusBg = "#ECFDF5";
-            statusColor = "#10B981";
-          }
-
-          // Độ khó chiến dịch
-          let diffBg = "#F1F5F9";
-          let diffColor = "#475569";
-          if (c._difficulty === "Dễ") {
-            diffBg = "#ECFDF5";
-            diffColor = "#10B981";
-          } else if (c._difficulty === "Trung bình") {
-            diffBg = "#FFFBEB";
-            diffColor = "#D97706";
-          } else if (c._difficulty === "Khó") {
-            diffBg = "#FEF2F2";
-            diffColor = "#EF4444";
-          }
-
+          const pct = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+          const isDone = completed === total && total > 0;
+          const isInProgress = completed > 0 && !isDone;
           const isLocked = c._eligible === false;
+
+          // Status
+          const status = isDone
+            ? { text: "Hoàn thành", bg: "#ECFDF5", color: "#059669" }
+            : isInProgress
+            ? { text: "Đang làm", bg: "#EEF2FF", color: "#4F46E5" }
+            : { text: "Chưa bắt đầu", bg: "#F8FAFC", color: "#64748B" };
+
+          // Difficulty
+          const diff = c._difficulty === "Dễ"
+            ? { bg: "#ECFDF5", color: "#059669" }
+            : c._difficulty === "Trung bình"
+            ? { bg: "#FFFBEB", color: "#D97706" }
+            : c._difficulty === "Khó"
+            ? { bg: "#FEF2F2", color: "#EF4444" }
+            : { bg: "#F1F5F9", color: "#64748B" };
 
           return (
             <div
               key={c.campaignId}
               onClick={() => { if (!isLocked) onPick(c.campaignId); }}
-              className={`group flex flex-col justify-between p-6 bg-white rounded-2xl text-left border border-slate-100 shadow-sm transition-all duration-200 relative overflow-hidden ${
-                isLocked
-                  ? "cursor-not-allowed opacity-75"
-                  : "cursor-pointer hover:shadow-md hover:-translate-y-0.5"
-              }`}
+              className={`cp-enter cp-card flex flex-col rounded-2xl overflow-hidden relative ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}
+              style={{
+                animationDelay: `${idx * 60}ms`,
+                border: isDone
+                  ? "1.5px solid rgba(16,185,129,0.25)"
+                  : isInProgress
+                  ? "1.5px solid rgba(99,102,241,0.2)"
+                  : "1px solid #E2E8F0",
+                background: "white",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+                opacity: isLocked ? 0.85 : 1,
+              }}
             >
+              {/* Top gradient strip */}
+              <div style={{
+                height: 4,
+                background: isDone
+                  ? "linear-gradient(90deg,#10B981,#34D399)"
+                  : isInProgress
+                  ? "linear-gradient(90deg,#6366F1,#818CF8)"
+                  : "#F1F5F9",
+              }} />
+
               {/* Locked overlay */}
               {isLocked && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
-                  <div className="w-12 h-12 rounded-full bg-amber-50 border-2 border-amber-200 flex items-center justify-center mb-3">
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl"
+                  style={{ background: "rgba(248,250,252,0.88)", backdropFilter: "blur(3px)" }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
+                    style={{ background: "linear-gradient(135deg,#FEF3C7,#FDE68A)", boxShadow: "0 4px 16px rgba(245,158,11,0.25)" }}>
                     <Lock size={20} className="text-amber-500" />
                   </div>
                   <p className="font-bold text-amber-700 text-sm">Chưa đủ điều kiện</p>
-                  <p className="text-amber-600/70 text-xs mt-1 text-center px-6 leading-relaxed">
-                    Hoàn thành bài học lý thuyết bắt buộc để mở khoá chiến dịch này.
+                  <p className="text-amber-600 text-xs mt-1 text-center px-6 leading-relaxed" style={{ opacity: 0.8 }}>
+                    Hoàn thành bài học bắt buộc để mở khoá chiến dịch này
                   </p>
                   <button
                     onClick={(e) => { e.stopPropagation(); onGoLessons(); }}
-                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 transition-all"
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:scale-[1.02]"
+                    style={{ color: "#6366F1", background: "#EEF2FF", border: "1px solid rgba(99,102,241,0.2)" }}
                   >
-                    <BookOpen size={13} /> Về trang bài học <ArrowRight size={11} />
+                    <BookOpen size={12} /> Về bài học <ArrowRight size={11} />
                   </button>
                 </div>
               )}
 
-              <div>
-                {/* Card Top: Icon and Badges */}
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+              <div className="flex flex-col flex-1 p-5 space-y-4">
+                {/* Top row */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
                     style={{
-                      background: completed === total && total > 0
-                        ? "linear-gradient(135deg, #ECFDF5, #D1FAE5)"
-                        : "linear-gradient(135deg, #EEF2FF, #E0E7FF)"
-                    }}
-                  >
-                    <Shield
-                      size={22}
-                      className={completed === total && total > 0 ? "text-emerald-500" : "text-indigo-500"}
+                      background: isDone
+                        ? "linear-gradient(135deg,#ECFDF5,#D1FAE5)"
+                        : "linear-gradient(135deg,#EEF2FF,#E0E7FF)",
+                      boxShadow: isDone
+                        ? "0 4px 12px rgba(16,185,129,0.2)"
+                        : "0 4px 12px rgba(99,102,241,0.15)",
+                    }}>
+                    <Shield size={21} style={{ color: isDone ? "#10B981" : "#6366F1" }} />
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 justify-end">
+                    {c._difficulty && (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                        style={{ background: diff.bg, color: diff.color }}>
+                        {c._difficulty}
+                      </span>
+                    )}
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                      style={{ background: status.bg, color: status.color }}>
+                      {status.text}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Title + description */}
+                <div>
+                  <h3 className="font-extrabold leading-snug line-clamp-1 transition-colors"
+                    style={{ fontSize: "0.92rem", color: isLocked ? "#94A3B8" : "#0F172A" }}>
+                    {c.campaignName}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1.5 line-clamp-2 leading-relaxed"
+                    style={{ minHeight: "2.5rem" }}>
+                    {c.description || "Thực hành nhận biết hành vi lừa đảo với các tình huống email giả lập thực tế."}
+                  </p>
+                </div>
+
+                {/* Progress */}
+                <div className="space-y-2 pt-1 border-t border-slate-50 mt-auto">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-medium">Tiến độ</span>
+                    <span className="font-bold" style={{ color: isDone ? "#059669" : "#334155" }}>
+                      {completed}/{total} email · {pct}%
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F1F5F9" }}>
+                    <div
+                      className="h-full rounded-full cp-bar"
+                      style={{
+                        width: `${pct}%`,
+                        background: isDone
+                          ? "linear-gradient(90deg,#10B981,#34D399)"
+                          : "linear-gradient(90deg,#6366F1,#818CF8)",
+                      }}
                     />
                   </div>
-                  
-                  {/* Badges container */}
-                  <div className="flex flex-wrap items-center gap-1.5 justify-end">
-                    <span
-                      className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
-                      style={{ background: diffBg, color: diffColor }}
-                    >
-                      {c._difficulty || "Chưa xác định"}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-slate-400">
+                      {c.endDate
+                        ? `Hạn: ${new Date(c.endDate).toLocaleDateString("vi-VN")}`
+                        : "Không giới hạn"}
                     </span>
-                    <span
-                      className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
-                      style={{ background: statusBg, color: statusColor }}
-                    >
-                      {statusText}
+                    <span className="flex items-center gap-1 text-xs font-bold transition-transform group-hover:translate-x-0.5"
+                      style={{ color: isLocked ? "#CBD5E1" : isDone ? "#059669" : "#6366F1" }}>
+                      {isLocked ? <><Lock size={11} /> Khoá</>
+                        : isDone ? <><CheckCircle2 size={11} /> Chơi lại</>
+                        : isInProgress ? <>Tiếp tục <ChevronRight size={13} /></>
+                        : <>Bắt đầu <ChevronRight size={13} /></>}
                     </span>
                   </div>
-                </div>
-
-                {/* Campaign Title & Description */}
-                <h3 className={`font-extrabold text-slate-800 text-sm leading-snug transition-colors line-clamp-1 ${!isLocked ? "group-hover:text-indigo-600" : ""}`}>
-                  {c.campaignName}
-                </h3>
-                <p className="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed min-h-[2.5rem]">
-                  {c.description || "Thực hành nhận biết hành vi lừa đảo với các tình huống email giả lập thực tế."}
-                </p>
-              </div>
-
-              {/* Card Bottom: Progress & Details */}
-              <div className="mt-6 pt-4 border-t border-slate-50 space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400 font-medium">Tiến độ thực hiện</span>
-                  <span className="font-bold text-slate-700">
-                    {completed}/{total} email ({progressPercent}%)
-                  </span>
-                </div>
-                
-                {/* Custom Progress Bar */}
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${progressPercent}%`,
-                      background: completed === total && total > 0
-                        ? "linear-gradient(90deg, #10B981, #34D399)"
-                        : "linear-gradient(90deg, #6366F1, #818CF8)"
-                    }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-slate-400 font-medium">
-                    {c.endDate
-                      ? `Hạn chót: ${new Date(c.endDate).toLocaleDateString("vi-VN")}`
-                      : "Không giới hạn thời gian"}
-                  </span>
-                  
-                  <span className={`inline-flex items-center gap-1 text-xs font-bold transition-transform ${isLocked ? "text-slate-400" : "text-indigo-600 group-hover:translate-x-0.5"}`}>
-                    {isLocked
-                      ? "Khoá"
-                      : completed === total && total > 0 ? "Luyện tập lại" : "Bắt đầu ngay"}
-                    {isLocked ? <Lock size={12} /> : <ChevronRight size={14} />}
-                  </span>
                 </div>
               </div>
             </div>

@@ -57,4 +57,14 @@ export const analyticsService = {
       throw error;
     }
   },
+
+  getAdminOverview: async () => {
+    try {
+      const response = await axiosInstance.get("/Analytics/admin-overview");
+      if (response && response.isSuccess) return response.result;
+      throw new Error(response?.errorMessage || "Không thể tải tổng quan admin");
+    } catch (error) {
+      throw error;
+    }
+  },
 };

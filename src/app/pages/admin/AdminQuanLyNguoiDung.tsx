@@ -12,6 +12,7 @@ export interface UserAccountResponse {
   id: number; fullName: string; email: string; avatarUrl: string;
   createdAt: string; lastLogin?: string; role: RoleResponse;
   status: string; systemScore: number; riskLevel: string;
+  activePlanName?: string;
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -271,8 +272,8 @@ export function AdminQuanLyNguoiDung() {
                 <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">Người dùng</th>
                 <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">Vai trò</th>
                 <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">Trạng thái</th>
-                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden md:table-cell">Điểm / Rủi ro</th>
-                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:table-cell">Ngày tạo</th>
+                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden md:table-cell">Gói dịch vụ</th>
+                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:table-cell">Đăng nhập cuối</th>
                 <th className="px-5 py-3.5 w-14"></th>
               </tr>
             </thead>
@@ -315,20 +316,21 @@ export function AdminQuanLyNguoiDung() {
                       </span>
                     </td>
 
-                    {/* Score / Risk */}
+                    {/* Active Plan */}
                     <td className="px-5 py-3.5 hidden md:table-cell">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-slate-700">{u.systemScore}</span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold"
-                          style={{ background: rk.bg, color: rk.color }}>
-                          {rk.label}
+                      {u.activePlanName ? (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold"
+                          style={{ background: "#EEF2FF", color: "#6366F1" }}>
+                          {u.activePlanName}
                         </span>
-                      </div>
+                      ) : (
+                        <span className="text-xs text-slate-300">Miễn phí</span>
+                      )}
                     </td>
 
-                    {/* Created */}
+                    {/* Last Login */}
                     <td className="px-5 py-3.5 text-xs text-slate-400 hidden lg:table-cell">
-                      {u.createdAt ? new Date(u.createdAt).toLocaleDateString("vi-VN") : "—"}
+                      {u.lastLogin ? new Date(u.lastLogin).toLocaleDateString("vi-VN") : "—"}
                     </td>
 
                     {/* Action */}
