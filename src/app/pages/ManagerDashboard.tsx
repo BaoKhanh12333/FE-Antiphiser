@@ -9,6 +9,7 @@ import {
   Loader2, PlusCircle, ShoppingCart,
 } from "lucide-react";
 import { analyticsService } from "../services/analyticsService";
+import { motion } from "motion/react";
 
 /* ── riskConfig: thêm critical ──────────────────────── */
 const riskConfig: Record<string, { label: string; color: string; glow: string }> = {
@@ -100,9 +101,13 @@ export function ManagerDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 size={28} className="animate-spin text-indigo-500" />
-        <span className="ml-3 text-slate-400 text-sm">Đang tải dữ liệu...</span>
+      <div className="space-y-8 max-w-screen-xl mx-auto animate-pulse">
+        <div className="h-8 w-52 bg-slate-100 rounded-xl" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-28 bg-slate-100 rounded-3xl" />)}
+        </div>
+        <div className="h-72 bg-slate-100 rounded-3xl" />
+        <div className="h-64 bg-slate-100 rounded-3xl" />
       </div>
     );
   }
@@ -148,10 +153,14 @@ export function ManagerDashboard() {
 
       {/* Stat cards — deltas ẩn (không có time-series) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {cards.map(({ label, value, suffix, icon: Icon, color, sub }) => (
-          <div
+        {cards.map(({ label, value, suffix, icon: Icon, color, sub }, i) => (
+          <motion.div
             key={label}
-            className="rounded-3xl p-5 transition-all duration-300 hover:-translate-y-0.5"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: i * 0.07, ease: "easeOut" }}
+            whileHover={{ y: -4, boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}
+            className="rounded-3xl p-5"
             style={{
               background: "rgba(255,255,255,0.7)",
               backdropFilter: "blur(16px)",
@@ -169,7 +178,7 @@ export function ManagerDashboard() {
               {value}<span style={{ fontSize: "0.9rem", fontWeight: 500, color: "#94A3B8" }}>{suffix}</span>
             </p>
             <p className="text-slate-400" style={{ fontSize: "0.72rem" }}>{sub}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
 

@@ -5,6 +5,7 @@ import { userService } from "../services/userService";
 import { campaignService } from "../services/campaignService";
 import { scenarioService } from "../services/scenarioService";
 import { lessonService } from "../services/lessonService";
+import { motion } from "motion/react";
 
 // ─── SVG Accuracy Ring ────────────────────────────────────────────────────────
 function AccuracyRing({ value, size = 120, strokeWidth = 10 }: { value: number; size?: number; strokeWidth?: number }) {
@@ -168,13 +169,18 @@ export function TongQuan() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="relative mx-auto mb-4" style={{ width: 50, height: 50 }}>
-            <div className="absolute inset-0 rounded-full border-4 border-indigo-500/10" />
-            <div className="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin" />
-          </div>
-          <p className="text-slate-500 font-semibold text-sm">Đang tải dữ liệu tổng quan...</p>
+      <div className="space-y-6 max-w-screen-xl mx-auto animate-pulse">
+        <div className="h-8 w-72 bg-slate-100 rounded-xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-3 h-48 bg-slate-100 rounded-2xl" />
+          <div className="lg:col-span-2 h-48 bg-slate-100 rounded-2xl" />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 bg-slate-100 rounded-2xl" />)}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-3 h-52 bg-slate-100 rounded-2xl" />
+          <div className="lg:col-span-2 h-52 bg-slate-100 rounded-2xl" />
         </div>
       </div>
     );
@@ -367,51 +373,29 @@ export function TongQuan() {
 
       {/* ── Row 3: 4 Metrics Grid ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Tổng email đã xử lý */}
-        <div className="rounded-2xl p-4 bg-white border border-slate-100 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-50">
-            <Mail size={18} className="text-indigo-600" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email đã xử lý</span>
-            <span className="text-lg font-black text-slate-800 block mt-0.5">{stats.processedEmails}</span>
-          </div>
-        </div>
-
-        {/* Card 2: Phát hiện chính xác */}
-        <div className="rounded-2xl p-4 bg-white border border-slate-100 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50">
-            <CheckCircle2 size={18} className="text-emerald-600" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phát hiện chính xác</span>
-            <span className="text-lg font-black text-slate-800 block mt-0.5">{stats.correctDetections}</span>
-          </div>
-        </div>
-
-        {/* Card 3: Lần dính bẫy */}
-        <div className="rounded-2xl p-4 bg-white border border-slate-100 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-50">
-            <AlertTriangle size={18} className="text-amber-600" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lần dính bẫy</span>
-            <span className="text-lg font-black text-amber-600 block mt-0.5">{stats.trickedTimes}</span>
-          </div>
-        </div>
-
-        {/* Card 4: Bài học lý thuyết */}
-        <div className="rounded-2xl p-4 bg-white border border-slate-100 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-violet-50">
-            <BookOpen size={18} className="text-violet-600" />
-          </div>
-          <div>
-            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bài học hoàn thành</span>
-            <span className="text-lg font-black text-slate-800 block mt-0.5">
-              {completedLessonsCount} / {totalLessonsCount}
-            </span>
-          </div>
-        </div>
+        {[
+          { icon: Mail,          bg: "bg-indigo-50",  iconCls: "text-indigo-600",  label: "Email đã xử lý",       value: stats.processedEmails,  valCls: "text-slate-800" },
+          { icon: CheckCircle2,  bg: "bg-emerald-50", iconCls: "text-emerald-600", label: "Phát hiện chính xác",  value: stats.correctDetections, valCls: "text-slate-800" },
+          { icon: AlertTriangle, bg: "bg-amber-50",   iconCls: "text-amber-600",   label: "Lần dính bẫy",         value: stats.trickedTimes,     valCls: "text-amber-600" },
+          { icon: BookOpen,      bg: "bg-violet-50",  iconCls: "text-violet-600",  label: "Bài học hoàn thành",   value: `${completedLessonsCount} / ${totalLessonsCount}`, valCls: "text-slate-800" },
+        ].map(({ icon: Icon, bg, iconCls, label, value, valCls }, i) => (
+          <motion.div
+            key={label}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: i * 0.07, ease: "easeOut" }}
+            whileHover={{ y: -3, boxShadow: "0 8px 24px rgba(99,102,241,0.1)" }}
+            className="rounded-2xl p-4 bg-white border border-slate-100 flex items-center gap-4 cursor-default"
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${bg}`}>
+              <Icon size={18} className={iconCls} />
+            </div>
+            <div>
+              <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+              <span className={`text-lg font-black block mt-0.5 ${valCls}`}>{value}</span>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
       {/* ── Row 4: Bottom Grid (Phase progress & Call To Action) ── */}

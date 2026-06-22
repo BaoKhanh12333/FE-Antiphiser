@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { userService } from "../../services/userService";
 import { companyService } from "../../services/companyService";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 
 /* ── Types ─────────────────────────────────────────── */
 interface CompanyEmployee {

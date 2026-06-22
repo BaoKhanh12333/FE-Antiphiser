@@ -35,11 +35,9 @@ axiosInstance.interceptors.response.use(
       const data = error.response.data;
 
       if (status === 401) {
-        console.warn("Unauthorized! Redirecting to login...");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        // Có thể cấu hình chuyển hướng người dùng về trang đăng nhập nếu token hết hạn:
-        // window.location.href = "/dang-nhap";
+        window.location.href = "/dang-nhap";
       } else if (status === 403) {
         console.error("Forbidden! You don't have permission to perform this action.");
       }

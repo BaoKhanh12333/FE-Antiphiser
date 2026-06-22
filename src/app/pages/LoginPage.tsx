@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import { authService } from "../services/authService";
 import { userService } from "../services/userService";
+import logoVuong from "../../data/logo vuoong.png";
 import {
   Shield,
   Eye,
@@ -476,28 +477,12 @@ export function LoginPage() {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between h-full p-12">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div
-              className="w-11 h-11 flex items-center justify-center"
-              style={{
-                borderRadius: 14,
-                background: "rgba(255,255,255,0.1)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                backdropFilter: "blur(8px)",
-              }}
-            >
-              <Shield size={22} className="text-white" />
-            </div>
-            <span
-              className="text-white"
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 800,
-                fontSize: "1.2rem",
-              }}
-            >
-              AntiPhisher
-            </span>
+          <div className="flex items-center">
+            <img
+              src={logoVuong}
+              alt="AntiPhisher"
+              style={{ height: 44, background: "white", borderRadius: 10, padding: 5 }}
+            />
           </div>
 
           {/* Quote */}
@@ -562,27 +547,8 @@ export function LoginPage() {
         {/* Form container */}
         <div className="w-full" style={{ maxWidth: 440 }}>
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div
-              className="w-11 h-11 flex items-center justify-center"
-              style={{
-                borderRadius: 14,
-                background: "linear-gradient(135deg, #6366F1, #818CF8)",
-                boxShadow: "0 4px 16px rgba(99,102,241,0.3)",
-              }}
-            >
-              <Shield size={22} className="text-white" />
-            </div>
-            <span
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 800,
-                fontSize: "1.2rem",
-                color: "#1E1B4B",
-              }}
-            >
-              AntiPhisher
-            </span>
+          <div className="lg:hidden mb-10">
+            <img src={logoVuong} alt="AntiPhisher" style={{ height: 44 }} />
           </div>
 
           {/* Heading */}

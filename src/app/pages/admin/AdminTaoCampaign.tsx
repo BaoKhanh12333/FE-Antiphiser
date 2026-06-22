@@ -9,7 +9,7 @@ import { campaignService }  from "../../services/campaignService";
 import { scenarioService }  from "../../services/scenarioService";
 import { lessonService }    from "../../services/lessonService";
 import { userService }      from "../../services/userService";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 
 /* ── Types ─────────────────────────────────────────────── */
 type Scenario = {
