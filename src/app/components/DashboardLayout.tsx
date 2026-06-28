@@ -3,14 +3,16 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { authService } from "../services/authService";
 import { userService } from "../services/userService";
+import axiosInstance from "../api/axiosInstance";
 import {
   LayoutDashboard, BookOpen, ShieldAlert, BarChart3,
   X, LogOut, Settings, Menu, Bell, Search,
   Users, LayoutGrid, Sliders, Library, ChevronDown, PlusCircle, Package,
-  ChevronsLeft, ChevronsRight,
+  ChevronsLeft, ChevronsRight, Trophy,
 } from "lucide-react";
 import logoNgang from "../../data/logo ngang.png";
 import logoVuong from "../../data/logo vuoong.png";
+import { BaselineModal } from "./BaselineModal";
 
 type Role = "user" | "manager" | "admin";
 
@@ -23,12 +25,13 @@ const navByRole: Record<Role, { to: string; label: string; icon: React.ElementTy
     { to: "/nguoi-dung", label: "Tổng quan", icon: LayoutDashboard, end: true },
     { to: "/nguoi-dung/lo-trinh", label: "Bài học", icon: BookOpen },
     { to: "/nguoi-dung/mo-phong", label: "Mô phỏng", icon: ShieldAlert },
-    { to: "#", label: "Báo cáo AI", icon: BarChart3, comingSoon: true },
+    { to: "/nguoi-dung/bao-cao-ai", label: "Báo cáo AI", icon: BarChart3 },
   ],
   manager: [
     { to: "/quan-ly", label: "Tổng quan", icon: LayoutDashboard, end: true },
     { to: "/quan-ly/tao-chien-dich", label: "Tạo chiến dịch", icon: PlusCircle },
     { to: "/quan-ly/nhan-vien", label: "Nhân viên", icon: Users },
+    { to: "/quan-ly/leaderboard", label: "Leaderboard", icon: Trophy },
     { to: "/quan-ly/bao-cao", label: "Báo cáo & AI", icon: BarChart3 },
   ],
   admin: [
@@ -39,6 +42,7 @@ const navByRole: Record<Role, { to: string; label: string; icon: React.ElementTy
     { to: "/quan-tri/goi-dich-vu", label: "Quản lý gói dịch vụ", icon: Package },
     { to: "/quan-tri/ai-controller", label: "Bộ điều khiển AI", icon: Sliders },
     { to: "/quan-tri/quan-ly", label: "Quản lý người dùng", icon: LayoutGrid },
+    { to: "/quan-tri/bao-cao-ai", label: "Báo cáo AI Tổ chức", icon: BarChart3 },
   ],
 };
 
@@ -57,6 +61,35 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const navItems  = navByRole[role];
 
   const [userProfile, setUserProfile] = useState<{ fullName: string; email: string; role?: { roleName: string } } | null>(null);
+  const [showBaseline, setShowBaseline] = useState(false);
+  const [streak, setStreak] = useState<number>(0);
+
+  useEffect(() => {
+    if (role === "user" && !localStorage.getItem("baselineCompleted")) {
+      setShowBaseline(true);
+    }
+  }, [role]);
+
+  useEffect(() => {
+    if (role !== "user") return;
+    (axiosInstance as any)
+      .get("Analytics/my-report")
+      .then((data: { recentTrend: { date: string; correct: number; total: number }[] }) => {
+        const trend = data.recentTrend ?? [];
+        let s = 0;
+        for (let i = trend.length - 1; i >= 0; i--) {
+          if (trend[i].total > 0) s++;
+          else break;
+        }
+        setStreak(s);
+      })
+      .catch(() => {});
+  }, [role]);
+
+  const handleBaselineComplete = () => {
+    localStorage.setItem("baselineCompleted", "true");
+    setShowBaseline(false);
+  };
 
   useEffect(() => {
     const cached = userService.getCurrentUser();
@@ -198,7 +231,7 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               </div>
             ) : (
               <NavLink
-                key={to} to={to} end={end}
+                key={to} to={to} end={end}  
                 title={collapsed ? label : undefined}
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
@@ -266,6 +299,8 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
         </div>
       </aside>
 
+      {showBaseline && <BaselineModal onComplete={handleBaselineComplete} />}
+
       {/* ── Main ── */}
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Topbar */}
@@ -286,10 +321,10 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               <Bell size={20} className="text-slate-600" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: "#F59E0B" }} />
             </button>
-            {role === "user" && (
+            {role === "user" && streak > 0 && (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl" style={{ background: "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
                 <span style={{ fontSize: "1rem" }}>🔥</span>
-                <span className="text-amber-700" style={{ fontWeight: 700, fontSize: "0.85rem" }}>7 ngày</span>
+                <span className="text-amber-700" style={{ fontWeight: 700, fontSize: "0.85rem" }}>{streak} ngày</span>
               </div>
             )}
             <div
