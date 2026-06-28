@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { Mail, CheckCircle2, AlertTriangle, PlayCircle, BookOpen, Shield, Building2, ShieldAlert, ArrowRight, TrendingUp } from "lucide-react";
 import { userService } from "../services/userService";
@@ -6,6 +6,9 @@ import { campaignService } from "../services/campaignService";
 import { scenarioService } from "../services/scenarioService";
 import { lessonService } from "../services/lessonService";
 import { motion } from "motion/react";
+import mascotWave from "../../data/mascot/wave.png";
+import mascotPoint from "../../data/mascot/point.png";
+import mascotIdle from "../../data/mascot/idle.png";
 
 // ─── SVG Accuracy Ring ────────────────────────────────────────────────────────
 function AccuracyRing({ value, size = 120, strokeWidth = 10 }: { value: number; size?: number; strokeWidth?: number }) {
@@ -167,6 +170,18 @@ export function TongQuan() {
     loadDashboardData();
   }, []);
 
+  const achievements = useMemo(() => {
+    const list: { icon: string; title: string; desc: string }[] = [];
+    if (stats.processedEmails >= 1)  list.push({ icon: "🎯", title: "Người mới",   desc: "Hoàn thành email đầu tiên" });
+    if (stats.processedEmails >= 10) list.push({ icon: "⚡", title: "Siêng năng",  desc: "Xử lý 10 email" });
+    if (stats.processedEmails >= 50) list.push({ icon: "🔥", title: "Chiến binh",  desc: "Xử lý 50 email" });
+    if (stats.correctDetections >= 5)  list.push({ icon: "🛡️", title: "Mắt tinh",  desc: "Phát hiện đúng 5 email lừa đảo" });
+    if (stats.correctDetections >= 20) list.push({ icon: "🏆", title: "Chuyên gia", desc: "Phát hiện đúng 20 email" });
+    if (stats.trickedTimes === 0 && stats.processedEmails >= 5)
+      list.push({ icon: "💎", title: "Bất bại", desc: "Chưa dính bẫy lần nào" });
+    return list;
+  }, [stats.processedEmails, stats.correctDetections, stats.trickedTimes]);
+
   if (loading) {
     return (
       <div className="space-y-6 max-w-screen-xl mx-auto animate-pulse">
@@ -222,14 +237,24 @@ export function TongQuan() {
     <div className="space-y-6 max-w-screen-xl mx-auto" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       
       {/* ── Header ── */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-extrabold text-2xl text-slate-800 leading-tight">
-            Chào mừng quay trở lại, {profile?.fullName || "người dùng"}! 👋
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 font-medium">
-            Hôm nay: {new Date().toLocaleDateString("vi-VN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-          </p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <motion.img
+            src={mascotWave}
+            alt="AntiPhisher mascot chào"
+            className="w-20 h-20 object-contain"
+            initial={{ scale: 0, rotate: -15 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+          />
+          <div>
+            <h1 className="font-extrabold text-2xl text-slate-800 leading-tight">
+              Chào mừng quay trở lại, {profile?.fullName || "người dùng"}! 👋
+            </h1>
+            <p className="text-xs text-slate-400 mt-1 font-medium">
+              Hôm nay: {new Date().toLocaleDateString("vi-VN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -397,6 +422,38 @@ export function TongQuan() {
           </motion.div>
         ))}
       </div>
+
+      {/* ── Achievements ── */}
+      {achievements.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <img src={mascotPoint} alt="mascot" className="w-10 h-10 object-contain" />
+            <h2 className="font-semibold text-slate-800">Thành tựu đã đạt</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {achievements.map((a, i) => (
+              <motion.div
+                key={i}
+                className="bg-white border border-slate-100 rounded-xl p-4 flex items-center gap-3"
+                style={{ boxShadow: "0 2px 8px rgba(15,23,42,0.04)" }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6 + i * 0.1 }}
+              >
+                <span className="text-2xl">{a.icon}</span>
+                <div>
+                  <p className="font-semibold text-sm text-slate-800">{a.title}</p>
+                  <p className="text-xs text-slate-400">{a.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* ── Row 4: Bottom Grid (Phase progress & Call To Action) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

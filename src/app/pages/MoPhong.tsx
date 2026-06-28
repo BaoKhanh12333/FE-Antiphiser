@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "motion/react";
 import { useLocation, useNavigate } from "react-router";
 import {
   CheckCircle2, XCircle, AlertTriangle, RefreshCw,
@@ -7,6 +8,8 @@ import {
   Loader2, BookOpen, FileText,
 } from "lucide-react";
 import { scenarioService } from "../services/scenarioService";
+import mascotPoint    from "../../data/mascot/point.png";
+import mascotSurprised from "../../data/mascot/surprised.png";
 import { campaignService } from "../services/campaignService";
 import { lessonService } from "../services/lessonService";
 import { Lock } from "lucide-react";
@@ -95,9 +98,12 @@ const mapDbScenario = (s: any) => {
       const indicators = typeof s.phishingIndicators === "string" ? JSON.parse(s.phishingIndicators) : s.phishingIndicators;
       if (Array.isArray(indicators)) {
         clues = indicators.map((ind: any) => ({
-          flag: ind.flag || "🚩",
-          label: ind.label || "Indicator",
-          text: ind.text || ind.description || ""
+          id: ind.id,
+          type: ind.type,
+          label: ind.visible_text || "",
+          explanation: ind.explanation || "",
+          severity: ind.severity || "medium",
+          flag: ind.severity === "high" ? "🔴" : "🟡",
         }));
       }
     }
@@ -106,16 +112,21 @@ const mapDbScenario = (s: any) => {
   if (clues.length === 0) {
     if (s.isPhishing) {
       clues = [
-        { flag: "🚩", label: "Fake Domain", text: s.senderEmail || "Tên miền giả mạo" },
-        { flag: "🚩", label: "Phishing Attempt", text: s.explanationHint || "Dấu hiệu lừa đảo" }
+        { id: "rf_domain", type: "suspicious_sender_domain", label: s.senderEmail || "Tên miền giả mạo", explanation: s.explanationHint || "Dấu hiệu lừa đảo", severity: "high", flag: "🔴" },
       ];
     } else {
       clues = [
-        { flag: "✅", label: "Legit Sender", text: s.senderEmail || "Địa chỉ tin cậy" },
-        { flag: "✅", label: "Safe Email", text: s.explanationHint || "Nội dung hợp lệ" }
+        { id: "rf_safe", type: "safe_sender", label: s.senderEmail || "Địa chỉ tin cậy", explanation: s.explanationHint || "Nội dung hợp lệ", severity: "low", flag: "✅" },
       ];
     }
   }
+
+  // Adapt clues to legacy aiVerdict format (flag/label/text) for AIFeedbackPanel fallback
+  const legacyClues = clues.map((c: any) => ({
+    flag: c.flag,
+    label: c.label,
+    text: c.explanation,
+  }));
 
   return {
     id: s.scenarioId,
@@ -129,18 +140,19 @@ const mapDbScenario = (s: any) => {
     isPhishing: s.isPhishing,
     hasAttachment: !!s.attachmentUrl,
     starred: false,
+    redFlags: clues,
     aiVerdict: {
       correct: {
         headline: s.isPhishing ? "Chính xác! Bạn đã phát hiện email phishing." : "Chính xác! Đây là email hợp lệ.",
         summary: s.description || "Hãy xem phân tích chi tiết bên dưới.",
-        clues: clues,
+        clues: legacyClues,
         points: s.isPhishing ? "+15" : "+10",
         pointColor: "#10B981",
       },
       wrong: {
         headline: s.isPhishing ? "Chưa đúng! Đây là email phishing." : "Chưa đúng! Đây là email hợp lệ.",
         summary: s.explanationHint || "Xem dấu hiệu nhận biết của email này.",
-        clues: clues,
+        clues: legacyClues,
         points: "-5",
         pointColor: "#EF4444",
       }
@@ -253,16 +265,70 @@ function AIFeedbackPanel({
   onNext,
   isLast,
   backendFeedback,
+  redFlags,
+  selectedRedFlags,
+  isPhishingReport,
 }: {
   verdict: any;
   correct: boolean;
   onNext: () => void;
   isLast: boolean;
   backendFeedback?: any;
+  redFlags?: any[];
+  selectedRedFlags?: string[];
+  isPhishingReport?: boolean;
 }) {
   const data = correct ? verdict.correct : verdict.wrong;
   const isPhishingEmail = verdict.correct.clues.some((c: any) => c.flag === "🚩" || c.flag === "💡");
   const pointColor = backendFeedback ? (backendFeedback.scoreEarned >= 0 ? "#10B981" : "#EF4444") : data.pointColor;
+
+  const correctFlags     = (redFlags ?? []).filter((rf: any) => rf.severity === "high");
+  const userFoundFlags   = correctFlags.filter((rf: any) => (selectedRedFlags ?? []).includes(rf.type));
+  const missedFlags      = correctFlags.filter((rf: any) => !(selectedRedFlags ?? []).includes(rf.type));
+  const bonusFlags       = (redFlags ?? []).filter((rf: any) => rf.severity !== "high" && (selectedRedFlags ?? []).includes(rf.type));
+  const correctFlagTypes = new Set(correctFlags.map((rf: any) => rf.type));
+  const falsePositives   = (selectedRedFlags ?? []).filter((t) => !correctFlagTypes.has(t));
+  const allRedFlagTypes  = new Set((redFlags ?? []).map((rf: any) => rf.type));
+  const displayWrong     = falsePositives.filter((t) => !allRedFlagTypes.has(t));
+  const flagScore = Math.max(0, userFoundFlags.length - falsePositives.length);
+  const flagTotal = correctFlags.length;
+  const scoreColor = flagScore === flagTotal && falsePositives.length === 0
+    ? "#10B981"
+    : flagScore >= flagTotal / 2
+    ? "#F59E0B"
+    : "#EF4444";
+  const scoreLabel = flagScore === flagTotal && falsePositives.length === 0
+    ? "Tuyệt vời — chính xác hoàn toàn!"
+    : flagScore >= flagTotal / 2
+    ? `Khá tốt — còn ${missedFlags.length} bỏ sót${falsePositives.length > 0 ? `, ${falsePositives.length} chọn sai` : ""}`
+    : "Cần cải thiện";
+
+  // ── Animated score counter ──
+  const [displayScore, setDisplayScore] = useState(0);
+  useEffect(() => {
+    const target = backendFeedback?.scoreEarned ?? 0;
+    if (target === 0) { setDisplayScore(0); return; }
+    const duration = 1500;
+    const start = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayScore(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [backendFeedback?.scoreEarned]);
+
+  // ── Risk level config ──
+  const riskConfig: Record<string, { bg: string; color: string; label: string }> = {
+    Low:      { bg: "#ECFDF5", color: "#10B981", label: "Rủi ro thấp" },
+    Medium:   { bg: "#FEF9C3", color: "#EAB308", label: "Rủi ro trung bình" },
+    High:     { bg: "#FFF7ED", color: "#F97316", label: "Rủi ro cao" },
+    Critical: { bg: "#FEF2F2", color: "#EF4444", label: "Rủi ro nghiêm trọng" },
+  };
+  const riskInfo = backendFeedback?.riskLevel ? riskConfig[backendFeedback.riskLevel] : null;
+  const isPulsing = backendFeedback?.riskLevel === "High" || backendFeedback?.riskLevel === "Critical";
 
   return (
     <div
@@ -273,7 +339,10 @@ function AIFeedbackPanel({
         boxShadow: "0 4px 24px rgba(99,102,241,0.08)",
       }}
     >
-      <div
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
         className="px-5 py-4 flex items-center gap-3"
         style={{
           background: correct
@@ -282,7 +351,18 @@ function AIFeedbackPanel({
           borderBottom: `1px solid ${correct ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)"}`,
         }}
       >
-        <div
+        <motion.img
+          src={correct ? mascotPoint : mascotSurprised}
+          alt={correct ? "Mascot chỉ tay hào hứng" : "Mascot hoảng hốt"}
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", delay: 0.3, stiffness: 200 }}
+          style={{ width: 80, height: 80, objectFit: "contain", flexShrink: 0 }}
+        />
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", delay: 0.3, stiffness: 300, damping: 20 }}
           className="w-10 h-10 rounded-xl flex items-center justify-center"
           style={{
             background: correct ? "#10B981" : "#EF4444",
@@ -290,7 +370,7 @@ function AIFeedbackPanel({
           }}
         >
           {correct ? <CheckCircle2 size={20} className="text-white" /> : <XCircle size={20} className="text-white" />}
-        </div>
+        </motion.div>
         <div className="flex-1 min-w-0">
           <div style={{ fontWeight: 700, fontSize: "0.88rem", color: correct ? "#065F46" : "#991B1B", lineHeight: 1.3 }}>
             {backendFeedback
@@ -305,11 +385,165 @@ function AIFeedbackPanel({
             color: correct ? "#10B981" : "#EF4444"
           }}
         >
-          {backendFeedback ? `${backendFeedback.scoreEarned >= 0 ? "+" : ""}${backendFeedback.scoreEarned}` : data.points} pts
+          {backendFeedback ? `${displayScore >= 0 ? "+" : ""}${displayScore}` : data.points} pts
         </div>
-      </div>
+      </motion.div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+
+        {/* ── Risk Level badge ── */}
+        {riskInfo && (
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.3 }}
+            className="w-fit"
+          >
+            {isPulsing ? (
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                style={{ background: riskInfo.bg, border: `1px solid ${riskInfo.color}40` }}
+              >
+                <span style={{ color: riskInfo.color, fontWeight: 700, fontSize: "0.82rem" }}>
+                  ⚠ {riskInfo.label}
+                </span>
+              </motion.div>
+            ) : (
+              <div
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                style={{ background: riskInfo.bg, border: `1px solid ${riskInfo.color}40` }}
+              >
+                <span style={{ color: riskInfo.color, fontWeight: 700, fontSize: "0.82rem" }}>
+                  ● {riskInfo.label}
+                </span>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ── Red Flag Score (only when user reported phishing) ── */}
+        {isPhishingReport && flagTotal > 0 && (
+          <div className="space-y-3">
+            {/* Score header */}
+            <div className="flex items-center gap-4 p-3 rounded-xl" style={{ background: scoreColor + "0D", border: `1.5px solid ${scoreColor}30` }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.3, stiffness: 260, damping: 20 }}
+                className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: "#fff", border: `2.5px solid ${scoreColor}` }}
+              >
+                <span style={{ fontWeight: 900, fontSize: "1rem", lineHeight: 1, color: scoreColor }}>
+                  {flagScore}/{flagTotal}
+                </span>
+              </motion.div>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: "0.88rem", color: scoreColor }}>{scoreLabel}</p>
+                {falsePositives.length > 0 && (
+                  <p style={{ fontSize: "0.72rem", color: "#EF4444", fontWeight: 600 }} className="mt-0.5">
+                    Chọn sai {falsePositives.length} dấu hiệu (bị trừ điểm)
+                  </p>
+                )}
+                <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.72rem" }}>
+                  Xem giải thích chi tiết từng red flag bên dưới
+                </p>
+              </div>
+            </div>
+
+            {/* Detail analysis */}
+            <div>
+              <p className="uppercase text-xs text-slate-400 font-bold tracking-wider mb-2">Phân tích chi tiết</p>
+              <div className="space-y-2">
+                {/* High-severity flags: found or missed */}
+                {correctFlags.map((rf: any, index: number) => {
+                  const found = (selectedRedFlags ?? []).includes(rf.type);
+                  return (
+                    <motion.div
+                      key={rf.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
+                      className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+                      style={{
+                        background: found ? "#F0FDF4" : "#FFF7ED",
+                        border: `1px solid ${found ? "rgba(16,185,129,0.15)" : "rgba(234,179,8,0.2)"}`,
+                      }}
+                    >
+                      <span className="text-base shrink-0 mt-0.5">{found ? "✅" : "⚠️"}</span>
+                      <div className="min-w-0">
+                        <p style={{ fontWeight: 700, fontSize: "0.82rem", color: found ? "#065F46" : "#92400E" }}>
+                          {found ? rf.label : `Bỏ sót: ${rf.label}`}
+                        </p>
+                        <p className="text-slate-500 mt-0.5" style={{ fontSize: "0.75rem", lineHeight: 1.55 }}>
+                          {rf.explanation}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+
+                {/* Truly wrong — selected type doesn't exist in this email at all */}
+                {displayWrong.map((t: string, index: number) => {
+                  const label = STATIC_RED_FLAGS.find((r) => r.type === t)?.label ?? t;
+                  return (
+                    <motion.div
+                      key={t}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + (correctFlags.length + index) * 0.1 }}
+                      className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+                      style={{ background: "#FEF2F2", border: "1px solid rgba(239,68,68,0.2)" }}
+                    >
+                      <span className="text-base shrink-0 mt-0.5">❌</span>
+                      <div className="min-w-0">
+                        <p style={{ fontWeight: 700, fontSize: "0.82rem", color: "#991B1B" }}>
+                          Chọn sai: {label}
+                        </p>
+                        <p className="text-slate-500 mt-0.5" style={{ fontSize: "0.75rem", lineHeight: 1.55 }}>
+                          Dấu hiệu này không xuất hiện trong email này.
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+
+                {/* Non-high flags user selected (bonus) */}
+                {bonusFlags.map((rf: any, index: number) => (
+                  <motion.div
+                    key={rf.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + (correctFlags.length + displayWrong.length + index) * 0.1 }}
+                    className="flex items-start gap-2.5 rounded-xl px-3.5 py-3"
+                    style={{ background: "#F8FAFF", border: "1px solid rgba(99,102,241,0.12)" }}
+                  >
+                    <span className="text-base shrink-0 mt-0.5 text-indigo-400 font-bold">—</span>
+                    <div className="min-w-0">
+                      <span className="inline-block px-1.5 py-0.5 rounded text-xs font-bold mb-1" style={{ background: "#EEF2FF", color: "#6366F1" }}>
+                        Bonus
+                      </span>
+                      <p style={{ fontWeight: 600, fontSize: "0.82rem", color: "#374151" }}>{rf.label}</p>
+                      <p className="text-slate-400 mt-0.5" style={{ fontSize: "0.75rem", lineHeight: 1.55 }}>
+                        {rf.explanation}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t" style={{ borderColor: "rgba(99,102,241,0.08)" }} />
+          </div>
+        )}
+
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0, duration: 0.4 }}
+          className="space-y-4"
+        >
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#EEF2FF" }}>
             <Bot size={16} className="text-indigo-500" />
@@ -426,10 +660,17 @@ function AIFeedbackPanel({
             {correct ? "được cộng vào hồ sơ của bạn" : "bị trừ — làm lại để lấy lại điểm"}
           </p>
         </div>
+        </motion.div>{/* end feedback sections motion wrapper */}
       </div>
 
       {/* Next button */}
-      <div className="px-5 py-4 border-t" style={{ borderColor: "rgba(99,102,241,0.08)" }}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 0.3 }}
+        className="px-5 py-4 border-t"
+        style={{ borderColor: "rgba(99,102,241,0.08)" }}
+      >
         <button
           onClick={onNext}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -444,7 +685,7 @@ function AIFeedbackPanel({
             <>Email tiếp theo <ArrowRight size={16} /></>
           )}
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -772,6 +1013,166 @@ function CampaignPicker({
   );
 }
 
+// ─── Report Panel constants ───────────────────────────────────────────────────
+
+const STATIC_RED_FLAGS = [
+  { type: "suspicious_sender_domain", label: "Địa chỉ người gửi lạ" },
+  { type: "urgency_language",         label: "Ngôn từ cấp bách" },
+  { type: "suspicious_link",          label: "Link đáng ngờ" },
+  { type: "generic_greeting",         label: "Lời chào chung chung" },
+  { type: "threat_consequence",       label: "Đe dọa hậu quả" },
+  { type: "impersonation",            label: "Giả mạo tổ chức" },
+  { type: "credential_request",       label: "Yêu cầu đăng nhập qua link" },
+];
+
+const TACTICS      = ["Tạo sự cấp bách", "Gây sợ hãi", "Giả quyền lực", "Gợi tò mò"];
+const ATTACK_TYPES = ["Lừa đảo qua email", "Lừa đảo có chủ đích", "Giả mạo lãnh đạo (BEC)", "Giả mạo nhân sự", "Giả mạo ngân hàng", "Giả mạo CEO", "Lừa đảo dịch vụ cloud"];
+
+// ─── ReportPanel ──────────────────────────────────────────────────────────────
+
+function TagButton({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="px-4 py-2 rounded-full text-sm font-semibold border transition-all"
+      style={{
+        background:   selected ? "#1C1917" : "#fff",
+        color:        selected ? "#fff"     : "#374151",
+        borderColor:  selected ? "#1C1917"  : "#E5E7EB",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function ReportPanel({
+  email, selectedRedFlags, setSelectedRedFlags,
+  selectedTactics, setSelectedTactics,
+  selectedAttackTypes, setSelectedAttackTypes,
+  userRedFlagNotes, setUserRedFlagNotes,
+  userTacticNotes, setUserTacticNotes,
+  userAttackNotes, setUserAttackNotes,
+  onSubmit, onBack, loading,
+}: {
+  email: any;
+  selectedRedFlags: string[];    setSelectedRedFlags: (v: string[]) => void;
+  selectedTactics: string[];     setSelectedTactics: (v: string[]) => void;
+  selectedAttackTypes: string[]; setSelectedAttackTypes: (v: string[]) => void;
+  userRedFlagNotes: string;      setUserRedFlagNotes: (v: string) => void;
+  userTacticNotes: string;       setUserTacticNotes: (v: string) => void;
+  userAttackNotes: string;       setUserAttackNotes: (v: string) => void;
+  onSubmit: () => void; onBack: () => void; loading: boolean;
+}) {
+  const toggle = (arr: string[], val: string, set: (v: string[]) => void) =>
+    set(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-7"
+      style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+
+      {/* Header */}
+      <div>
+        <h2 style={{ fontWeight: 800, fontSize: "1.2rem", color: "#0F172A" }}>Báo cáo phishing</h2>
+        <p className="text-slate-400 text-sm mt-0.5">Chọn các dấu hiệu bạn nhận ra trong email này</p>
+      </div>
+
+      {/* NGƯỜI GỬI */}
+      <div>
+        <p className="uppercase text-xs text-slate-400 font-bold tracking-wider mb-3">Người gửi</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="px-3 py-1.5 rounded-lg bg-slate-100 font-mono text-slate-700 text-sm">{email.from}</span>
+          <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#EEF2FF", color: "#6366F1" }}>
+            tự động điền
+          </span>
+        </div>
+      </div>
+
+      {/* DẤU HIỆU BẠN NHẬN RA */}
+      <div>
+        <p className="uppercase text-xs text-slate-400 font-bold tracking-wider mb-3">
+          Dấu hiệu bạn nhận ra
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {STATIC_RED_FLAGS.map(({ type, label }) => (
+            <TagButton
+              key={type}
+              label={label}
+              selected={selectedRedFlags.includes(type)}
+              onClick={() => toggle(selectedRedFlags, type, setSelectedRedFlags)}
+            />
+          ))}
+        </div>
+        <textarea
+          className="w-full mt-3 p-3 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 text-slate-700 placeholder:text-slate-400"
+          rows={2}
+          placeholder="Ghi nhận xét thêm của bạn..."
+          value={userRedFlagNotes}
+          onChange={(e) => setUserRedFlagNotes(e.target.value)}
+        />
+      </div>
+
+      {/* THỦ THUẬT TÂM LÝ */}
+      <div>
+        <p className="uppercase text-xs text-slate-400 font-bold tracking-wider mb-3">
+          Thủ thuật tâm lý
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {TACTICS.map((t) => (
+            <TagButton
+              key={t}
+              label={t}
+              selected={selectedTactics.includes(t)}
+              onClick={() => toggle(selectedTactics, t, setSelectedTactics)}
+            />
+          ))}
+        </div>
+        <textarea
+          className="w-full mt-3 p-3 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 text-slate-700 placeholder:text-slate-400"
+          rows={2}
+          placeholder="Bạn nhận thấy thủ thuật gì khác?"
+          value={userTacticNotes}
+          onChange={(e) => setUserTacticNotes(e.target.value)}
+        />
+      </div>
+
+      {/* LOẠI LỪA ĐẢO */}
+      <div>
+        <p className="uppercase text-xs text-slate-400 font-bold tracking-wider mb-3">Loại lừa đảo</p>
+        <div className="flex flex-wrap gap-2">
+          {ATTACK_TYPES.map((a) => (
+            <TagButton
+              key={a}
+              label={a}
+              selected={selectedAttackTypes.includes(a)}
+              onClick={() => toggle(selectedAttackTypes, a, setSelectedAttackTypes)}
+            />
+          ))}
+        </div>
+        <textarea
+          className="w-full mt-3 p-3 border border-slate-200 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 text-slate-700 placeholder:text-slate-400"
+          rows={2}
+          placeholder="Bạn nghĩ đây là loại lừa đảo gì?"
+          value={userAttackNotes}
+          onChange={(e) => setUserAttackNotes(e.target.value)}
+        />
+      </div>
+
+      {/* Submit */}
+      <button
+        onClick={onSubmit}
+        disabled={loading}
+        className="w-full py-3 rounded-xl text-white font-bold text-sm transition-all hover:opacity-90 disabled:opacity-60 disabled:cursor-wait flex items-center justify-center gap-2"
+        style={{ background: "linear-gradient(135deg, #6366F1, #4F46E5)", boxShadow: "0 4px 16px rgba(99,102,241,0.3)" }}
+      >
+        {loading
+          ? <><Loader2 size={16} className="animate-spin" /> Đang gửi...</>
+          : <>Gửi báo cáo</>}
+      </button>
+    </div>
+  );
+}
+
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export function MoPhong() {
@@ -801,6 +1202,13 @@ export function MoPhong() {
   const [loadingDecision, setLoadingDecision] = useState(false);
   const [backendFeedback, setBackendFeedback] = useState<any>(null);
   const [clickedLink,     setClickedLink]     = useState(false);
+  const [showRedFlagPanel,    setShowRedFlagPanel]    = useState(false);
+  const [selectedRedFlags,    setSelectedRedFlags]    = useState<string[]>([]);
+  const [selectedTactics,     setSelectedTactics]     = useState<string[]>([]);
+  const [selectedAttackTypes, setSelectedAttackTypes] = useState<string[]>([]);
+  const [userRedFlagNotes,    setUserRedFlagNotes]    = useState("");
+  const [userTacticNotes,     setUserTacticNotes]     = useState("");
+  const [userAttackNotes,     setUserAttackNotes]     = useState("");
 
   // Bước 1: Nếu không có campaignId → fetch my-campaigns để hiện picker
   // Phần D: lọc ẩn campaign tên chứa "Test"/"Verify" (chỉ FE, không xóa DB)
@@ -973,6 +1381,39 @@ export function MoPhong() {
     }
   };
 
+  const handleSubmitReport = async () => {
+    if (answered || loadingDecision || !email) return;
+    setLoadingDecision(true);
+    const userObservations = [
+      selectedRedFlags.length > 0 ? `Dấu hiệu: ${selectedRedFlags.join(", ")}` : "",
+      userRedFlagNotes ? `Nhận xét dấu hiệu: ${userRedFlagNotes}` : "",
+      selectedTactics.length > 0 ? `Thủ thuật tâm lý: ${selectedTactics.join(", ")}` : "",
+      userTacticNotes ? `Nhận xét tâm lý: ${userTacticNotes}` : "",
+      selectedAttackTypes.length > 0 ? `Loại lừa đảo: ${selectedAttackTypes.join(", ")}` : "",
+      userAttackNotes ? `Nhận xét loại: ${userAttackNotes}` : "",
+    ].filter(Boolean).join("\n");
+    try {
+      const result = await scenarioService.submitAttempt({
+        scenarioId: email.id,
+        campaignId: activeCampaign?.campaignId ?? selectedCampaignId,
+        timeTakenSeconds: 12,
+        isReported: true,
+        isClickedLink: clickedLink,
+        isCredentialLeaked: false,
+        userObservations,
+      });
+      setBackendFeedback(result);
+      setDecision("phishing");
+      if (result.isCorrect) setScore((s) => s + 1);
+    } catch {
+      setDecision("phishing");
+      if (email.isPhishing) setScore((s) => s + 1);
+    } finally {
+      setLoadingDecision(false);
+      setShowRedFlagPanel(false);
+    }
+  };
+
   const handleNext = () => {
     if (current + 1 >= scenarios.length) {
       setFinished(true);
@@ -981,6 +1422,13 @@ export function MoPhong() {
       setDecision(null);
       setBackendFeedback(null);
       setClickedLink(false);
+      setShowRedFlagPanel(false);
+      setSelectedRedFlags([]);
+      setSelectedTactics([]);
+      setSelectedAttackTypes([]);
+      setUserRedFlagNotes("");
+      setUserTacticNotes("");
+      setUserAttackNotes("");
     }
   };
 
@@ -1046,8 +1494,102 @@ export function MoPhong() {
         </div>
       </div>
 
+      {/* ── Red Flag Report Panel (side-by-side) ──────── */}
+      {showRedFlagPanel && !answered && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* Cột trái: Email readonly */}
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ background: "#fff", border: "1px solid rgba(99,102,241,0.1)", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
+          >
+            {/* Toolbar chrome */}
+            <div className="flex items-center gap-3 px-5 py-3 border-b" style={{ background: "#FAFAFF", borderColor: "rgba(99,102,241,0.06)" }}>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+              </div>
+              <div className="flex items-center gap-3.5 ml-2">
+                <Inbox size={14} className="text-slate-400" />
+                <Archive size={14} className="text-slate-400" />
+                <Trash2 size={14} className="text-slate-400" />
+              </div>
+              <div className="ml-auto flex items-center gap-1.5">
+                <Mail size={13} className="text-indigo-400" />
+                <span className="text-slate-400" style={{ fontSize: "0.72rem" }}>Hộp thư mô phỏng</span>
+              </div>
+            </div>
+
+            {/* Email header */}
+            <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(99,102,241,0.06)" }}>
+              <div className="flex items-start gap-3">
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center text-white shrink-0 font-bold"
+                  style={{ background: email.avatarColor, fontSize: "0.85rem" }}
+                >
+                  {email.fromAvatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-800 font-bold" style={{ fontSize: "0.95rem" }}>{email.fromName}</span>
+                    <span className="text-slate-400" style={{ fontSize: "0.75rem" }}>· {email.time}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-slate-400" style={{ fontSize: "0.75rem" }}>Từ:</span>
+                    <span className="px-1.5 py-0.5 rounded font-mono" style={{ fontSize: "0.72rem", background: "#F1F5F9", color: "#475569", fontWeight: 600 }}>
+                      {email.from}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <Star size={15} className={email.starred ? "text-amber-400" : "text-slate-300"} fill={email.starred ? "#FBBF24" : "transparent"} />
+                  {email.hasAttachment && <Paperclip size={15} className="text-red-400" />}
+                </div>
+              </div>
+              <p className="mt-4 text-slate-800 font-bold" style={{ fontSize: "1.05rem", lineHeight: 1.5 }}>
+                {email.subject}
+              </p>
+            </div>
+
+            {/* Email body — scrollable */}
+            <div className="px-6 py-5 overflow-y-auto" style={{ maxHeight: "60vh" }}>
+              <EmailBodyRenderer
+                parts={email.bodyParts}
+                isPhishing={email.isPhishing}
+                answered={null}
+                isCorrect={null}
+                onLinkClick={() => setClickedLink(true)}
+              />
+            </div>
+          </div>
+
+          {/* Cột phải: ReportPanel */}
+          <div className="overflow-y-auto" style={{ maxHeight: "80vh" }}>
+            <ReportPanel
+              email={email}
+              selectedRedFlags={selectedRedFlags}
+              setSelectedRedFlags={setSelectedRedFlags}
+              selectedTactics={selectedTactics}
+              setSelectedTactics={setSelectedTactics}
+              selectedAttackTypes={selectedAttackTypes}
+              setSelectedAttackTypes={setSelectedAttackTypes}
+              userRedFlagNotes={userRedFlagNotes}
+              setUserRedFlagNotes={setUserRedFlagNotes}
+              userTacticNotes={userTacticNotes}
+              setUserTacticNotes={setUserTacticNotes}
+              userAttackNotes={userAttackNotes}
+              setUserAttackNotes={setUserAttackNotes}
+              onSubmit={handleSubmitReport}
+              onBack={() => setShowRedFlagPanel(false)}
+              loading={loadingDecision}
+            />
+          </div>
+        </div>
+      )}
+
       {/* ── Action Bar (pre-answer) ────────────────────── */}
-      {!answered && (
+      {!answered && !showRedFlagPanel && (
         <div
           className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4 flex-wrap"
           style={{
@@ -1079,7 +1621,7 @@ export function MoPhong() {
               Xác nhận An toàn
             </button>
             <button
-              onClick={() => handleDecision("phishing")}
+              onClick={() => setShowRedFlagPanel(true)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.97]"
               style={{
                 background: "linear-gradient(135deg, #FEF2F2, #FEE2E2)",
@@ -1096,7 +1638,7 @@ export function MoPhong() {
       )}
 
       {/* ── Main workspace: Email + AI Panel ──────────── */}
-      <div className={`grid gap-5 ${answered ? "grid-cols-1 lg:grid-cols-5" : "grid-cols-1"}`}>
+      {!showRedFlagPanel && <div className={`grid gap-5 ${answered ? "grid-cols-1 lg:grid-cols-5" : "grid-cols-1"}`}>
 
         {/* Email client */}
         <div className={answered ? "lg:col-span-3" : ""}>
@@ -1210,15 +1752,19 @@ export function MoPhong() {
         {answered && isCorrect !== null && (
           <div className="lg:col-span-2 min-h-[500px] flex flex-col">
             <AIFeedbackPanel
+              key={email?.id}
               verdict={email.aiVerdict}
               correct={isCorrect}
               onNext={handleNext}
               isLast={current + 1 >= scenarios.length}
               backendFeedback={backendFeedback}
+              redFlags={email.redFlags}
+              selectedRedFlags={selectedRedFlags}
+              isPhishingReport={decision === "phishing"}
             />
           </div>
         )}
-      </div>
+      </div>}
     </div>
   );
 }

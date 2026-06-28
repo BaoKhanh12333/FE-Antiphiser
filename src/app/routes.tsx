@@ -10,15 +10,18 @@ import { LoTrinh } from "./pages/LoTrinh";
 import { BaiHoc } from "./pages/BaiHoc";
 import { MoPhong } from "./pages/MoPhong";
 import { BaoCao } from "./pages/BaoCao";
+import { BaoCaoAI } from "./pages/BaoCaoAI";
 import { ManagerDashboard } from "./pages/ManagerDashboard";
 import { ManagerNhanVien } from "./pages/manager/ManagerNhanVien";
 import { ManagerBaoCao } from "./pages/manager/ManagerBaoCao";
 import { ManagerTaoCampaign } from "./pages/manager/ManagerTaoCampaign";
 import { ManagerMuaGoi } from "./pages/manager/ManagerMuaGoi";
+import { ManagerLeaderboard } from "./pages/manager/ManagerLeaderboard";
 import { AdminTongQuan } from "./pages/admin/AdminTongQuan";
 import { AdminThuVien } from "./pages/admin/AdminThuVien";
 import { AdminTaoCampaign } from "./pages/admin/AdminTaoCampaign";
 import { AdminAIController } from "./pages/admin/AdminAIController";
+import { AdminBaoCaoAI } from "./pages/admin/AdminBaoCaoAI";
 import { AdminQuanLyNguoiDung } from "./pages/admin/AdminQuanLyNguoiDung";
 import { AdminQuanLyGoi } from "./pages/admin/AdminQuanLyGoi";
 import { AdminQuanLyLesson } from "./pages/admin/AdminQuanLyLesson";
@@ -89,6 +92,7 @@ export const router = createBrowserRouter([
               { path: "bai-hoc/:lessonId", Component: BaiHoc },
               { path: "mo-phong", Component: MoPhong },
               { path: "bao-cao", Component: BaoCao },
+              { path: "bao-cao-ai", Component: BaoCaoAI },
               { path: "mua-goi", Component: MuaGoi },
               { path: "cai-dat", Component: Settings },
             ],
@@ -106,6 +110,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true, Component: ManagerDashboard },
               { path: "nhan-vien", Component: ManagerNhanVien },
+              { path: "leaderboard", Component: ManagerLeaderboard },
               { path: "bao-cao", Component: ManagerBaoCao },
               { path: "tao-chien-dich", Component: ManagerTaoCampaign },
               { path: "mua-goi", Component: ManagerMuaGoi },
@@ -130,6 +135,7 @@ export const router = createBrowserRouter([
               { path: "goi-dich-vu", Component: AdminQuanLyGoi },
               { path: "ai-controller", Component: AdminAIController },
               { path: "quan-ly", Component: AdminQuanLyNguoiDung },
+              { path: "bao-cao-ai", Component: AdminBaoCaoAI },
               { path: "cai-dat", Component: Settings },
             ],
           },
