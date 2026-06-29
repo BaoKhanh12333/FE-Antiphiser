@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { subscriptionService } from "../services/subscriptionService";
 import { orderService } from "../services/orderService";
 import { QRPaymentModal } from "../components/QRPaymentModal";
+import { BusinessOnboardingModal } from "../components/BusinessOnboardingModal";
+import { IndividualPlanSuccessModal } from "../components/IndividualPlanSuccessModal";
 import { motion } from "motion/react";
 
 interface Plan {
@@ -31,6 +33,9 @@ export function MuaGoi() {
   const [buying, setBuying]       = useState<number | null>(null);
   const [order, setOrder]         = useState<OrderInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [paidPlan, setPaidPlan]      = useState<Plan | null>(null);
+  const [onboarding, setOnboarding]  = useState(false);
+  const [indSuccess, setIndSuccess]  = useState(false);
 
   useEffect(() => {
     subscriptionService.getAllPlans()
@@ -46,6 +51,7 @@ export function MuaGoi() {
         ? await orderService.createOrderIndividual(plan.id)
         : await orderService.createOrderBusinessUpgrade(plan.id);
       setOrder(result);
+      setPaidPlan(plan);
       setModalOpen(true);
     } catch (err: any) {
       toast.error(err?.message || "Không thể tạo đơn hàng. Vui lòng thử lại.");
@@ -54,7 +60,15 @@ export function MuaGoi() {
     }
   };
 
-  const handlePaid = () => navigate("/nguoi-dung/cai-dat");
+  const handlePaid = () => {
+    setModalOpen(false);
+    const isBusiness = (paidPlan?.maxSlots ?? 0) > 1;
+    if (isBusiness) {
+      setOnboarding(true);
+    } else {
+      setIndSuccess(true);
+    }
+  };
 
   const parseFeatures = (feature?: string): string[] => {
     if (!feature) return [];
@@ -371,7 +385,19 @@ export function MuaGoi() {
         onOpenChange={setModalOpen}
         order={order}
         onPaid={handlePaid}
-        onCancelled={() => setOrder(null)}
+        onCancelled={() => { setOrder(null); setPaidPlan(null); }}
+      />
+
+      <BusinessOnboardingModal
+        open={onboarding}
+        plan={paidPlan}
+        onClose={() => { setOnboarding(false); navigate("/nguoi-dung/cai-dat"); }}
+      />
+
+      <IndividualPlanSuccessModal
+        open={indSuccess}
+        plan={paidPlan}
+        onClose={() => setIndSuccess(false)}
       />
     </div>
   );

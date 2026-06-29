@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import {
   ChevronLeft, Loader2, CheckCircle2, AlertCircle,
-  ShieldAlert, BookOpen, Users, Search, PlusCircle,
+  ShieldAlert, ShieldCheck, BookOpen, Users, Search, PlusCircle, Sparkles,
+  Eye, X, Mail,
 } from "lucide-react";
+import DOMPurify from "dompurify";
 import { campaignService } from "../../services/campaignService";
 import { scenarioService } from "../../services/scenarioService";
 import { lessonService } from "../../services/lessonService";
@@ -12,10 +14,21 @@ import { userService } from "../../services/userService";
 type Scenario = {
   scenarioId: number;
   title: string;
+  description: string;
   difficultyId: number;
   difficultyName: string | null;
+  categoryName: string | null;
   isPhishing: boolean;
+  isAIGenerated: boolean;
   isActive: boolean;
+  senderName: string;
+  senderEmail: string;
+  recipientName: string;
+  subject: string;
+  emailBodyHtml: string;
+  phishingIndicators: string | null;
+  explanationHint: string;
+  createdByUserId: number | null;
 };
 
 type Employee = {
@@ -40,6 +53,226 @@ const DIFF_META: Record<number, { label: string; color: string }> = {
 function initials(name: string) {
   const parts = name.trim().split(/\s+/);
   return (parts[0][0] + (parts[parts.length - 1]?.[0] ?? "")).toUpperCase();
+}
+
+type ParsedIndicator = {
+  id?: string;
+  type?: string;
+  visible_text?: string;
+  explanation?: string;
+  severity?: string;
+};
+
+const SEVERITY_META: Record<string, { color: string; bg: string; label: string }> = {
+  high:   { color: "#DC2626", bg: "#FEF2F2", label: "Cao" },
+  medium: { color: "#D97706", bg: "#FFFBEB", label: "Trung bình" },
+  low:    { color: "#059669", bg: "#ECFDF5", label: "Thấp" },
+};
+
+function parseIndicators(raw: string | null): ParsedIndicator[] | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === "object") return parsed;
+  } catch {}
+  return null;
+}
+
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\*(.+?)\*/g, "$1")
+    .replace(/^#+\s/gm, "")
+    .trim();
+}
+
+function ScenarioPreviewModal({
+  scenario,
+  selected,
+  onClose,
+  onToggle,
+}: {
+  scenario: Scenario;
+  selected: boolean;
+  onClose: () => void;
+  onToggle: () => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cleanHtml = DOMPurify.sanitize(scenario.emailBodyHtml || "");
+  const diff = DIFF_META[scenario.difficultyId] ?? { label: "?", color: "#94A3B8" };
+  const indicators = parseIndicators(scenario.phishingIndicators ?? null);
+  const hint = scenario.explanationHint ? stripMarkdown(scenario.explanationHint) : "";
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [scenario.scenarioId]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(2,6,23,0.7)", backdropFilter: "blur(6px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl rounded-2xl overflow-hidden flex flex-col"
+        style={{ background: "#fff", boxShadow: "0 24px 64px rgba(0,0,0,0.3)", maxHeight: "88vh" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal header */}
+        <div className="flex items-start justify-between gap-4 px-6 py-4 shrink-0" style={{ borderBottom: "1px solid #F1F5F9" }}>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1.5">
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: `${diff.color}15`, color: diff.color }}>
+                {scenario.difficultyName ?? diff.label}
+              </span>
+              {scenario.isPhishing ? (
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#FEF2F2", color: "#DC2626" }}>Phishing</span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#ECFDF5", color: "#059669" }}>Hợp lệ</span>
+              )}
+              {scenario.categoryName && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: "#F1F5F9", color: "#64748B" }}>
+                  {scenario.categoryName}
+                </span>
+              )}
+              {scenario.isAIGenerated && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1" style={{ background: "rgba(99,102,241,0.1)", color: "#6366F1" }}>
+                  <Sparkles size={10} /> AI
+                </span>
+              )}
+            </div>
+            <h2 className="font-bold text-slate-800 leading-snug" style={{ fontSize: "1rem" }}>
+              {scenario.title}
+            </h2>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors shrink-0">
+            <X size={16} style={{ color: "#64748B" }} />
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div ref={scrollRef} className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
+
+          {/* Email mockup */}
+          <div style={{ border: "1.5px solid #E2E8F0", borderRadius: 14, overflow: "hidden" }}>
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid #F1F5F9", background: "#FAFAFA" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: "linear-gradient(135deg, #6366F1, #8B5CF6)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#fff", fontWeight: 700, fontSize: "0.85rem", flexShrink: 0,
+                }}>
+                  {scenario.senderName?.charAt(0)?.toUpperCase() || "?"}
+                </div>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0F172A" }}>{scenario.senderName}</p>
+                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{scenario.senderEmail}</p>
+                </div>
+                <div className="ml-auto flex items-center gap-1" style={{ fontSize: "0.72rem", color: "#94A3B8" }}>
+                  <Mail size={12} />
+                  <span>Tới: {scenario.recipientName}</span>
+                </div>
+              </div>
+              <p style={{ fontWeight: 700, fontSize: "0.95rem", color: "#0F172A" }}>{scenario.subject}</p>
+            </div>
+            <div
+              style={{ padding: "18px 20px", maxHeight: 260, overflowY: "auto", fontSize: "0.875rem", lineHeight: 1.75, color: "#334155" }}
+              dangerouslySetInnerHTML={{ __html: cleanHtml }}
+            />
+          </div>
+
+          {/* Phishing analysis */}
+          <div style={{
+            padding: "14px 16px",
+            background: scenario.isPhishing ? "#FFF5F5" : "#F0FDF4",
+            borderRadius: 12,
+            border: `1px solid ${scenario.isPhishing ? "#FECACA" : "#A7F3D0"}`,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              {scenario.isPhishing
+                ? <ShieldAlert size={16} style={{ color: "#DC2626" }} />
+                : <ShieldCheck size={16} style={{ color: "#059669" }} />}
+              <p style={{ fontWeight: 700, fontSize: "0.85rem", color: scenario.isPhishing ? "#DC2626" : "#059669" }}>
+                {scenario.isPhishing ? "Email lừa đảo (Phishing)" : "Email hợp lệ (Safe)"}
+              </p>
+            </div>
+
+            {/* Indicators — parsed JSON array */}
+            {indicators && indicators.length > 0 && (
+              <div className="mb-4">
+                <p style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                  Dấu hiệu nhận biết ({indicators.length})
+                </p>
+                <div className="space-y-2">
+                  {indicators.map((ind, i) => {
+                    const sev = SEVERITY_META[ind.severity ?? ""] ?? SEVERITY_META.medium;
+                    return (
+                      <div key={i} style={{ padding: "10px 12px", background: "#fff", borderRadius: 10, border: "1px solid #F1F5F9" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                          {ind.visible_text && (
+                            <code style={{ fontSize: "0.72rem", padding: "1px 6px", borderRadius: 5, background: "#F8FAFC", color: "#475569", border: "1px solid #E2E8F0", fontFamily: "monospace" }}>
+                              {ind.visible_text}
+                            </code>
+                          )}
+                          <span style={{ fontSize: "0.65rem", fontWeight: 700, padding: "1px 6px", borderRadius: 99, background: sev.bg, color: sev.color, marginLeft: "auto" }}>
+                            {sev.label}
+                          </span>
+                        </div>
+                        {ind.explanation && (
+                          <p style={{ fontSize: "0.78rem", color: "#64748B", lineHeight: 1.6 }}>{ind.explanation}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Fallback: plain text indicators */}
+            {!indicators && scenario.phishingIndicators && (
+              <div className="mb-4">
+                <p style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
+                  Dấu hiệu nhận biết
+                </p>
+                <p style={{ fontSize: "0.82rem", color: "#475569", lineHeight: 1.65 }}>{scenario.phishingIndicators}</p>
+              </div>
+            )}
+
+            {/* Explanation hint — stripped of markdown */}
+            {hint && (
+              <div>
+                <p style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
+                  Gợi ý giải thích cho học viên
+                </p>
+                <p style={{ fontSize: "0.82rem", color: "#475569", lineHeight: 1.7 }}>{hint}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-3 px-6 py-4 shrink-0" style={{ borderTop: "1px solid #F1F5F9", background: "#FAFAFA" }}>
+          <button type="button" onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-slate-100" style={{ border: "1px solid #E2E8F0", color: "#64748B" }}>
+            Đóng
+          </button>
+          <button
+            type="button"
+            onClick={() => { onToggle(); onClose(); }}
+            className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
+            style={{
+              background: selected ? "rgba(239,68,68,0.08)" : "linear-gradient(135deg, #6366F1, #4F46E5)",
+              color: selected ? "#DC2626" : "#fff",
+              border: selected ? "1px solid rgba(239,68,68,0.25)" : "none",
+              boxShadow: selected ? "none" : "0 4px 14px rgba(99,102,241,0.35)",
+            }}
+          >
+            {selected ? "✕ Bỏ chọn kịch bản" : "✓ Thêm vào chiến dịch"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function SectionCard({
@@ -95,6 +328,9 @@ export function ManagerTaoCampaign() {
   const [scenarioSearch, setScenarioSearch] = useState("");
   const [diffFilter,  setDiffFilter]  = useState<number | "all">("all");
   const [typeFilter,  setTypeFilter]  = useState<"all" | "phishing" | "legit">("all");
+
+  /* ── Scenario preview ────────────────────────────────────────── */
+  const [previewScenario, setPreviewScenario] = useState<Scenario | null>(null);
 
   /* ── Submit ───────────────────────────────────────────────────── */
   const [submitting,  setSubmitting]  = useState(false);
@@ -259,6 +495,7 @@ export function ManagerTaoCampaign() {
   };
 
   return (
+    <>
     <form
       onSubmit={handleSubmit}
       className="space-y-6 max-w-2xl mx-auto"
@@ -343,6 +580,34 @@ export function ManagerTaoCampaign() {
         </div>
       </SectionCard>
 
+      {/* ── AI Banner ─────────────────────────────────────────────── */}
+      <div
+        className="flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer hover:opacity-90 transition-opacity"
+        style={{
+          background: "linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.06) 100%)",
+          border: "1.5px solid rgba(99,102,241,0.2)",
+        }}
+        onClick={() => navigate("/quan-ly/ai-sinh-kich-ban")}
+      >
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+          style={{ background: "linear-gradient(135deg, #6366F1, #8B5CF6)", boxShadow: "0 4px 14px rgba(99,102,241,0.35)" }}
+        >
+          <Sparkles size={18} style={{ color: "#fff" }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p style={{ fontWeight: 700, fontSize: "0.88rem", color: "#4F46E5" }}>
+            Chưa có kịch bản phù hợp?
+          </p>
+          <p style={{ fontSize: "0.78rem", color: "#6366F1", marginTop: 1 }}>
+            Dùng AI sinh kịch bản riêng cho công ty — không cần Admin duyệt, hiện ngay trong danh sách.
+          </p>
+        </div>
+        <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#6366F1", whiteSpace: "nowrap" }}>
+          Tạo bằng AI →
+        </span>
+      </div>
+
       {/* ── 2. Kịch bản ─────────────────────────────────────────── */}
       <SectionCard title="Kịch bản mô phỏng" icon={ShieldAlert} count={selectedScenarioIds.length} total={scenarios.length}>
         {/* Search + chips */}
@@ -414,17 +679,18 @@ export function ManagerTaoCampaign() {
               const selected = selectedScenarioIds.includes(s.scenarioId);
               const diff = DIFF_META[s.difficultyId] ?? { label: "?", color: "#94A3B8" };
               return (
-                <button
+                <div
                   key={s.scenarioId}
-                  type="button"
-                  onClick={() => toggleId(s.scenarioId, selectedScenarioIds, setSelectedScenarioIds)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left transition-all border-b last:border-b-0 hover:bg-slate-50"
+                  className="flex items-center gap-3 px-4 py-3 border-b last:border-b-0 group"
                   style={{
-                    background: selected ? "#ECFDF5" : "transparent",
+                    background: selected ? "rgba(5,150,105,0.05)" : "transparent",
                     borderBottomColor: "#F1F5F9",
                   }}
                 >
-                  <div
+                  {/* Checkbox area */}
+                  <button
+                    type="button"
+                    onClick={() => toggleId(s.scenarioId, selectedScenarioIds, setSelectedScenarioIds)}
                     className="w-4 h-4 rounded flex items-center justify-center shrink-0"
                     style={{
                       background: selected ? "#059669" : "transparent",
@@ -432,10 +698,18 @@ export function ManagerTaoCampaign() {
                     }}
                   >
                     {selected && <CheckCircle2 size={11} className="text-white" />}
-                  </div>
-                  <span className="flex-1 text-slate-700" style={{ fontSize: "0.85rem" }}>
+                  </button>
+
+                  {/* Title — click to preview */}
+                  <button
+                    type="button"
+                    onClick={() => setPreviewScenario(s)}
+                    className="flex-1 text-left hover:text-indigo-600 transition-colors"
+                    style={{ fontSize: "0.85rem", color: "#334155" }}
+                  >
                     {s.title}
-                  </span>
+                  </button>
+
                   <span
                     className="px-2 py-0.5 rounded-full text-xs font-semibold shrink-0"
                     style={{ background: `${diff.color}15`, color: diff.color }}
@@ -451,7 +725,18 @@ export function ManagerTaoCampaign() {
                       Hợp lệ
                     </span>
                   )}
-                </button>
+
+                  {/* Eye preview button */}
+                  <button
+                    type="button"
+                    onClick={() => setPreviewScenario(s)}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                    style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.15)" }}
+                    title="Xem chi tiết"
+                  >
+                    <Eye size={13} style={{ color: "#6366F1" }} />
+                  </button>
+                </div>
               );
             })
           )}
@@ -603,5 +888,16 @@ export function ManagerTaoCampaign() {
         </button>
       </div>
     </form>
+
+    {/* Scenario preview modal */}
+    {previewScenario && (
+      <ScenarioPreviewModal
+        scenario={previewScenario}
+        selected={selectedScenarioIds.includes(previewScenario.scenarioId)}
+        onClose={() => setPreviewScenario(null)}
+        onToggle={() => toggleId(previewScenario.scenarioId, selectedScenarioIds, setSelectedScenarioIds)}
+      />
+    )}
+    </>
   );
 }

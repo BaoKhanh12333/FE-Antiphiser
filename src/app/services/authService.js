@@ -139,6 +139,23 @@ export const authService = {
   },
 
   /**
+   * Tái cấp JWT với role hiện tại từ DB (sau khi webhook nâng cấp role Manager).
+   * Cập nhật localStorage và trả về token mới.
+   */
+  refreshToken: async () => {
+    try {
+      const response = await axiosInstance.post("/Auth/refresh-token");
+      if (response && response.isSuccess && response.result) {
+        localStorage.setItem("token", response.result);
+        return response.result;
+      }
+      throw new Error(response?.errorMessage || "Không thể làm mới phiên đăng nhập");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
    * Đăng xuất hệ thống
    */
   logout: () => {

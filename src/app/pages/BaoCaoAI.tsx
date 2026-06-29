@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from "recharts";
-import { TrendingUp, Target, Flame, Bot } from "lucide-react";
+import { TrendingUp, Target, Flame, Bot, Award, Download, Copy, CheckCircle } from "lucide-react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
+import { toPng } from "html-to-image";
 import axiosInstance from "../api/axiosInstance";
+import { CertificateCard } from "../components/CertificateCard";
 import mascotPoint from "../../data/mascot/point.png";
 import mascotSad from "../../data/mascot/sad.png";
 
@@ -41,6 +43,11 @@ export function BaoCaoAI() {
   const [report, setReport]   = useState<MyReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [advice, setAdvice]   = useState<any>(null);
+  const [cert, setCert]       = useState<any>(null);
+  const [certLoading, setCertLoading] = useState(true);
+  const [issuing, setIssuing] = useState(false);
+  const [copied, setCopied]   = useState(false);
+  const certRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     (axiosInstance as any)
@@ -64,6 +71,40 @@ export function BaoCaoAI() {
       .then((data: any) => setAdvice(data))
       .catch(() => setAdvice(null));
   }, []);
+
+  useEffect(() => {
+    (axiosInstance as any)
+      .get("Certificate/mine")
+      .then((res: any) => { if (res?.isSuccess) setCert(res.result); })
+      .catch(() => setCert(null))
+      .finally(() => setCertLoading(false));
+  }, []);
+
+  async function handleIssueCert() {
+    setIssuing(true);
+    try {
+      const res: any = await (axiosInstance as any).post("Certificate/issue");
+      if (res?.isSuccess) setCert(res.result);
+    } finally {
+      setIssuing(false);
+    }
+  }
+
+  async function handleDownload() {
+    if (!certRef.current) return;
+    const png = await toPng(certRef.current, { cacheBust: true, pixelRatio: 2 });
+    const a = document.createElement("a");
+    a.href = png;
+    a.download = `chung-chi-${cert?.certificateCode ?? "antiphisher"}.png`;
+    a.click();
+  }
+
+  function handleCopyLink() {
+    if (!cert) return;
+    navigator.clipboard.writeText(`${window.location.origin}/xac-nhan-chung-chi/${cert.certificateCode}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
 
   // ── Loading ────────────────────────────────────────────
   if (loading) {
@@ -162,6 +203,170 @@ export function BaoCaoAI() {
           </p>
         </div>
       </div>
+
+      {/* [E] AI Predictive Advice */}
+      {advice && (
+        <motion.div
+          className={cardCls}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <img src={mascotPoint} alt="mascot" className="w-12 h-12 object-contain" />
+            <div>
+              <h2 style={{ fontWeight: 700, fontSize: "1rem", color: "#0F172A" }}>Phân tích AI cá nhân</h2>
+              <p className="text-sm text-slate-500">Dựa trên 90 ngày hoạt động gần nhất</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="rounded-xl p-4" style={{ background: "#FEF2F2" }}>
+              <p className="text-xs font-semibold uppercase mb-1" style={{ color: "#DC2626" }}>Xu hướng rủi ro</p>
+              <p className="text-sm font-medium">{advice.riskPattern}</p>
+            </div>
+            <div className="rounded-xl p-4" style={{ background: "#FFF7ED" }}>
+              <p className="text-xs font-semibold uppercase mb-1" style={{ color: "#EA580C" }}>Điểm yếu chính</p>
+              <p className="text-sm font-medium">{advice.primaryWeakness}</p>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-slate-500">Độ tin cậy phân tích</span>
+              <span style={{ fontWeight: 700 }}>{Math.round((advice.confidenceScore ?? 0) * 100)}%</span>
+            </div>
+            <div className="w-full rounded-full h-2" style={{ background: "#F1F5F9" }}>
+              <div
+                className="h-2 rounded-full transition-all"
+                style={{ width: `${(advice.confidenceScore ?? 0) * 100}%`, background: "#6366F1" }}
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase mb-2 text-slate-500">Lời khuyên cụ thể</p>
+            <div className="space-y-2">
+              {(advice.actionableAdvice ?? []).map((tip: string, i: number) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <span className="mt-0.5 shrink-0">💡</span>
+                  <p className="text-sm text-slate-700">{tip}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl p-3 flex items-center gap-2" style={{ background: "#EFF6FF" }}>
+            <span>📊</span>
+            <p className="text-sm">
+              Độ khó đề xuất tiếp theo:{" "}
+              <span style={{ fontWeight: 700 }}>
+                {advice.recommendedNextDifficulty === "Easy" ? "Dễ"
+                  : advice.recommendedNextDifficulty === "Medium" ? "Trung bình" : "Khó"}
+              </span>
+            </p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* [F] Certificate */}
+      {!certLoading && (
+        <motion.div
+          className={cardCls}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <Award size={20} className="text-indigo-500" />
+            <h2 style={{ fontWeight: 700, fontSize: "1rem", color: "#0F172A" }}>Chứng chỉ hoàn thành</h2>
+          </div>
+
+          {cert ? (
+            <>
+              <div className="overflow-x-auto pb-3">
+                <CertificateCard
+                  ref={certRef}
+                  certCode={cert.certificateCode}
+                  fullName={cert.fullNameSnapshot}
+                  companyName={cert.companyNameSnapshot}
+                  issuedAt={cert.issuedAt}
+                  correctRate={cert.correctRateSnapshot}
+                  totalAttempts={cert.totalAttemptsSnapshot}
+                  verifyUrl={`${window.location.origin}/xac-nhan-chung-chi/${cert.certificateCode}`}
+                />
+              </div>
+              <div className="flex gap-3 flex-wrap mt-4">
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ padding: "10px 20px", borderRadius: 12, background: "#6366F1", color: "#fff", fontWeight: 700, fontSize: "0.85rem", border: "none", cursor: "pointer" }}
+                >
+                  <Download size={15} /> Tải PNG
+                </button>
+                <button
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ padding: "10px 20px", borderRadius: 12, background: copied ? "#ECFDF5" : "#F1F5F9", color: copied ? "#059669" : "#475569", fontWeight: 700, fontSize: "0.85rem", border: "none", cursor: "pointer" }}
+                >
+                  {copied ? <CheckCircle size={15} /> : <Copy size={15} />}
+                  {copied ? "Đã sao chép!" : "Sao chép link xác minh"}
+                </button>
+              </div>
+            </>
+          ) : report && report.totalAttempts >= 10 && report.correctRate >= 70 ? (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <img src={mascotPoint} alt="mascot" className="w-20 h-20 object-contain" />
+              <div>
+                <p style={{ fontWeight: 700, fontSize: "1rem", color: "#0F172A", marginBottom: 4 }}>
+                  Bạn đủ điều kiện nhận chứng chỉ!
+                </p>
+                <p className="text-slate-400 text-sm mb-5">
+                  Đã hoàn thành {report.totalAttempts} bài · tỉ lệ đúng {report.correctRate.toFixed(1)}%
+                </p>
+              </div>
+              <button
+                onClick={handleIssueCert}
+                disabled={issuing}
+                className="flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{ padding: "12px 28px", borderRadius: 14, background: issuing ? "#94A3B8" : "linear-gradient(135deg, #6366F1, #818CF8)", color: "#fff", fontWeight: 700, fontSize: "0.9rem", border: "none", cursor: issuing ? "not-allowed" : "pointer" }}
+              >
+                <Award size={17} />
+                {issuing ? "Đang tạo chứng chỉ..." : "Nhận chứng chỉ ngay"}
+              </button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-slate-500 text-sm mb-4">Hoàn thành các yêu cầu sau để nhận chứng chỉ:</p>
+              <div className="space-y-4">
+                {[
+                  { label: "Số lần thực hành", current: report?.totalAttempts ?? 0, target: 10, unit: "lần" },
+                  { label: "Tỉ lệ trả lời đúng", current: Math.round(report?.correctRate ?? 0), target: 70, unit: "%" },
+                ].map(({ label, current, target, unit }) => {
+                  const pct = Math.min((current / target) * 100, 100);
+                  const done = current >= target;
+                  return (
+                    <div key={label}>
+                      <div className="flex justify-between mb-1.5">
+                        <span className="text-sm text-slate-600">{label}</span>
+                        <span style={{ fontWeight: 700, fontSize: "0.85rem", color: done ? "#059669" : "#64748B" }}>
+                          {current}{unit} / {target}{unit} {done ? "✓" : ""}
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full" style={{ background: "#F1F5F9" }}>
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${pct}%`, background: done ? "#10B981" : "#6366F1" }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {/* [B] Line chart */}
       <div className={cardCls}>
@@ -306,70 +511,6 @@ export function BaoCaoAI() {
         </div>
       )}
 
-      {/* [E] AI Predictive Advice */}
-      {advice && (
-        <motion.div
-          className={cardCls}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <img src={mascotPoint} alt="mascot" className="w-12 h-12 object-contain" />
-            <div>
-              <h2 style={{ fontWeight: 700, fontSize: "1rem", color: "#0F172A" }}>Phân tích AI cá nhân</h2>
-              <p className="text-sm text-slate-500">Dựa trên 90 ngày hoạt động gần nhất</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="rounded-xl p-4" style={{ background: "#FEF2F2" }}>
-              <p className="text-xs font-semibold uppercase mb-1" style={{ color: "#DC2626" }}>Xu hướng rủi ro</p>
-              <p className="text-sm font-medium">{advice.riskPattern}</p>
-            </div>
-            <div className="rounded-xl p-4" style={{ background: "#FFF7ED" }}>
-              <p className="text-xs font-semibold uppercase mb-1" style={{ color: "#EA580C" }}>Điểm yếu chính</p>
-              <p className="text-sm font-medium">{advice.primaryWeakness}</p>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-slate-500">Độ tin cậy phân tích</span>
-              <span style={{ fontWeight: 700 }}>{Math.round((advice.confidenceScore ?? 0) * 100)}%</span>
-            </div>
-            <div className="w-full rounded-full h-2" style={{ background: "#F1F5F9" }}>
-              <div
-                className="h-2 rounded-full transition-all"
-                style={{ width: `${(advice.confidenceScore ?? 0) * 100}%`, background: "#6366F1" }}
-              />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <p className="text-xs font-semibold uppercase mb-2 text-slate-500">Lời khuyên cụ thể</p>
-            <div className="space-y-2">
-              {(advice.actionableAdvice ?? []).map((tip: string, i: number) => (
-                <div key={i} className="flex gap-2 items-start">
-                  <span className="mt-0.5 shrink-0">💡</span>
-                  <p className="text-sm text-slate-700">{tip}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl p-3 flex items-center gap-2" style={{ background: "#EFF6FF" }}>
-            <span>📊</span>
-            <p className="text-sm">
-              Độ khó đề xuất tiếp theo:{" "}
-              <span style={{ fontWeight: 700 }}>
-                {advice.recommendedNextDifficulty === "Easy" ? "Dễ"
-                  : advice.recommendedNextDifficulty === "Medium" ? "Trung bình" : "Khó"}
-              </span>
-            </p>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }

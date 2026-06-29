@@ -421,6 +421,7 @@ export function AdminQuanLyNguoiDung() {
   const [statusFilter, setStatusFilter] = useState<"all"|"Active"|"Banned"|"Unverified">("all");
   const [page,         setPage]         = useState(1);
   const [detailUser,   setDetailUser]   = useState<UserAccountResponse | null>(null);
+  const [riskFilter,   setRiskFilter]   = useState<"all"|"Low"|"Medium"|"High">("all");
 
   const load = async () => {
     setLoading(true);
@@ -437,7 +438,7 @@ export function AdminQuanLyNguoiDung() {
     total:    allUsers.length,
     active:   allUsers.filter(u => u.status === "Active").length,
     managers: allUsers.filter(u => u.role?.roleId === 2).length,
-    admins:   allUsers.filter(u => u.role?.roleId === 1).length,
+    highRisk: allUsers.filter(u => u.riskLevel === "High").length,
   }), [allUsers]);
 
   const filtered = useMemo(() => {
@@ -449,9 +450,10 @@ export function AdminQuanLyNguoiDung() {
         || (roleFilter === "manager" && u.role?.roleId === 2)
         || (roleFilter === "user"    && u.role?.roleId === 3);
       const matchStatus = statusFilter === "all" || u.status === statusFilter;
-      return matchSearch && matchRole && matchStatus;
+      const matchRisk   = riskFilter === "all" || u.riskLevel === riskFilter;
+      return matchSearch && matchRole && matchStatus && matchRisk;
     });
-  }, [allUsers, search, roleFilter, statusFilter]);
+  }, [allUsers, search, roleFilter, statusFilter, riskFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged      = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -485,8 +487,8 @@ export function AdminQuanLyNguoiDung() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={Users}     label="Tổng người dùng" value={stats.total}    color="#6366F1" bg="#EEF2FF" />
         <StatCard icon={UserCheck} label="Đang hoạt động"  value={stats.active}   color="#059669" bg="#D1FAE5" />
-        <StatCard icon={Briefcase} label="Quản lý"         value={stats.managers} color="#2563EB" bg="#DBEAFE" />
-        <StatCard icon={Shield}    label="Admin"           value={stats.admins}   color="#7C3AED" bg="#EDE9FE" />
+        <StatCard icon={Briefcase} label="Quản lý (Manager)" value={stats.managers} color="#2563EB" bg="#DBEAFE" />
+        <StatCard icon={Shield}    label="Rủi ro cao"      value={stats.highRisk} color="#DC2626" bg="#FEE2E2" />
       </div>
 
       {/* Filters */}
@@ -524,6 +526,17 @@ export function AdminQuanLyNguoiDung() {
           ))}
         </div>
 
+        <div className="flex rounded-xl overflow-hidden border border-slate-200 text-xs font-semibold">
+          {(["all","Low","Medium","High"] as const).map(r => (
+            <button key={r} onClick={() => { setRiskFilter(r); resetPage(); }}
+              className={`px-3 py-2 transition ${riskFilter === r
+                ? r === "High" ? "bg-red-500 text-white" : r === "Medium" ? "bg-amber-500 text-white" : r === "Low" ? "bg-emerald-500 text-white" : "bg-indigo-600 text-white"
+                : "bg-white text-slate-500 hover:bg-slate-50"}`}>
+              {r === "all" ? "Rủi ro: Tất cả" : RISK[r]?.label ?? r}
+            </button>
+          ))}
+        </div>
+
         <span className="text-xs text-slate-400 ml-auto">{filtered.length} kết quả</span>
       </div>
 
@@ -542,8 +555,9 @@ export function AdminQuanLyNguoiDung() {
                 <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">Người dùng</th>
                 <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">Vai trò</th>
                 <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider">Trạng thái</th>
-                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden md:table-cell">Gói dịch vụ</th>
-                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:table-cell">Điểm</th>
+                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden md:table-cell">Rủi ro</th>
+                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:table-cell">Điểm / Gói</th>
+                <th className="px-5 py-3.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden xl:table-cell">Đăng nhập cuối</th>
                 <th className="px-5 py-3.5 w-8"></th>
               </tr>
             </thead>
@@ -590,22 +604,45 @@ export function AdminQuanLyNguoiDung() {
                       </span>
                     </td>
 
-                    {/* Active Plan */}
+                    {/* Risk */}
                     <td className="px-5 py-3.5 hidden md:table-cell">
-                      {u.activePlanName ? (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold"
-                          style={{ background: "#EEF2FF", color: "#6366F1" }}>
-                          {u.activePlanName}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-slate-300">Miễn phí</span>
-                      )}
+                      {(() => {
+                        const rk = RISK[u.riskLevel] ?? RISK.Low;
+                        return (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold"
+                            style={{ background: rk.bg, color: rk.color }}>
+                            {rk.label}
+                          </span>
+                        );
+                      })()}
                     </td>
 
-                    {/* Score */}
+                    {/* Score + Plan */}
                     <td className="px-5 py-3.5 hidden lg:table-cell">
-                      <span className="text-sm font-bold" style={{ color: scoreCol }}>{u.systemScore}</span>
-                      <span className="text-xs text-slate-300">/100</span>
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-bold" style={{ color: scoreCol }}>{u.systemScore}</span>
+                          <span className="text-xs text-slate-300">/100</span>
+                        </div>
+                        {u.activePlanName ? (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md w-fit" style={{ background: "#EEF2FF", color: "#6366F1" }}>
+                            {u.activePlanName}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-slate-300">Miễn phí</span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Last login */}
+                    <td className="px-5 py-3.5 hidden xl:table-cell">
+                      {u.lastLogin ? (
+                        <span className="text-xs text-slate-400">
+                          {new Date(u.lastLogin).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-300">Chưa đăng nhập</span>
+                      )}
                     </td>
 
                     {/* Arrow hint */}

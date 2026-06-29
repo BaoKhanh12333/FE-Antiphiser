@@ -17,6 +17,7 @@ import { ManagerBaoCao } from "./pages/manager/ManagerBaoCao";
 import { ManagerTaoCampaign } from "./pages/manager/ManagerTaoCampaign";
 import { ManagerMuaGoi } from "./pages/manager/ManagerMuaGoi";
 import { ManagerLeaderboard } from "./pages/manager/ManagerLeaderboard";
+import { ManagerAISinhKichBan } from "./pages/manager/ManagerAISinhKichBan";
 import { AdminTongQuan } from "./pages/admin/AdminTongQuan";
 import { AdminThuVien } from "./pages/admin/AdminThuVien";
 import { AdminTaoCampaign } from "./pages/admin/AdminTaoCampaign";
@@ -25,6 +26,7 @@ import { AdminBaoCaoAI } from "./pages/admin/AdminBaoCaoAI";
 import { AdminQuanLyNguoiDung } from "./pages/admin/AdminQuanLyNguoiDung";
 import { AdminQuanLyGoi } from "./pages/admin/AdminQuanLyGoi";
 import { AdminQuanLyLesson } from "./pages/admin/AdminQuanLyLesson";
+import { AdminAchievements } from "./pages/admin/AdminAchievements";
 import { Settings } from "./pages/Settings";
 import { MuaGoi } from "./pages/MuaGoi";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
@@ -32,6 +34,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
 import { PaymentFail } from "./pages/PaymentFail";
 import { AcceptInvite } from "./pages/AcceptInvite";
+import { VerifyCertificate } from "./pages/VerifyCertificate";
 
 function RootLayout() {
   return <Outlet />;
@@ -79,6 +82,9 @@ export const router = createBrowserRouter([
       // Public: xác nhận lời mời tham gia công ty (không cần đăng nhập)
       { path: "xac-nhan-moi", Component: AcceptInvite },
 
+      // Public: xác minh chứng chỉ (không cần đăng nhập)
+      { path: "xac-nhan-chung-chi/:code", Component: VerifyCertificate },
+
       // Nhóm người dùng (User/Nhân viên, Manager, Admin)
       {
         element: <ProtectedRoute allowedRoles={["User", "Manager", "Admin"]} />,
@@ -113,6 +119,7 @@ export const router = createBrowserRouter([
               { path: "leaderboard", Component: ManagerLeaderboard },
               { path: "bao-cao", Component: ManagerBaoCao },
               { path: "tao-chien-dich", Component: ManagerTaoCampaign },
+              { path: "ai-sinh-kich-ban", Component: ManagerAISinhKichBan },
               { path: "mua-goi", Component: ManagerMuaGoi },
               { path: "cai-dat", Component: Settings },
             ],
@@ -136,6 +143,7 @@ export const router = createBrowserRouter([
               { path: "ai-controller", Component: AdminAIController },
               { path: "quan-ly", Component: AdminQuanLyNguoiDung },
               { path: "bao-cao-ai", Component: AdminBaoCaoAI },
+              { path: "thanh-tuu", Component: AdminAchievements },
               { path: "cai-dat", Component: Settings },
             ],
           },

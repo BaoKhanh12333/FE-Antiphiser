@@ -96,6 +96,20 @@ export const scenarioService = {
   },
 
   /**
+   * Tạo kịch bản công ty (Manager) — gắn CreatedByUserId, chỉ hiện trong nội bộ công ty
+   * @param {object} data - CreateScenarioRequest fields
+   */
+  createCompanyScenario: async (data) => {
+    try {
+      const response = await axiosInstance.post("/Scenarios/company", data);
+      if (response && response.isSuccess) return response.result;
+      throw new Error(response?.errorMessage || "Không thể tạo kịch bản");
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
    * Xóa kịch bản mô phỏng (Admin)
    * @param {number} id - ID kịch bản cần xóa
    * @returns {Promise<object>} Kết quả xóa
