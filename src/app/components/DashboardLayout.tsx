@@ -3,12 +3,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { authService } from "../services/authService";
 import { userService } from "../services/userService";
+import { lessonService } from "../services/lessonService";
 import axiosInstance from "../api/axiosInstance";
 import {
   LayoutDashboard, BookOpen, ShieldAlert, BarChart3,
   X, LogOut, Settings, Menu, Bell, Search,
-  Users, LayoutGrid, Sliders, Library, ChevronDown, PlusCircle, Package,
-  ChevronsLeft, ChevronsRight, Trophy,
+  Users, LayoutGrid, Library, ChevronDown, PlusCircle, Package,
+  ChevronsLeft, ChevronsRight, Trophy, Lock, Sparkles,
 } from "lucide-react";
 import logoNgang from "../../data/logo ngang.png";
 import logoVuong from "../../data/logo vuoong.png";
@@ -20,16 +21,17 @@ interface DashboardLayoutProps {
   role: Role;
 }
 
-const navByRole: Record<Role, { to: string; label: string; icon: React.ElementType; badge?: string; end?: boolean; comingSoon?: boolean }[]> = {
+const navByRole: Record<Role, { to: string; label: string; icon: React.ElementType; badge?: string; end?: boolean; comingSoon?: boolean; requiresPlan?: boolean }[]> = {
   user: [
     { to: "/nguoi-dung", label: "Tổng quan", icon: LayoutDashboard, end: true },
     { to: "/nguoi-dung/lo-trinh", label: "Bài học", icon: BookOpen },
     { to: "/nguoi-dung/mo-phong", label: "Mô phỏng", icon: ShieldAlert },
-    { to: "/nguoi-dung/bao-cao-ai", label: "Báo cáo AI", icon: BarChart3 },
+    { to: "/nguoi-dung/bao-cao-ai", label: "Báo cáo AI", icon: BarChart3, requiresPlan: true },
   ],
   manager: [
     { to: "/quan-ly", label: "Tổng quan", icon: LayoutDashboard, end: true },
     { to: "/quan-ly/tao-chien-dich", label: "Tạo chiến dịch", icon: PlusCircle },
+    { to: "/quan-ly/ai-sinh-kich-ban", label: "Sinh kịch bản AI", icon: Sparkles },
     { to: "/quan-ly/nhan-vien", label: "Nhân viên", icon: Users },
     { to: "/quan-ly/leaderboard", label: "Leaderboard", icon: Trophy },
     { to: "/quan-ly/bao-cao", label: "Báo cáo & AI", icon: BarChart3 },
@@ -40,9 +42,10 @@ const navByRole: Record<Role, { to: string; label: string; icon: React.ElementTy
     { to: "/quan-tri/bai-hoc", label: "Quản lý bài học", icon: BookOpen },
     { to: "/quan-tri/kich-ban", label: "Thư viện kịch bản", icon: Library },
     { to: "/quan-tri/goi-dich-vu", label: "Quản lý gói dịch vụ", icon: Package },
-    { to: "/quan-tri/ai-controller", label: "Bộ điều khiển AI", icon: Sliders },
+    { to: "/quan-tri/ai-controller", label: "Bộ điều khiển AI", icon: Sparkles },
     { to: "/quan-tri/quan-ly", label: "Quản lý người dùng", icon: LayoutGrid },
-    { to: "/quan-tri/bao-cao-ai", label: "Báo cáo AI Tổ chức", icon: BarChart3 },
+    { to: "/quan-tri/bao-cao-ai", label: "Báo cáo AI Hệ thống", icon: BarChart3 },
+    { to: "/quan-tri/thanh-tuu", label: "Quản lý Thành tựu", icon: Trophy },
   ],
 };
 
@@ -63,11 +66,19 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
   const [userProfile, setUserProfile] = useState<{ fullName: string; email: string; role?: { roleName: string } } | null>(null);
   const [showBaseline, setShowBaseline] = useState(false);
   const [streak, setStreak] = useState<number>(0);
+  const [hasPlan, setHasPlan] = useState<boolean>(true);
 
   useEffect(() => {
     if (role === "user" && !localStorage.getItem("baselineCompleted")) {
       setShowBaseline(true);
     }
+  }, [role]);
+
+  useEffect(() => {
+    if (role !== "user") return;
+    (lessonService as any).getMyLessons()
+      .then((ls: any[]) => setHasPlan(!ls?.some((l: any) => l.isLocked)))
+      .catch(() => setHasPlan(true));
   }, [role]);
 
   useEffect(() => {
@@ -210,8 +221,25 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
               Menu chính
             </p>
           )}
-          {navItems.map(({ to, label, icon: Icon, badge, end, comingSoon }) =>
-            comingSoon ? (
+          {navItems.map(({ to, label, icon: Icon, badge, end, comingSoon, requiresPlan }) =>
+            requiresPlan && !hasPlan ? (
+              <div
+                key={label}
+                title={collapsed ? label : undefined}
+                className={`flex items-center rounded-xl cursor-pointer transition-all
+                  ${collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2.5"}`}
+                style={{ opacity: 0.45 }}
+                onClick={() => { navigate("/nguoi-dung/mua-goi"); setSidebarOpen(false); }}
+              >
+                <Icon size={18} className="text-indigo-300 shrink-0" />
+                {!collapsed && (
+                  <>
+                    <span style={{ fontSize: "0.9rem" }} className="text-indigo-200">{label}</span>
+                    <Lock size={11} className="ml-auto text-indigo-400 shrink-0" />
+                  </>
+                )}
+              </div>
+            ) : comingSoon ? (
               <div
                 key={label}
                 title={label}

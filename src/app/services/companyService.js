@@ -22,6 +22,17 @@ export const companyService = {
     }
   },
 
+  /** Cập nhật tên công ty (dùng ngay sau khi mua gói, trước khi refresh token) */
+  updateCompanyName: async (companyName) => {
+    try {
+      const response = await axiosInstance.put("/Company/update-name", { companyName });
+      if (response && response.isSuccess) return response.result;
+      throw new Error(response?.errorMessage || "Không thể cập nhật tên công ty");
+    } catch (error) {
+      throw error;
+    }
+  },
+
   /** Nhân viên xác nhận lời mời bằng token trong email */
   acceptInvitation: async (token) => {
     try {

@@ -10,6 +10,7 @@ import { scenarioService }  from "../../services/scenarioService";
 import { lessonService }    from "../../services/lessonService";
 import { userService }      from "../../services/userService";
 import { AnimatePresence, motion } from "motion/react";
+import { Sparkles } from "lucide-react";
 
 /* ── Types ─────────────────────────────────────────────── */
 type Scenario = {
@@ -529,6 +530,23 @@ export function AdminTaoCampaign() {
             </button>
           }
         >
+          {/* AI banner */}
+          <div
+            className="flex items-center gap-3 rounded-xl px-4 py-3 mb-3 cursor-pointer transition-all hover:opacity-90"
+            style={{ background: "linear-gradient(135deg,#F5F3FF,#EEF2FF)", border: "1px solid rgba(139,92,246,0.2)" }}
+            onClick={() => navigate("/quan-tri/ai-controller?tab=sinh")}
+          >
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg,#8B5CF6,#6366F1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Sparkles size={16} style={{ color: "#fff" }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p style={{ fontWeight: 700, fontSize: "0.82rem", color: "#4C1D95" }}>Muốn tạo kịch bản bằng AI?</p>
+              <p style={{ fontSize: "0.72rem", color: "#7C3AED", lineHeight: 1.4, marginTop: 1 }}>
+                OpenRouter AI có thể sinh email phishing từ mô tả ngữ cảnh — nhanh hơn và đa dạng hơn
+              </p>
+            </div>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#6366F1", whiteSpace: "nowrap", flexShrink: 0 }}>Thử ngay →</span>
+          </div>
           {/* Filters */}
           <div className="space-y-2 mb-3">
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>

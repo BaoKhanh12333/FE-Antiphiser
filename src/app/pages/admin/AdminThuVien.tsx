@@ -8,7 +8,6 @@ import {
   Loader2,
   ShieldAlert,
   ShieldCheck,
-  Zap,
   RefreshCw,
   Mail,
   AlertCircle,
@@ -788,8 +787,8 @@ function DeleteModal({
   );
 }
 
-/* ── ScenarioCard ─────────────────────────────────────── */
-function ScenarioCard({
+/* ── ScenarioRow ──────────────────────────────────────── */
+function ScenarioRow({
   scenario,
   onEdit,
   onDelete,
@@ -798,229 +797,99 @@ function ScenarioCard({
   onEdit: (s: Scenario) => void;
   onDelete: (s: Scenario) => void;
 }) {
-  const [hovered, setHovered] = useState(false);
   const isP = scenario.isPhishing;
 
   return (
-    <div
-      className="rounded-3xl overflow-hidden transition-all duration-300"
-      style={{
-        background: "#fff",
-        border: "1px solid rgba(0,0,0,0.05)",
-        boxShadow: hovered
-          ? "0 16px 48px rgba(99,102,241,0.14), 0 4px 16px rgba(0,0,0,0.05)"
-          : "0 1px 4px rgba(0,0,0,0.03), 0 4px 20px rgba(0,0,0,0.05)",
-        transform: hovered ? "translateY(-4px)" : "none",
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <tr
+      className="group transition-colors hover:bg-indigo-50/40"
+      style={{ borderBottom: "1px solid #F1F5F9" }}
     >
-      {/* Accent gradient bar */}
-      <div
-        style={{
-          height: 4,
-          background: isP
-            ? "linear-gradient(90deg,#EF4444,#F87171,#FCA5A5)"
-            : "linear-gradient(90deg,#10B981,#34D399,#6EE7B7)",
-        }}
-      />
-
-      {/* Visual header */}
-      <div
-        className="relative flex items-center justify-center"
-        style={{
-          height: 100,
-          background: isP
-            ? "linear-gradient(135deg,rgba(239,68,68,0.05),rgba(248,113,113,0.08))"
-            : "linear-gradient(135deg,rgba(16,185,129,0.05),rgba(52,211,153,0.08))",
-        }}
-      >
-        {/* Decorative rings */}
+      {/* Type icon */}
+      <td className="px-4 py-3 w-10 shrink-0">
         <div
-          className="absolute"
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: "50%",
-            border: `1px solid ${isP ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.12)"}`,
-          }}
-        />
-        <div
-          className="absolute"
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: "50%",
-            border: `1px solid ${isP ? "rgba(239,68,68,0.18)" : "rgba(16,185,129,0.18)"}`,
-          }}
-        />
-
-        {/* Icon */}
-        <div
-          className="relative z-10 w-12 h-12 rounded-2xl flex items-center justify-center"
-          style={{
-            background: isP ? "#FEF2F2" : "#ECFDF5",
-            boxShadow: `0 4px 16px ${isP ? "rgba(239,68,68,0.18)" : "rgba(16,185,129,0.18)"}`,
-          }}
+          className="w-8 h-8 rounded-xl flex items-center justify-center"
+          style={{ background: isP ? "#FEF2F2" : "#ECFDF5" }}
         >
-          {isP ? (
-            <ShieldAlert size={22} className="text-red-500" />
-          ) : (
-            <ShieldCheck size={22} className="text-emerald-500" />
-          )}
+          {isP
+            ? <ShieldAlert size={15} className="text-red-500" />
+            : <ShieldCheck size={15} className="text-emerald-500" />}
         </div>
+      </td>
 
-        {/* Hover action overlay */}
-        <div
-          className="absolute inset-0 flex items-center justify-center gap-2 px-3 transition-all duration-200"
-          style={{
-            background: "rgba(15,23,42,0.6)",
-            backdropFilter: "blur(6px)",
-            opacity: hovered ? 1 : 0,
-            pointerEvents: hovered ? "auto" : "none",
-          }}
+      {/* Title + subject */}
+      <td className="px-2 py-3 min-w-0">
+        <p
+          style={{ fontWeight: 700, fontSize: "0.875rem", color: "#0F172A", lineHeight: 1.3 }}
+          className="truncate max-w-xs"
+          title={scenario.title}
         >
-          <button
-            onClick={() => onEdit(scenario)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold text-white transition hover:scale-105"
-            style={{
-              fontSize: "0.78rem",
-              background: "rgba(99,102,241,0.9)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.15)",
-            }}
-          >
-            <Pencil size={12} /> Chỉnh sửa
-          </button>
-          <button
-            onClick={() => onDelete(scenario)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold text-white transition hover:scale-105"
-            style={{
-              fontSize: "0.78rem",
-              background: "rgba(239,68,68,0.85)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.15)",
-            }}
-          >
-            <Trash2 size={12} /> Xóa
-          </button>
-          <button
-            disabled
-            title="Tính năng đang phát triển"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold"
-            style={{
-              fontSize: "0.78rem",
-              background: "rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.4)",
-              cursor: "not-allowed",
-              border: "1px solid rgba(255,255,255,0.1)",
-            }}
-          >
-            <Zap size={12} /> Dùng ngay
-          </button>
+          {scenario.title}
+        </p>
+        <div className="flex items-center gap-1 mt-0.5">
+          <Mail size={10} className="text-indigo-300 shrink-0" />
+          <p className="text-slate-400 truncate max-w-xs" style={{ fontSize: "0.72rem", fontStyle: "italic" }}>
+            {scenario.subject}
+          </p>
         </div>
-      </div>
+      </td>
 
-      {/* Card body */}
-      <div className="p-5">
-        {/* Badges */}
-        <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+      {/* Badges */}
+      <td className="px-2 py-3 whitespace-nowrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <span
-            className="px-2.5 py-1 rounded-lg"
-            style={{
-              fontSize: "0.72rem",
-              fontWeight: 700,
-              color: isP ? "#DC2626" : "#059669",
-              background: isP ? "#FEF2F2" : "#ECFDF5",
-            }}
+            className="px-2 py-0.5 rounded-md"
+            style={{ fontSize: "0.68rem", fontWeight: 700, color: isP ? "#DC2626" : "#059669", background: isP ? "#FEF2F2" : "#ECFDF5" }}
           >
             {isP ? "Phishing" : "An toàn"}
           </span>
           {scenario.categoryName && (
-            <span
-              className="px-2.5 py-1 rounded-lg"
-              style={{ fontSize: "0.72rem", fontWeight: 600, color: "#6366F1", background: "#EEF2FF" }}
-            >
+            <span className="px-2 py-0.5 rounded-md" style={{ fontSize: "0.68rem", fontWeight: 600, color: "#6366F1", background: "#EEF2FF" }}>
               {scenario.categoryName}
             </span>
           )}
           {scenario.difficultyName && (
-            <span
-              className="px-2.5 py-1 rounded-lg"
-              style={{ fontSize: "0.72rem", fontWeight: 500, color: "#64748B", background: "#F1F5F9" }}
-            >
+            <span className="px-2 py-0.5 rounded-md" style={{ fontSize: "0.68rem", fontWeight: 500, color: "#64748B", background: "#F1F5F9" }}>
               {scenario.difficultyName}
             </span>
           )}
         </div>
+      </td>
 
-        {/* Title */}
-        <h3
-          className="text-slate-800 mb-1.5 leading-snug"
-          style={{
-            fontFamily: "'Inter',sans-serif",
-            fontWeight: 700,
-            fontSize: "0.97rem",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
+      {/* Status */}
+      <td className="px-2 py-3 whitespace-nowrap">
+        <span
+          className="px-2 py-0.5 rounded-md"
+          style={{ fontSize: "0.68rem", fontWeight: 600, color: scenario.isActive ? "#059669" : "#94A3B8", background: scenario.isActive ? "#ECFDF5" : "#F8FAFC" }}
         >
-          {scenario.title}
-        </h3>
+          {scenario.isActive ? "● Hoạt động" : "○ Ẩn"}
+        </span>
+      </td>
 
-        {/* Description */}
-        <p
-          className="text-slate-400 mb-3"
-          style={{
-            fontSize: "0.82rem",
-            lineHeight: 1.7,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {scenario.description}
-        </p>
+      {/* Date */}
+      <td className="px-2 py-3 whitespace-nowrap" style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
+        {formatDate(scenario.createdAt)}
+      </td>
 
-        {/* Subject preview */}
-        <div
-          className="flex items-center gap-1.5 rounded-lg px-3 py-2 mb-4"
-          style={{ background: "#F8FAFF", border: "1px solid rgba(99,102,241,0.08)" }}
-        >
-          <Mail size={12} className="text-indigo-300 shrink-0" />
-          <p
-            className="text-slate-500 truncate"
-            style={{ fontSize: "0.75rem", fontStyle: "italic" }}
+      {/* Actions */}
+      <td className="px-4 py-3 whitespace-nowrap">
+        <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => onEdit(scenario)}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-semibold transition-all hover:scale-105"
+            style={{ fontSize: "0.75rem", background: "#EEF2FF", color: "#4F46E5", border: "1px solid rgba(99,102,241,0.15)" }}
           >
-            {scenario.subject}
-          </p>
-        </div>
-
-        {/* Footer */}
-        <div
-          className="flex items-center justify-between pt-3"
-          style={{ borderTop: "1px solid #F1F5F9" }}
-        >
-          <span
-            className="px-2 py-0.5 rounded-md"
-            style={{
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              color: scenario.isActive ? "#059669" : "#94A3B8",
-              background: scenario.isActive ? "#ECFDF5" : "#F8FAFC",
-            }}
+            <Pencil size={11} /> Sửa
+          </button>
+          <button
+            onClick={() => onDelete(scenario)}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-semibold transition-all hover:scale-105"
+            style={{ fontSize: "0.75rem", background: "#FEF2F2", color: "#DC2626", border: "1px solid rgba(239,68,68,0.15)" }}
           >
-            {scenario.isActive ? "● Hoạt động" : "○ Ẩn"}
-          </span>
-          <span style={{ fontSize: "0.72rem", color: "#CBD5E1" }}>
-            {formatDate(scenario.createdAt)}
-          </span>
+            <Trash2 size={11} /> Xóa
+          </button>
         </div>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 }
 
@@ -1239,40 +1108,72 @@ export function AdminThuVien() {
         <>
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                style={{ background: "#F1F5F9" }}
-              >
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: "#F1F5F9" }}>
                 <Mail size={28} className="text-slate-300" />
               </div>
               <p style={{ fontWeight: 700, fontSize: "1rem", color: "#94A3B8", marginBottom: 6 }}>
-                {search || activeCategory !== "Tất cả"
-                  ? "Không tìm thấy kịch bản phù hợp"
-                  : "Chưa có kịch bản nào"}
+                {search || activeCategory !== "Tất cả" ? "Không tìm thấy kịch bản phù hợp" : "Chưa có kịch bản nào"}
               </p>
               <p style={{ fontSize: "0.85rem", color: "#CBD5E1" }}>
-                {search || activeCategory !== "Tất cả"
-                  ? "Thử tìm kiếm với từ khóa khác hoặc đổi bộ lọc."
-                  : "Bấm \"Thêm kịch bản\" để tạo kịch bản đầu tiên."}
+                {search || activeCategory !== "Tất cả" ? "Thử tìm kiếm với từ khóa khác hoặc đổi bộ lọc." : "Bấm \"Thêm kịch bản\" để tạo kịch bản đầu tiên."}
               </p>
             </div>
           ) : (
             <>
-              {/* Results count */}
               {(search || activeCategory !== "Tất cả") && (
-                <p style={{ fontSize: "0.82rem", color: "#94A3B8" }}>
+                <p style={{ fontSize: "0.82rem", color: "#94A3B8", marginBottom: 4 }}>
                   Hiển thị {filtered.length}/{scenarios.length} kịch bản
                 </p>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filtered.map((sc) => (
-                  <ScenarioCard
-                    key={sc.scenarioId}
-                    scenario={sc}
-                    onEdit={setEditTarget}
-                    onDelete={setDeleteTarget}
-                  />
-                ))}
+              {/* Table */}
+              <div
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  border: "1px solid rgba(99,102,241,0.08)",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+                  overflow: "hidden",
+                }}
+              >
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: "#FAFAFA", borderBottom: "1px solid #F1F5F9" }}>
+                      {["", "Tiêu đề / Subject", "Loại & Phân loại", "Trạng thái", "Ngày tạo", ""].map((h) => (
+                        <th
+                          key={h}
+                          style={{
+                            padding: "10px 16px",
+                            textAlign: "left",
+                            fontSize: "0.68rem",
+                            fontWeight: 700,
+                            color: "#94A3B8",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.06em",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((sc) => (
+                      <ScenarioRow
+                        key={sc.scenarioId}
+                        scenario={sc}
+                        onEdit={setEditTarget}
+                        onDelete={setDeleteTarget}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+                {/* Footer */}
+                <div style={{ padding: "8px 16px", borderTop: "1px solid #F1F5F9", background: "#FAFAFA" }}>
+                  <p style={{ fontSize: "0.72rem", color: "#94A3B8" }}>
+                    {filtered.length} kịch bản · Hover vào dòng để hiện nút hành động
+                  </p>
+                </div>
               </div>
             </>
           )}

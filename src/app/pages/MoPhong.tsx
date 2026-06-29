@@ -12,6 +12,7 @@ import mascotPoint    from "../../data/mascot/point.png";
 import mascotSurprised from "../../data/mascot/surprised.png";
 import { campaignService } from "../services/campaignService";
 import { lessonService } from "../services/lessonService";
+import { subscriptionService } from "../services/subscriptionService";
 import { Lock } from "lucide-react";
 
 
@@ -777,21 +778,28 @@ const campaignCSS = `
   @keyframes cpProgressFill { from { width:0%; } }
   .cp-enter { animation: cpFadeUp 0.4s ease-out both; }
   .cp-bar   { animation: cpProgressFill 0.9s 0.4s ease-out both; }
-  .cp-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(99,102,241,0.14) !important; }
-  .cp-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .cp-card  { transition: transform 0.22s ease, box-shadow 0.22s ease; }
+  .cp-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.12) !important; }
+  .cp-btn   { transition: filter 0.15s ease, transform 0.15s ease; }
+  .cp-btn:hover { filter: brightness(1.08); transform: scale(1.04); }
+  @keyframes cpShimmer { 0%,100% { opacity:1; } 50% { opacity:0.45; } }
+  .cp-locked-badge { animation: cpShimmer 2.2s ease-in-out infinite; }
   @media (prefers-reduced-motion: reduce) {
-    .cp-enter, .cp-bar { animation: none !important; }
-    .cp-card:hover { transform: none !important; }
+    .cp-enter, .cp-bar, .cp-locked-badge { animation: none !important; }
+    .cp-card:hover, .cp-btn:hover { transform: none !important; }
   }
 `;
 
 // ─── Campaign Picker ──────────────────────────────────────────────────────────
 function CampaignPicker({
-  campaigns, loading, error, onPick, onGoLessons
+  campaigns, loading, error, onPick, onGoLessons, hasPlan, onGoShop
 }: {
   campaigns: any[]; loading: boolean; error: string | null;
   onPick: (id: number) => void; onGoLessons: () => void;
+  hasPlan: boolean; onGoShop: () => void;
 }) {
+  const [upgradeModal, setUpgradeModal] = useState<string | null>(null);
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[340px] gap-4">
       <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
@@ -834,6 +842,11 @@ function CampaignPicker({
     </div>
   );
 
+  const doneCount = campaigns.filter((c: any) => {
+    const t = c._totalEmails ?? 0;
+    return t > 0 && (c._completedEmails ?? 0) === t;
+  }).length;
+
   return (
     <div className="max-w-5xl mx-auto space-y-6" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{campaignCSS}</style>
@@ -848,12 +861,73 @@ function CampaignPicker({
             Rèn luyện phản xạ phát hiện email phishing trong môi trường thực tế
           </p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl shrink-0 self-start sm:self-auto"
-          style={{ background: "#EEF2FF", border: "1px solid rgba(99,102,241,0.15)" }}>
-          <Sparkles size={14} className="text-indigo-500" />
-          <span className="text-indigo-700 text-sm font-bold">{campaigns.length} chiến dịch</span>
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+            style={{ background: "#EEF2FF", border: "1px solid rgba(99,102,241,0.15)" }}>
+            <Sparkles size={14} className="text-indigo-500" />
+            <span className="text-indigo-700 text-sm font-bold">{campaigns.length} chiến dịch</span>
+          </div>
+          {doneCount > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+              style={{ background: "#ECFDF5", border: "1px solid rgba(16,185,129,0.2)" }}>
+              <CheckCircle2 size={14} className="text-emerald-500" />
+              <span className="text-emerald-700 text-sm font-bold">{doneCount} hoàn thành</span>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Upgrade modal */}
+      {upgradeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(6px)" }}
+          onClick={() => setUpgradeModal(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            style={{ background: "#fff", borderRadius: 24, padding: "36px 32px", maxWidth: 400, width: "100%", boxShadow: "0 24px 80px rgba(0,0,0,0.2)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
+              style={{ background: "linear-gradient(135deg,#F59E0B,#FBBF24)", boxShadow: "0 8px 24px rgba(245,158,11,0.35)" }}>
+              <Star size={32} className="text-white" />
+            </div>
+            <h2 style={{ fontWeight: 800, fontSize: "1.25rem", color: "#0F172A", textAlign: "center", marginBottom: 8 }}>
+              Chiến dịch Premium
+            </h2>
+            <p style={{ fontSize: "0.85rem", color: "#64748B", textAlign: "center", marginBottom: 6, lineHeight: 1.6 }}>
+              <strong style={{ color: "#334155" }}>"{upgradeModal}"</strong> yêu cầu gói đăng ký.
+            </p>
+            <p style={{ fontSize: "0.82rem", color: "#94A3B8", textAlign: "center", marginBottom: 24, lineHeight: 1.6 }}>
+              Nâng cấp để truy cập toàn bộ chiến dịch và rèn luyện không giới hạn.
+            </p>
+            <div className="space-y-2.5 mb-6">
+              {["Truy cập toàn bộ chiến dịch mô phỏng", "Phân tích AI cá nhân hóa", "Chứng chỉ hoàn thành khóa học"].map(b => (
+                <div key={b} className="flex items-center gap-2.5">
+                  <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
+                  <span style={{ fontSize: "0.83rem", color: "#475569" }}>{b}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => { setUpgradeModal(null); onGoShop(); }}
+              className="w-full py-3 rounded-2xl text-white font-bold text-sm mb-3 transition-all hover:scale-[1.02]"
+              style={{ background: "linear-gradient(135deg,#6366F1,#4F46E5)", boxShadow: "0 4px 16px rgba(99,102,241,0.35)" }}
+            >
+              <Sparkles size={14} className="inline mr-1.5 -mt-0.5" />
+              Xem các gói dịch vụ
+            </button>
+            <button
+              onClick={() => setUpgradeModal(null)}
+              className="w-full py-2 text-slate-400 text-sm font-medium hover:text-slate-600 transition-colors"
+            >
+              Để sau
+            </button>
+          </motion.div>
+        </div>
+      )}
 
       {/* Cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -863,55 +937,43 @@ function CampaignPicker({
           const pct = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
           const isDone = completed === total && total > 0;
           const isInProgress = completed > 0 && !isDone;
-          const isLocked = c._eligible === false;
+          const isFreeCard = c.campaignName?.toLowerCase().includes("nhận diện phishing cơ bản");
+          const isSubscriptionLocked = !hasPlan && !isFreeCard;
+          const isLocked = !isSubscriptionLocked && c._eligible === false;
 
-          // Status
-          const status = isDone
-            ? { text: "Hoàn thành", bg: "#ECFDF5", color: "#059669" }
-            : isInProgress
-            ? { text: "Đang làm", bg: "#EEF2FF", color: "#4F46E5" }
-            : { text: "Chưa bắt đầu", bg: "#F8FAFC", color: "#64748B" };
-
-          // Difficulty
-          const diff = c._difficulty === "Dễ"
-            ? { bg: "#ECFDF5", color: "#059669" }
+          // Difficulty visual config
+          const diffConfig = c._difficulty === "Dễ"
+            ? { headerGrad: "linear-gradient(135deg,#059669,#10B981)", barColor: "linear-gradient(90deg,#10B981,#34D399)" }
             : c._difficulty === "Trung bình"
-            ? { bg: "#FFFBEB", color: "#D97706" }
+            ? { headerGrad: "linear-gradient(135deg,#D97706,#F59E0B)", barColor: "linear-gradient(90deg,#F59E0B,#FCD34D)" }
             : c._difficulty === "Khó"
-            ? { bg: "#FEF2F2", color: "#EF4444" }
-            : { bg: "#F1F5F9", color: "#64748B" };
+            ? { headerGrad: "linear-gradient(135deg,#DC2626,#EF4444)", barColor: "linear-gradient(90deg,#EF4444,#F87171)" }
+            : { headerGrad: "linear-gradient(135deg,#4338CA,#6366F1)", barColor: "linear-gradient(90deg,#6366F1,#818CF8)" };
 
           return (
             <div
               key={c.campaignId}
-              onClick={() => { if (!isLocked) onPick(c.campaignId); }}
+              onClick={() => {
+                if (isSubscriptionLocked) { setUpgradeModal(c.campaignName); return; }
+                if (!isLocked) onPick(c.campaignId);
+              }}
               className={`cp-enter cp-card flex flex-col rounded-2xl overflow-hidden relative ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}
               style={{
                 animationDelay: `${idx * 60}ms`,
                 border: isDone
-                  ? "1.5px solid rgba(16,185,129,0.25)"
+                  ? "1.5px solid rgba(16,185,129,0.3)"
                   : isInProgress
-                  ? "1.5px solid rgba(99,102,241,0.2)"
+                  ? "1.5px solid rgba(99,102,241,0.22)"
                   : "1px solid #E2E8F0",
-                background: "white",
+                background: isDone ? "#F8FFFE" : "white",
                 boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-                opacity: isLocked ? 0.85 : 1,
+                opacity: isSubscriptionLocked ? 0.78 : isLocked ? 0.85 : 1,
               }}
             >
-              {/* Top gradient strip */}
-              <div style={{
-                height: 4,
-                background: isDone
-                  ? "linear-gradient(90deg,#10B981,#34D399)"
-                  : isInProgress
-                  ? "linear-gradient(90deg,#6366F1,#818CF8)"
-                  : "#F1F5F9",
-              }} />
-
               {/* Locked overlay */}
               {isLocked && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl"
-                  style={{ background: "rgba(248,250,252,0.88)", backdropFilter: "blur(3px)" }}>
+                  style={{ background: "rgba(248,250,252,0.9)", backdropFilter: "blur(3px)" }}>
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
                     style={{ background: "linear-gradient(135deg,#FEF3C7,#FDE68A)", boxShadow: "0 4px 16px rgba(245,158,11,0.25)" }}>
                     <Lock size={20} className="text-amber-500" />
@@ -930,79 +992,118 @@ function CampaignPicker({
                 </div>
               )}
 
-              <div className="flex flex-col flex-1 p-5 space-y-4">
-                {/* Top row */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
-                    style={{
-                      background: isDone
-                        ? "linear-gradient(135deg,#ECFDF5,#D1FAE5)"
-                        : "linear-gradient(135deg,#EEF2FF,#E0E7FF)",
-                      boxShadow: isDone
-                        ? "0 4px 12px rgba(16,185,129,0.2)"
-                        : "0 4px 12px rgba(99,102,241,0.15)",
-                    }}>
-                    <Shield size={21} style={{ color: isDone ? "#10B981" : "#6366F1" }} />
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 justify-end">
-                    {c._difficulty && (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
-                        style={{ background: diff.bg, color: diff.color }}>
-                        {c._difficulty}
+              {/* Gradient header */}
+              <div style={{
+                background: isSubscriptionLocked
+                  ? "linear-gradient(135deg,#94A3B8,#CBD5E1)"
+                  : isDone ? "linear-gradient(135deg,#059669,#10B981)" : diffConfig.headerGrad,
+                padding: "18px 20px 16px",
+                position: "relative",
+                overflow: "hidden",
+              }}>
+                <div style={{ position:"absolute", right:-24, top:-24, width:90, height:90, borderRadius:"50%", background:"rgba(255,255,255,0.08)", pointerEvents:"none" }} />
+                <div style={{ position:"absolute", left:-16, bottom:-20, width:60, height:60, borderRadius:"50%", background:"rgba(255,255,255,0.06)", pointerEvents:"none" }} />
+
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    {!isSubscriptionLocked && c._difficulty && (
+                      <span style={{
+                        background: "rgba(255,255,255,0.25)", color: "#fff",
+                        fontSize: "0.68rem", fontWeight: 700,
+                        padding: "2px 9px", borderRadius: 99,
+                        backdropFilter: "blur(4px)",
+                      }}>{c._difficulty}</span>
+                    )}
+                    {!isSubscriptionLocked && total > 0 && (
+                      <span style={{
+                        background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.88)",
+                        fontSize: "0.65rem", fontWeight: 600,
+                        padding: "2px 8px", borderRadius: 99,
+                      }}>📧 {total} email</span>
+                    )}
+                    {isSubscriptionLocked && (
+                      <span className="cp-locked-badge flex items-center gap-1" style={{
+                        background: "rgba(255,255,255,0.22)", color: "rgba(255,255,255,0.9)",
+                        fontSize: "0.68rem", fontWeight: 700,
+                        padding: "2px 9px", borderRadius: 99,
+                      }}>
+                        <Lock size={9} /> Khoá
                       </span>
                     )}
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
-                      style={{ background: status.bg, color: status.color }}>
-                      {status.text}
-                    </span>
                   </div>
+                  {!isSubscriptionLocked && isDone ? (
+                    <CheckCircle2 size={16} color="rgba(255,255,255,0.9)" />
+                  ) : !isSubscriptionLocked && isInProgress ? (
+                    <span style={{ fontSize:"0.65rem", color:"rgba(255,255,255,0.85)", fontWeight:700, background:"rgba(255,255,255,0.18)", padding:"2px 8px", borderRadius:99 }}>Đang làm</span>
+                  ) : null}
                 </div>
 
-                {/* Title + description */}
-                <div>
-                  <h3 className="font-extrabold leading-snug line-clamp-1 transition-colors"
-                    style={{ fontSize: "0.92rem", color: isLocked ? "#94A3B8" : "#0F172A" }}>
+                <div className="flex items-start justify-between gap-3">
+                  <h3 style={{
+                    color: isSubscriptionLocked ? "rgba(255,255,255,0.75)" : "#fff",
+                    fontWeight:800, fontSize:"1rem", lineHeight:1.3, flex:1, letterSpacing:"-0.01em"
+                  }} className="line-clamp-2">
                     {c.campaignName}
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1.5 line-clamp-2 leading-relaxed"
-                    style={{ minHeight: "2.5rem" }}>
-                    {c.description || "Thực hành nhận biết hành vi lừa đảo với các tình huống email giả lập thực tế."}
-                  </p>
+                  <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:12, padding:10, backdropFilter:"blur(4px)", flexShrink:0 }}>
+                    {isSubscriptionLocked
+                      ? <Lock size={22} color="rgba(255,255,255,0.75)" />
+                      : isDone ? <CheckCircle2 size={22} color="#fff" /> : <Shield size={22} color="#fff" />}
+                  </div>
+                </div>
+              </div>
+
+              {/* Card body */}
+              <div className="flex flex-col flex-1 p-5 gap-4">
+                <p className="text-xs leading-relaxed line-clamp-2" style={{ minHeight:"2.4rem", color: isSubscriptionLocked ? "#CBD5E1" : "#94A3B8" }}>
+                  {isSubscriptionLocked
+                    ? "Nâng cấp gói để mở khoá chiến dịch này."
+                    : (c.description || "Thực hành nhận biết hành vi lừa đảo với các tình huống email giả lập thực tế.")}
+                </p>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium" style={{ color: isSubscriptionLocked ? "#E2E8F0" : "#94A3B8" }}>Tiến độ</span>
+                    {!isSubscriptionLocked && (
+                      <span className="font-bold" style={{ color: isDone ? "#059669" : "#334155" }}>
+                        {completed}/{total} · {pct}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="h-3.5 rounded-full overflow-hidden" style={{ background:"#F1F5F9" }}>
+                    {!isSubscriptionLocked && (
+                      <div className="h-full rounded-full cp-bar"
+                        style={{ width:`${pct}%`, background: isDone ? "linear-gradient(90deg,#10B981,#34D399)" : diffConfig.barColor }} />
+                    )}
+                  </div>
                 </div>
 
-                {/* Progress */}
-                <div className="space-y-2 pt-1 border-t border-slate-50 mt-auto">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-medium">Tiến độ</span>
-                    <span className="font-bold" style={{ color: isDone ? "#059669" : "#334155" }}>
-                      {completed}/{total} email · {pct}%
-                    </span>
-                  </div>
-                  <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F1F5F9" }}>
-                    <div
-                      className="h-full rounded-full cp-bar"
+                <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                  <span className="text-[10.5px]" style={{ color: isSubscriptionLocked ? "#CBD5E1" : "#94A3B8" }}>
+                    {isSubscriptionLocked ? "Yêu cầu gói đăng ký" : c.endDate ? `Hạn: ${new Date(c.endDate).toLocaleDateString("vi-VN")}` : "Không giới hạn"}
+                  </span>
+                  {isSubscriptionLocked ? (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setUpgradeModal(c.campaignName); }}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-xs font-bold shrink-0 cp-btn"
+                      style={{ background: "linear-gradient(135deg,#6366F1,#4F46E5)", boxShadow: "0 2px 10px rgba(99,102,241,0.3)" }}
+                    >
+                      <Lock size={11} /> Mua gói
+                    </button>
+                  ) : !isLocked && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onPick(c.campaignId); }}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-xs font-bold shrink-0 cp-btn"
                       style={{
-                        width: `${pct}%`,
-                        background: isDone
-                          ? "linear-gradient(90deg,#10B981,#34D399)"
-                          : "linear-gradient(90deg,#6366F1,#818CF8)",
+                        background: isDone ? "linear-gradient(135deg,#059669,#10B981)" : diffConfig.headerGrad,
+                        boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
                       }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400">
-                      {c.endDate
-                        ? `Hạn: ${new Date(c.endDate).toLocaleDateString("vi-VN")}`
-                        : "Không giới hạn"}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs font-bold transition-transform group-hover:translate-x-0.5"
-                      style={{ color: isLocked ? "#CBD5E1" : isDone ? "#059669" : "#6366F1" }}>
-                      {isLocked ? <><Lock size={11} /> Khoá</>
-                        : isDone ? <><CheckCircle2 size={11} /> Chơi lại</>
-                        : isInProgress ? <>Tiếp tục <ChevronRight size={13} /></>
-                        : <>Bắt đầu <ChevronRight size={13} /></>}
-                    </span>
-                  </div>
+                    >
+                      {isDone ? <><RefreshCw size={11} /> Chơi lại</>
+                        : isInProgress ? <>Tiếp tục <ChevronRight size={12} /></>
+                        : <>Bắt đầu <ChevronRight size={12} /></>}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1187,6 +1288,7 @@ export function MoPhong() {
   const [loadingMyCampaigns, setLoadingMyCampaigns] = useState(!incomingCampaignId);
   const [myCampaignsError,   setMyCampaignsError]   = useState<string | null>(null);
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(incomingCampaignId);
+  const [hasPlan,            setHasPlan]            = useState<boolean>(true);
 
   // ── Trạng thái campaign đang chạy ──
   const [activeCampaign, setActiveCampaign]   = useState<any>(null);
@@ -1209,6 +1311,13 @@ export function MoPhong() {
   const [userRedFlagNotes,    setUserRedFlagNotes]    = useState("");
   const [userTacticNotes,     setUserTacticNotes]     = useState("");
   const [userAttackNotes,     setUserAttackNotes]     = useState("");
+
+  // Dùng lesson lock status (server-computed) làm indicator free tier — cùng nguồn với LoTrinh
+  useEffect(() => {
+    lessonService.getMyLessons()
+      .then((ls: any[]) => setHasPlan(!ls?.some((l: any) => l.isLocked)))
+      .catch(() => setHasPlan(true));
+  }, []);
 
   // Bước 1: Nếu không có campaignId → fetch my-campaigns để hiện picker
   // Phần D: lọc ẩn campaign tên chứa "Test"/"Verify" (chỉ FE, không xóa DB)
@@ -1306,6 +1415,8 @@ export function MoPhong() {
         error={myCampaignsError}
         onPick={(id) => { setLoadingCampaign(true); setSelectedCampaignId(id); }} // F1b: loading trước khi re-render
         onGoLessons={() => navigate("/nguoi-dung/lo-trinh")}
+        hasPlan={hasPlan}
+        onGoShop={() => navigate("/nguoi-dung/mua-goi")}
       />
     );
   }
