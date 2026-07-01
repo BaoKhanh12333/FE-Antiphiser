@@ -31,6 +31,7 @@ export function QRPaymentModal({ open, onOpenChange, order, onPaid, onCancelled 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [qrLoadFailed, setQrLoadFailed] = useState(false);
 
   const clearTimers = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
@@ -42,6 +43,8 @@ export function QRPaymentModal({ open, onOpenChange, order, onPaid, onCancelled 
       clearTimers();
       return;
     }
+
+    setQrLoadFailed(false);
 
     intervalRef.current = setInterval(async () => {
       try {
@@ -105,14 +108,26 @@ export function QRPaymentModal({ open, onOpenChange, order, onPaid, onCancelled 
             className="rounded-2xl overflow-hidden border-2 p-2"
             style={{ borderColor: "#E0E7FF", background: "#fff" }}
           >
-            <img
-              src={order.qrUrl}
-              alt="QR thanh toán"
-              width={256}
-              height={256}
-              className="block"
-              style={{ imageRendering: "pixelated" }}
-            />
+            {!qrLoadFailed ? (
+              <img
+                src={order.qrUrl}
+                alt="QR thanh toán"
+                width={256}
+                height={256}
+                className="block"
+                style={{ imageRendering: "pixelated" }}
+                onError={() => setQrLoadFailed(true)}
+              />
+            ) : (
+              <div
+                className="w-64 h-64 flex items-center justify-center text-center px-4"
+                style={{ color: "#B91C1C", background: "#FEF2F2" }}
+              >
+                <p className="text-xs font-semibold leading-relaxed">
+                  Không tải được ảnh QR. Vui lòng thử tạo lại đơn hoặc liên hệ quản trị để kiểm tra cấu hình thanh toán.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Amount */}
